@@ -1,0 +1,27 @@
+{% load static %}
+<html>
+    <head>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <!--<link rel="stylesheet" href="{% static 'roomsurvey/style.css' %}">-->
+    </head>
+    
+    <body class="bg-light">
+        <div class="container">
+            
+            <div class="py-5 text-center">
+                <h2>Select Room</h2>
+            </div>
+            
+            <div>
+                <p>{{ staircase }}</p>
+            </div>
+            
+            <form action="/roomsurvey/staircase/{{staircase.staircase_id}}/selectroom" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <br><input type="submit" value="Submit" />
+            </form>
+        </div>
+    </body>
+</html>

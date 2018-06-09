@@ -28,11 +28,19 @@ class Room(models.Model):
         (5, 'Band 5'),
         (6, 'Band 6')
     )
+
+    FLOOR_CHOICES = (
+        (1, 'Ground'),
+        (2, 'First'),
+        (3, 'Second')
+    )
     
     room_id = models.CharField('Room ID', max_length=10, primary_key=True)
     room_number = models.IntegerField()
+    floor = models.IntegerField(choices=FLOOR_CHOICES)
     is_ensuite = models.BooleanField('Has Ensuite?')
     is_double_bed = models.BooleanField('Has Double Bed?')
+    has_disabled_facilities = models.BooleanField('Has Disabled Facilities?')
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.CASCADE)
     band = models.IntegerField(choices=BAND_CHOICES)
