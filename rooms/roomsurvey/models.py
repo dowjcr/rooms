@@ -6,7 +6,7 @@ Defines database models to be used in this simple survey
 application, to get room metadata.
 """
 
-## Model to represent a staircase, currently only with a name attribute.
+# Model to represent a staircase, currently only with a name attribute.
 
 class Staircase(models.Model):
     staircase_id = models.AutoField(primary_key=True)
@@ -16,8 +16,7 @@ class Staircase(models.Model):
         return self.name
 
 
-## Model to represent a room, with various attributes. Note that
-## size is stored as an Integer, to be divided by 100.
+# Model to represent a room, with various attributes.
 
 class Room(models.Model):
     BAND_CHOICES = (
@@ -49,24 +48,22 @@ class Room(models.Model):
         return self.staircase.__str__() + ", Room " + str(self.room_number)
 
 
-## Model to represent a room review, written by a student.
+# Model to represent a room review, written by a student.
 
 class Review(models.Model):
-    review_id = models.AutoField(primary_key=True)
     author = models.CharField(max_length=30)
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     text = models.CharField(max_length=1000)
 
     def __str__(self):
         return self.review_id
 
 
-## Model to represent a survey response.
+# Model to represent a survey response.
 
 class SurveyResponse(models.Model):
-    response_id = models.AutoField(primary_key=True)
     author = models.CharField(max_length=30)
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
     overpriced = models.BooleanField()
     important_factors = models.CharField(max_length=200)

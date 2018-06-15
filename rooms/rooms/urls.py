@@ -19,5 +19,6 @@ from django.urls import include, path
 app_name = 'roomsurvey'
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('roomsurvey/', include('roomsurvey.urls'))
+    path('roomsurvey/', include('roomsurvey.urls')),
+    path(r'', include('ucamwebauth.urls'))
 ]
