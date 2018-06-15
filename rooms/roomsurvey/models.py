@@ -56,7 +56,7 @@ class Review(models.Model):
     text = models.CharField(max_length=1000)
 
     def __str__(self):
-        return self.review_id
+        return str(self.id)
 
 
 # Model to represent a survey response.
@@ -69,4 +69,4 @@ class SurveyResponse(models.Model):
     important_factors = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.response_id
+        return str(self.room)

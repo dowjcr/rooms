@@ -22,6 +22,8 @@ class RoomDetailView(generic.DetailView):
 # Selector for staircase.
 
 def get_staircase(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login')
     if request.method == 'POST':
         form = StaircaseSelector(request.POST)
         if form.is_valid():
@@ -35,14 +37,16 @@ def get_staircase(request):
 # Selector for room, reactive to previous staircase selection.
 
 def get_room(request, staircase_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('../../../accounts/login')
     staircase = get_object_or_404(Staircase, pk=staircase_id)
     if request.method == 'POST':
-        form = RoomSelector(request.POST, staircase=s)
+        form = RoomSelector(request.POST, staircase=staircase)
         if form.is_valid():
             room_id = request.POST.get('room')
             return HttpResponseRedirect('../../../roomsurvey/room_details/' + str(room_id))
     else:
-        form = RoomSelector(staircase=s)
+        form = RoomSelector(staircase=staircase)
     return render(request, 'roomsurvey/get-room.html', {
         'form' : form,
         'staircase' : staircase,
@@ -53,6 +57,8 @@ def get_room(request, staircase_id):
 # Form to respond to survey.
 
 def get_survey(request, room_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('../../accounts/login')
     room = get_object_or_404(Room, pk=room_id)
     if request.method == 'POST':
         form = SurveyForm(request.POST)
@@ -80,7 +86,7 @@ def get_survey(request, room_id):
             response.save()
             
             # TODO: redirect to confirmation page.
-            return HttpResponseRedirect('#')
+            return HttpResponseRedirect('../confirmation')
     else:
         form = SurveyForm()
     return render(request, 'roomsurvey/survey.html', {
@@ -88,3 +94,9 @@ def get_survey(request, room_id):
         'room' : room,
         'username' : request.user.get_username()
     })
+
+
+# Confirmation page after completing survey.
+
+def get_confirmation(request):
+    return render(request, 'roomsurvey/confirmation.html')

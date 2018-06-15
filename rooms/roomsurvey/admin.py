@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import Room, Staircase, SurveyResponse
+from .models import Room, Staircase, SurveyResponse, Review
 
 admin.site.register(Room)
 admin.site.register(Staircase)
-admin.site.register(SurveyResponse)
+admin.site.register(Review)
