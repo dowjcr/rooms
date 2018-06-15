@@ -35,7 +35,7 @@ class Room(models.Model):
     )
     
     room_id = models.CharField('Room ID', max_length=10, primary_key=True)
-    room_number = models.IntegerField()
+    room_number = models.CharField(max_length=10)
     floor = models.IntegerField(choices=FLOOR_CHOICES)
     is_ensuite = models.BooleanField('Has Ensuite?')
     is_double_bed = models.BooleanField('Has Double Bed?')
