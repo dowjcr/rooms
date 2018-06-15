@@ -2,7 +2,7 @@
  * Downing College JCR Theme
  */
  body {
-    background-color: #5b3450;
+    background-color: #990066;
     background-image: url('../../images/background.png');
     background-repeat: repeat;
     background-position: top left;
@@ -248,7 +248,7 @@ li.mobile-dropdown-item.active>a:hover, li.mobile-dropdown-item.active>a:active,
 
 footer {
     padding: 30px 40px 50px 40px;
-    background-color: #800055;
+    background-color: #990066;
     color: #ffd4f1;
 }
 

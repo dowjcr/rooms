@@ -43,6 +43,7 @@ class Room(models.Model):
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.CASCADE)
     band = models.IntegerField(choices=BAND_CHOICES)
+    survey_completed = models.BooleanField()
 
     def __str__(self):
         return self.staircase.__str__() + ", Room " + str(self.room_number)

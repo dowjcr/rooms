@@ -11,7 +11,9 @@ respond to survey, et cetera.
 # Form to select staircase.
 
 class StaircaseSelector(forms.Form):
-    staircase = forms.ModelChoiceField(queryset=Staircase.objects.all())
+    staircase = forms.ModelChoiceField(
+        queryset=Staircase.objects.all(),
+        )
 
 
 # Form to select room, having selected staircase.

@@ -12,11 +12,18 @@ Defines views to be used in this simple survey
 application, to display various metadata.
 """
 
-# Generic view to show room details.
+# Shows room details.
 
-class RoomDetailView(generic.DetailView):
-    model = Room
-    template_name = 'roomsurvey/room.html'
+def show_room(request, room_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login')
+    room = get_object_or_404(Room, pk=room_id)
+    if room.survey_completed:
+        # TODO: create error page, saying survey already conducted for that room.
+        return HttpResponseRedirect('../..')
+    else:
+        return render(request, 'roomsurvey/room.html', { 'room' : room })
+
 
 
 # Selector for staircase.
@@ -84,6 +91,10 @@ def get_survey(request, room_id):
             response.overpriced = overpriced
             response.important_factors = important_factors
             response.save()
+
+            # Mark room as having been surveyed.
+            room.survey_completed = True
+            room.save()
             
             # TODO: redirect to confirmation page.
             return HttpResponseRedirect('../confirmation')

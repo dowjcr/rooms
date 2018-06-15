@@ -5,18 +5,33 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <!--<link rel="stylesheet" href="{% static 'roomsurvey/style.css' %}">-->
     </head>
+
+    <div align="center" style="padding-top: 30px; padding-bottom: 30px; background-color: #990066">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width=100>
+    </div>
     
     <body class="bg-light">
         <div class="container">
             
-            <div class="py-5 text-center">
-                <h2>Select Staircase</h2>
+            <div>
+                <h1 style="font-family: 'Lato', sans-serif;">1. Select Staircase</h1>
             </div>
             
-            <form action="/roomsurvey/home" method="post">
+            <form action="/roomsurvey/home" method="post" style="font-family: 'Lato', sans-serif; font-size: 16px">
                 {% csrf_token %}
-                {{ form }}
-                <br><input type="submit" value="Submit" />
+                <table border="0">
+                        {% for field in form.visible_fields %}
+                          <tr>
+                            <th style="padding-right: 20px">{{ field.label_tag }}</th>
+                            <td>
+                              {{ field.errors }}
+                              {{ field }}
+                              {{ field.help_text }}
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </table><br>
+                      <input class="btn btn-info" type="submit" value="Next" style="font-family: 'Lato', sans-serif;"/>
             </form>
         </div>
     </body>

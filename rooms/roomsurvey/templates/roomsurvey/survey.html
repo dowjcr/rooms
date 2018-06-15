@@ -6,74 +6,17 @@
         <!--<link rel="stylesheet" href="{% static 'roomsurvey/style.css' %}">-->
     </head>
     
+    <div align="center" style="padding-top: 30px; padding-bottom: 30px; background-color: #990066">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width=100>
+    </div>
+    
     <body class="bg-light">
         <div class="container">
             
-            <div class="py-5 text-center">
-                <h2>Survey<br>{{ username }}</h2>
+            <div>
+                <h1 style="font-family: Lato">4. Survey</h1>
             </div>
-            
-            <!-- Room Details Table -->
-            <table class="table table-light" width=200>
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><b>Room ID</b></td>
-                        <td>{{ room.room_id }}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Staircase</b></td>
-                        <td>{{ room.staircase }}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Floor</b></td>
-                        <td>
-                            {% if room.floor == 1 %} Ground
-                            {% elif room.floor == 2 %} First
-                            {% elif room.floor == 3 %} Second
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                    <td><b>Ensuite</b></td>
-                        <td>
-                            {% if room.is_ensuite %} Yes
-                            {% else %} No
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Bed Type</b></td>
-                        <td>
-                            {% if room.is_double_bed %} Double
-                            {% else %} Single
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Disabled Facilities</b></td>
-                        <td>
-                            {% if room.has_disabled_facilities %} Yes
-                            {% else %} No
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Size</b></td>
-                        <td>{{ room.size }} m&#178;</td>
-                    </tr>
-                    <tr>
-                        <td><b>Band</b></td>
-                        <td>{{ room.band }}</td>
-                    </tr>
-                </tbody>
-        </table>
-            
+
             <form action="#" method="post">
                 {% csrf_token %}
                 {{ form }}
