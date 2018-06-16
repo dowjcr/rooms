@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
 
-from .models import Room, Staircase, SurveyResponse, Review
+from .models import Room, Staircase, SurveyResponse, Review, UserCompletedSurvey
 from .forms import StaircaseSelector, RoomSelector, SurveyForm
 
 """
@@ -20,7 +20,7 @@ def show_room(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     if room.survey_completed:
         # TODO: create error page, saying survey already conducted for that room.
-        return HttpResponseRedirect('../..')
+        return get_room_invalid(request)
     else:
         return render(request, 'roomsurvey/room.html', { 'room' : room })
 
@@ -74,6 +74,7 @@ def get_survey(request, room_id):
             overpriced = request.POST.get('overpriced')
             
             # TODO: change form to allow selection of important factors.
+            # TODO: change to use sanitised values.
             important_factors = 'hey'
 
             # Create Review object.
@@ -95,6 +96,11 @@ def get_survey(request, room_id):
             # Mark room as having been surveyed.
             room.survey_completed = True
             room.save()
+
+            # Mark user as having completed survey.
+            user_completed_survey = get_object_or_404(UserCompletedSurvey, user=request.user.get_username())
+            user_completed_survey.completed = True
+            user_completed_survey.save()
             
             # TODO: redirect to confirmation page.
             return HttpResponseRedirect('../confirmation')
@@ -111,3 +117,11 @@ def get_survey(request, room_id):
 
 def get_confirmation(request):
     return render(request, 'roomsurvey/confirmation.html')
+
+
+# Shown if survey has already been completed for that room.
+
+def get_room_invalid(request):
+    text = """Sorry, the survey has already been completed for this room. Did you
+    definitely select the right room?"""
+    return render(request, 'roomsurvey/error.html', { 'error' : text })

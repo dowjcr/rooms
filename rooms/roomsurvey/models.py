@@ -71,3 +71,13 @@ class SurveyResponse(models.Model):
 
     def __str__(self):
         return str(self.room)
+
+
+# Model to capture whether a given user has completed the survey.
+
+class UserCompletedSurvey(models.Model):
+    user = models.CharField(max_length=30)
+    completed = models.BooleanField()
+
+    def __str__(self):
+        return self.user

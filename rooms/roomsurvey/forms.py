@@ -11,9 +11,7 @@ respond to survey, et cetera.
 # Form to select staircase.
 
 class StaircaseSelector(forms.Form):
-    staircase = forms.ModelChoiceField(
-        queryset=Staircase.objects.all(),
-        )
+    staircase = forms.ModelChoiceField(queryset=Staircase.objects.all().order_by('name'))
 
 
 # Form to select room, having selected staircase.
@@ -22,7 +20,7 @@ class RoomSelector(forms.Form):
     def __init__(self, *args, **kwargs):
        s = kwargs.pop('staircase')
        super(RoomSelector, self).__init__(*args, **kwargs)
-       self.fields['room'] = forms.ModelChoiceField(queryset=Room.objects.all().filter(staircase=s))
+       self.fields['room'] = forms.ModelChoiceField(queryset=Room.objects.all().filter(staircase=s).order_by('room_id'))
 
 
 # Form to capture survey data.
