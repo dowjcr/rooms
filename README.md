@@ -1,4 +1,6 @@
-![alt text](https://www.jcr.dow.cam.ac.uk/themes/downingjcr/assets/images/logo_purple.png "Downing College JCR")
+<div align="center">
+  <img src=https://www.jcr.dow.cam.ac.uk/themes/downingjcr/assets/images/logo_purple.png width=200>
+</div>
 
 # Downing College JCR Room Balloting System
 
