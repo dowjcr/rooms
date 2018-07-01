@@ -1,6 +1,4 @@
-<div align="center">
-  <img src=https://www.jcr.dow.cam.ac.uk/themes/downingjcr/assets/images/logo_purple.png width=200>
-</div>
+<img src=https://www.jcr.dow.cam.ac.uk/themes/downingjcr/assets/images/logo_purple.png width=120>
 
 # Downing College JCR Room Balloting System
 
