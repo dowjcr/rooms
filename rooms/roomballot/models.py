@@ -23,11 +23,13 @@ class PriceCategory(models.Model):
 
 class Syndicate(models.Model):
     YEAR_CHOICES = (
-        (1, 'Current First Year'),
-        (2, 'Current Second Year')
+        (1, 'Currently First Year'),
+        (2, 'Currently Second Year')
     )
 
     syndicate_id = models.AutoField(primary_key=True)
+    owner_id = models.CharField(max_length=10)
+    complete = models.BooleanField(default=False)
     year = models.IntegerField(choices=YEAR_CHOICES)
     rank = models.IntegerField(editable=False)
 
@@ -57,11 +59,13 @@ class Staircase(models.Model):
 
 class Student(models.Model):
     user_id = models.CharField('CRSid', primary_key=True, max_length=10)
-    in_ballot = models.BooleanField()
-    has_allocated = models.BooleanField()
+    first_name = models.CharField('First Name', max_length=20)
+    surname = models.CharField('Surname', max_length=20)
+    in_ballot = models.BooleanField(default=True)
+    has_allocated = models.BooleanField(default=False)
     rank = models.IntegerField(editable=False)
     syndicate = models.ForeignKey(Syndicate, on_delete=models.CASCADE)
-    accepted_syndicate = models.BooleanField()
+    accepted_syndicate = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user_id
@@ -97,8 +101,8 @@ class Room(models.Model):
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.CASCADE)
     band = models.IntegerField(choices=BAND_CHOICES)
-    taken = models.BooleanField('Has been allocated?')
-    taken_by = models.ForeignKey(Student, on_delete=models.CASCADE)
+    taken = models.BooleanField(editable=False, default=False)
+    taken_by = models.ForeignKey(Student, on_delete=models.CASCADE, editable=False)
     price = models.IntegerField(editable=False)
 
     def __str__(self):

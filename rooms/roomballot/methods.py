@@ -5,8 +5,8 @@ Defines helper methods which are relied on for function.
 
 
 from .models import *
+from .email import *
 import random
-import math
 
 
 # ============== ALLOCATE ROOM ===================
@@ -17,13 +17,15 @@ import math
 def allocate_room(room, student):
     if room.taken:
         raise Exception()   # TODO: handle this error.
-    if student.has_allocated:
+    elif student.has_allocated:
         raise Exception()   # TODO: handle this error.
-    room.taken = True
-    room.taken_by = student
-    room.save()
-    student.has_allocated = True
-    student.save()
+    else:
+        room.taken = True
+        room.taken_by = student
+        room.save()
+        student.has_allocated = True
+        student.save()
+        selected_room(student)
 
 
 # ============= DEALLOCATE ROOM ==================
@@ -33,12 +35,13 @@ def allocate_room(room, student):
 def deallocate_room(room):
     if not room.taken:
         raise Exception()   # TODO: handle this error.
-    student = room.taken_by
-    student.has_allocated = False
-    student.save()
-    room.taken = False
-    room.taken_by = None
-    room.save()
+    else:
+        student = room.taken_by
+        student.has_allocated = False
+        student.save()
+        room.taken = False
+        room.taken_by = None
+        room.save()
 
 
 # ============= GENERATE PRICE ===================
@@ -57,6 +60,7 @@ def get_num_first_years_in_ballot():
     qset = Student.objects.filter(year=1, in_ballot=True)
     return qset.len()
 
+
 def get_num_first_year_syndicates():
     qset = Syndicate.objects.filter(year=1)
     return qset.len()
@@ -70,6 +74,7 @@ def get_num_first_year_syndicates():
 def get_num_second_years_in_ballot():
     qset = Student.objects.filter(year=2, in_ballot=True)
     return qset.len()
+
 
 def get_num_second_year_syndicates():
     qset = Syndicate.objects.filter(year=2)
@@ -129,6 +134,7 @@ def advance_year():
     for student in second_year_students:
         student.syndicate = None
         student.rank = None
+        student.year = None
         student.save()
     second_year_syndicates = Syndicate.objects.filter(year=2)
     for syndicate in second_year_syndicates:
@@ -199,3 +205,75 @@ def readd_to_ballot(student, syndicate):
     student.syndicate = syndicate
     student.rank = new_rank
     student.save()
+
+
+# ============= CREATE SYNDICATE =================
+# Creates a new syndicate, and sends invitations
+# to the concerned students.
+
+def create_syndicate(students, owner):
+    if owner.syndicate != None or owner.accepted_syndicate:
+        raise Exception()   # TODO: handle this error (user already associated with a syndicate).
+    else:
+        syndicate = Syndicate()
+        syndicate.year = 1
+        syndicate.owner_id = owner.user_id
+        syndicate.save()
+        for student in students:
+            student.syndicate = syndicate
+            student.accepted_syndicate = False
+            student.save()
+        owner.accepted_syndicate = True
+        owner.save()
+        invite_syndicate(syndicate)
+
+
+# ============ DISSOLVE SYNDICATE ================
+# Takes a syndicate and dissolves it, updating the
+# students' attributes.
+
+def dissolve_syndicate(syndicate):
+    # TODO: don't allow this if the syndicates have already been randomised!
+    for student in Student.objects.filter(syndicate=syndicate):
+        student.syndicate = None
+        student.accepted_syndicate = False
+        student.save()
+    syndicate.delete()
+
+
+# ============= ACCEPT SYNDICATE =================
+# Takes a user and updates to show they have accepted
+# the syndicate. Sends an email to all users if
+# syndicate is now complete.
+
+def accept_syndicate(student):
+    if student.accepted_syndicate:
+        raise Exception()   # TODO: handle this error (already accepted).
+    else:
+        student.accepted_syndicate = True
+        student.save()
+        syndicate = student.syndicate
+        accepted = True
+        for student in Student.objects.filter(syndicate=syndicate):
+            if not student.accepted_syndicate:
+                accepted = False
+        if accepted:
+            syndicate.complete = True
+            syndicate.save()
+            completed_syndicate(syndicate)
+
+
+# ============= DECLINE SYNDICATE =================
+# Takes a user and dissolves the syndicate, sending
+# an explanatory email to all members.
+
+def decline_syndicate(student):
+    if student.accepted_syndicate:
+        raise Exception()   # TODO: handle this error (already accepted).
+    else:
+        syndicate = student.syndicate
+        for student in Student.objects.filter(syndicate=syndicate):
+            student.syndicate = None
+            student.accepted_syndicate = False
+        failed_syndicate(syndicate)
+        syndicate.delete()
