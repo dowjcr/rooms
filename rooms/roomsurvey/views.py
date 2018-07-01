@@ -25,7 +25,6 @@ def show_room(request, room_id):
         return render(request, 'roomsurvey/room.html', { 'room' : room })
 
 
-
 # Selector for staircase.
 
 def get_staircase(request):
