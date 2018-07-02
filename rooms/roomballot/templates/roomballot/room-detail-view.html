@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>Room Detail View</title>
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
+
+    <a class="navbar-brand" href="#">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
+             style="padding-right: 10px">
+        Room Balloting System
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="nav navbar-nav">
+            <li class="mr-sm-2"><a class="nav-link" href="#">{{ username }}</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="border-bottom">
+        <h1>{{ room }}</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!--Images of room to go here-->
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped table-hover mt-4">
+                <thead style="display:none">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>Room ID</b></td>
+                    <td>{{ room.room_id }}</td>
+                </tr>
+                <tr>
+                    <td><b>Staircase</b></td>
+                    <td>{{ room.staircase }}</td>
+                </tr>
+                <tr>
+                    <td><b>Floor</b></td>
+                    <td>
+                        {% if room.floor == 1 %} Ground
+                        {% elif room.floor == 2 %} First
+                        {% elif room.floor == 3 %} Second
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Ensuite</b></td>
+                    <td>
+                        {% if room.is_ensuite %} Yes
+                        {% else %} No
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Bed Type</b></td>
+                    <td>
+                        {% if room.is_double_bed %} Double
+                        {% else %} Single
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Disabled Facilities</b></td>
+                    <td>
+                        {% if room.has_disabled_facilities %} Yes
+                        {% else %} No
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Size</b></td>
+                    <td>{{ room.size }} m&#178;</td>
+                </tr>
+                <tr>
+                    <td><b>Band</b></td>
+                    <td>{{ room.band }}</td>
+                </tr>
+                <tr>
+                    <td><b>Price</b></td>
+                    <td>£{% room.price / 100 %} per week</td>
+                </tr>
+                <tr>
+                    <td><b>Contract Length</b></td>
+                    <td>{{ room.staircase.contract_length }} weeks</td>
+                </tr>
+                <tr>
+                    <td><b>Total Price</b></td>
+                    <td>£{% room.price / 100 * room.staircase.contract_length %}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
