@@ -56,10 +56,10 @@
                     {% if student.accepted_syndicate %}
                         {% if not student.syndicate.complete %}
                         <p>Great news! You've accepted your syndicate. We're still waiting on other people to accept.</p>
-                        <a href="#" class="btn btn-primary">View Syndicate</a>
+                        <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate</a>
                         {% else %}
                         <p>Great news! Your syndicate is complete.</p>
-                        <a href="#" class="btn btn-primary">View Syndicate</a>
+                        <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate</a>
                         {% endif %}
                     {% else %}
                         {% if student.syndicate == None %}

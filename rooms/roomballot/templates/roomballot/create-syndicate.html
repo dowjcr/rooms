@@ -7,57 +7,101 @@
     <title>Create Syndicate</title>
     <link rel="stylesheet" href="../../static/css/bootstrap.css">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
+          media="all"/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
-    </script> <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
+            type="text/javascript"></script>
 </head>
 <body>
 
 <script>
-$(document).ready(function(){
+    window.CSRF_TOKEN = "{{ csrf_token }}";
 
-    $(function() {
+    $(document).ready(function () {
 
-        // Generate JSON of students who can be added to this syndicate.
-        var availableStudents = [
-           {% for st in students %}
-               {% if student != st %}
-               {
-                   value: "{{ st.user_id }}",
-                   label: "{{ st.first_name }} {{ st.surname }} ({{ st.user_id }})"
-               }
-               {% if not forloop.last %},{% endif %}
-               {% endif %}
-           {% endfor %}
-        ];
+        // Defining CSRF token.
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+        });
 
-        // Set parameters of autocomplete field.
-        $('#student').autocomplete({source: availableStudents,
-                                    select: function(event, ui) {
-                                        AutoCompleteSelectHandler(event, ui);
-                                        // Remove this student from those available to be added.
-                                        availableStudents = availableStudents.filter(function(jsonObject) {
-                                            return jsonObject.value !== ui.item.value;
-                                        });
-                                        $('#student').autocomplete({source: availableStudents});
-                                        return false;
-                                    }});
+        // Students' CRSids who have been added to syndicate.
+        var members = ["{{ student.user_id }}"];
 
-        // Global variable of student CRSids who have been added.
-        var members = [{{ student.user_id }}];
+        // Called when the user confirms they have inputted all members.
+        // Sends POST to create_syndicate view, which executes method.
+        function CreateSyndicateAjaxResponse() {
+            $.ajax({
+                url: '/roomballot/dashboard/create-syndicate',
+                type: 'POST',
+                data: {'crsids': members},
+                dataType: 'json',
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                success: function(result) {
+                    alert(result);
+                }
+            });
+        }
+
+        $(function () {
+
+            // Confirmation dialog.
+            $("#dialog-confirm").dialog({
+                autoOpen: false,
+                resizable: false,
+                show: 'blind',
+                hide: 'blind',
+                height: "auto",
+                width: 400,
+                modal: true,
+                buttons: {
+                    "Proceed": function () {
+                        CreateSyndicateAjaxResponse();
+                        $(this).dialog("close");
+                    },
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            // Generate JSON of students who can be added to this syndicate.
+            var availableStudents = [
+                {% for st in students %}
+                    {% if student != st %}
+                        {
+                            value: "{{ st.user_id }}",
+                            label: "{{ st.first_name }} {{ st.surname }} ({{ st.user_id }})"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endif %}
+                {% endfor %}
+            ];
+
+            // Set parameters of autocomplete field.
+            $('#student').autocomplete({
+                source: availableStudents,
+                select: function (event, ui) {
+                    $('#members').append('<br>' + ui.item.label);
+                    members.push(ui.item.value);
+                    $('#student').val("");
+                    // Remove this student from those available to be added.
+                    availableStudents = availableStudents.filter(function (jsonObject) {
+                        return jsonObject.value !== ui.item.value;
+                    });
+                    $('#student').autocomplete({source: availableStudents});
+                    return false;
+                }
+            });
+        });
+
+        // When 'continue' button is clicked, open confirmation dialog.
+        $('#continue').click(function() {
+            $('#dialog-confirm').dialog('open');
+            return false;
+        })
     });
-
-    function AutoCompleteSelectHandler(event, ui) {
-        // Display name under 'Syndicate Members'.
-        $('#members').append('<br>' + ui.item.label);
-        // Clear field.
-        $('#student').val("");
-    }
-
-    $('#shoppingCart').on('click', '.removeItem', function(){
-      $(this).parent().remove();
-    });
-});
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
@@ -89,22 +133,25 @@ $(document).ready(function(){
 
     <div class="row mt-3">
 
+        <div id="dialog-confirm" title="Confirm Syndicate">
+            <p>Do you wish to create this syndicate?</p>
+        </div>
+
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
             <p>To add a student to your syndicate, search for them in the box below.</p>
             <div class="ui-widget mb-2">
-                <label for="student">Student: </label>
                 <input id="student"><br>
             </div>
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
             <div class="jumbotron">
-                <h4>Syndicate Members</h4>
-                <p  id="members">{{ student.first_name }} {{ student.surname }} ({{ student.user_id }}) <b>Owner</b></p>
+                <h3>Syndicate Members</h3>
+                <p id="members">{{ student.first_name }} {{ student.surname }} ({{ student.user_id }}) <b>Owner</b></p>
             </div>
 
             <div align="right">
-                <a href="#" class="btn btn-primary">Continue</a>
+                <button class="btn btn-primary" id="continue">Continue</button>
             </div>
         </div>
     </div>

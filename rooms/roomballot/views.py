@@ -6,8 +6,9 @@ Author Cameron O'Connor
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
-from .models import Room, Image, Staircase, Student
+from .models import Room, Image, Staircase, Student, Syndicate
 from django.conf import settings
+from .methods import *
 
 
 # ================ ROOM DETAIL ===================
@@ -105,8 +106,37 @@ def create_syndicate(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/roomballot')
     student = Student.objects.get(user_id=request.user.username)
-    return render(request, 'roomballot/create-syndicate.html', {'student': student,
-                                                                'students': Student.objects.filter(year=1, syndicate=None, in_ballot=True)})
+    # If student already part of a syndicate, redirects to error page.
+    if student.syndicate is not None:
+        return error(request, 902)
+    if request.method == 'POST':
+        # TODO: implement some error handling here.
+        usernames = request.POST.getlist('crsids[]')
+        print(usernames)
+        create_new_syndicate(usernames, request.user.username)
+        return HttpResponseRedirect('/roomballot/dashboard')
+    else:
+        student = Student.objects.get(user_id=request.user.username)
+        return render(request, 'roomballot/create-syndicate.html', {'student': student,
+                                                                    'students': Student.objects.filter(year=1, syndicate=None, in_ballot=True)})
+
+
+# ============ SYNDICATE DETAIL ================
+# Shows syndicate information, including allowing
+# user to accept if required.
+
+def syndicate_detail(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/roomballot')
+    student = Student.objects.get(user_id=request.user.username)
+    if student.syndicate is None:
+        return error(request, 903)
+    students = []
+    for st in Student.objects.filter(syndicate=student.syndicate).order_by('surname'):
+        students.append(st)
+    return render(request, 'roomballot/syndicate-view.html', {'student': student,
+                                                              'syndicate': student.syndicate,
+                                                              'students': students})
 
 
 # ================= ERROR =====================
@@ -116,6 +146,9 @@ def create_syndicate(request):
 def error(request, code):
     messages = {
         404: "Page not found",
-        901: "Concurrency error when creating syndicate."
+        901: "Concurrency error when creating syndicate.",
+        902: "You're already part of a syndicate.",
+        903: "You're not part of a syndicate.",
+        904: "You're not registered as a student."
     }
     return render(request, 'roomballot/error.html', {'message': messages[code]})

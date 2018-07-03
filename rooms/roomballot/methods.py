@@ -211,18 +211,20 @@ def readd_to_ballot(student, syndicate):
 # Creates a new syndicate, and sends invitations
 # to the concerned students.
 
-def create_syndicate(students, owner):
-    if owner.syndicate != None or owner.accepted_syndicate:
-        raise Exception()   # TODO: handle this error (user already associated with a syndicate).
-    else:
+def create_new_syndicate(student_ids, owner_id):
+    #if owner.syndicate != None or owner.accepted_syndicate:
+        #raise Exception()   # TODO: handle this error (user already associated with a syndicate).
+    #else:
         syndicate = Syndicate()
         syndicate.year = 1
-        syndicate.owner_id = owner.user_id
+        syndicate.owner_id = owner_id
         syndicate.save()
-        for student in students:
+        for student_id in student_ids:
+            student = Student.objects.get(user_id=student_id)
             student.syndicate = syndicate
             student.accepted_syndicate = False
             student.save()
+        owner = Student.objects.get(user_id=owner_id)
         owner.accepted_syndicate = True
         owner.save()
         invite_syndicate(syndicate)

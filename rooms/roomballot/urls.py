@@ -10,5 +10,6 @@ urlpatterns = [
     path('staircases', views.staircase_list, name='staircases'),
     path('staircase/<int:staircase_id>', views.staircase_detail, name='staircase-detail'),
     path('dashboard', views.student_dashboard, name='dashboard'),
-    path('error/<int:code>', views.error, name='error')
+    path('error/<int:code>', views.error, name='error'),
+    path('dashboard/syndicate', views.syndicate_detail, name='syndicate')
 ]
