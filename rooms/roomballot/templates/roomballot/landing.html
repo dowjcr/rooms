@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
     <title>Room Detail View</title>
-    <link rel="stylesheet" href="../../static/css/bootstrap.css">
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
 </head>
 <body>
 
@@ -25,12 +25,12 @@
 <div class="container">
     <div class="jumbotron">
         <div class="row">
-            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
                 <h1>Why, hello there.</h1>
                 <h3>To continue, please login with Raven.</h3>
             </div>
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 mt-3">
-                <button type="button" class="btn btn-lg btn-primary">Primary</button>
+            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 mt-3">
+                <a class="btn btn-lg btn-primary" style="color: white" href="/accounts/login">Raven login</a>
             </div>
         </div>
     </div>

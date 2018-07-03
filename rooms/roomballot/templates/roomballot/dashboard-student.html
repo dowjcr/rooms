@@ -2,9 +2,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 </head>
 <body>
-$END$
+
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
+
+    <a class="navbar-brand" href="/roomballot">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
+             style="padding-right: 10px">
+        Room Balloting System
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="nav navbar-nav">
+            <li class="mr-sm-2"><a class="nav-link active" href="/roomballot/dashboard">Dashboard</a></li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="container">
+
+    <div class="border-bottom mb-3">
+        <h2>Dashboard</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3>Your Room</h3>
+                {% if student.has_allocated %}
+                <p>You have chosen {{ room }}.</p>
+                <a href="room/{{ room.room_id }}" class="btn btn-primary">View Room</a>
+                {% else %}
+                <p>You haven't picked a room yet.</p>
+                <a href="staircases" class="btn btn-primary">View Rooms</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3>Syndicate</h3>
+                {% if student.in_ballot %}
+                    {% if student.accepted_syndicate %}
+                        {% if not student.syndicate.complete %}
+                        <p>Great news! You've accepted your syndicate. We're still waiting on other people to accept.</p>
+                        <a href="#" class="btn btn-primary">View Syndicate</a>
+                        {% else %}
+                        <p>Great news! Your syndicate is complete.</p>
+                        <a href="#" class="btn btn-primary">View Syndicate</a>
+                        {% endif %}
+                    {% else %}
+                        {% if student.syndicate == None %}
+                        <p>You haven't created, or been invited to, a syndicate yet.</p>
+                        <a href="dashboard/create-syndicate" class="btn btn-primary">Create Syndicate</a>
+                        {% else %}
+                        <p>You've been invited to a syndicate. Accept the invite now!</p>
+                        <a href="#" class="btn btn-primary">Accept Invite</a>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <p>You've been removed from the ballot.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3>Ballot Rank</h3>
+                {% if student.in_ballot %}
+                    {% if student.rank == None %}
+                    <p>Your ranking hasn't been generated yet. Check back soon!</p>
+                    {% else %}
+                    <p>You are ranked <b>{{ student.rank }} out of all students.</b></p>
+                    <a href="#" class="btn btn-primary">View Rankings</a>
+                    {% endif %}
+                {% else %}
+                    <p>You've been removed from the ballot.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+
 </body>
 </html>

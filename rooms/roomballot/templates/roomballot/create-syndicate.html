@@ -2,9 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>Create Syndicate</title>
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+    </script> <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
 </head>
 <body>
-$END$
+
+<script>
+$(document).ready(function(){
+
+    $(function() {
+
+        // Generate JSON of students who can be added to this syndicate.
+        var availableStudents = [
+           {% for st in students %}
+               {% if student != st %}
+               {
+                   value: "{{ st.user_id }}",
+                   label: "{{ st.first_name }} {{ st.surname }} ({{ st.user_id }})"
+               }
+               {% if not forloop.last %},{% endif %}
+               {% endif %}
+           {% endfor %}
+        ];
+
+        // Set parameters of autocomplete field.
+        $('#student').autocomplete({source: availableStudents,
+                                    select: function(event, ui) {
+                                        AutoCompleteSelectHandler(event, ui);
+                                        // Remove this student from those available to be added.
+                                        availableStudents = availableStudents.filter(function(jsonObject) {
+                                            return jsonObject.value !== ui.item.value;
+                                        });
+                                        $('#student').autocomplete({source: availableStudents});
+                                        return false;
+                                    }});
+
+        // Global variable of student CRSids who have been added.
+        var members = [{{ student.user_id }}];
+    });
+
+    function AutoCompleteSelectHandler(event, ui) {
+        // Display name under 'Syndicate Members'.
+        $('#members').append('<br>' + ui.item.label);
+        // Clear field.
+        $('#student').val("");
+    }
+
+    $('#shoppingCart').on('click', '.removeItem', function(){
+      $(this).parent().remove();
+    });
+});
+</script>
+
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
+
+    <a class="navbar-brand" href="/roomballot">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
+             style="padding-right: 10px">
+        Room Balloting System
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="nav navbar-nav">
+            <li class="mr-sm-2"><a class="nav-link" href="/roomballot/dashboard">Dashboard</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="border-bottom">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xl-12">
+                <h2>Create Syndicate</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <p>To add a student to your syndicate, search for them in the box below.</p>
+            <div class="ui-widget mb-2">
+                <label for="student">Student: </label>
+                <input id="student"><br>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <div class="jumbotron">
+                <h4>Syndicate Members</h4>
+                <p  id="members">{{ student.first_name }} {{ student.surname }} ({{ student.user_id }}) <b>Owner</b></p>
+            </div>
+
+            <div align="right">
+                <a href="#" class="btn btn-primary">Continue</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 </body>
 </html>

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'roomsurvey.apps.RoomsurveyConfig',
+    'roomballot.apps.RoomballotConfig',
     'ucamwebauth'
 ]
 
@@ -52,6 +53,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'rooms.urls'
+ENV_PATH = "/home/cam/rooms/rooms/media/"
+MEDIA_ROOT = os.path.join(ENV_PATH, '/media')
 
 TEMPLATES = [
     {

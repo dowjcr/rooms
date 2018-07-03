@@ -1,6 +1,7 @@
 """
 MODELS
 Defines database models to be used in the room ballot application.
+Author Cameron O'Connor
 """
 
 
@@ -31,7 +32,7 @@ class Syndicate(models.Model):
     owner_id = models.CharField(max_length=10)
     complete = models.BooleanField(default=False)
     year = models.IntegerField(choices=YEAR_CHOICES)
-    rank = models.IntegerField(editable=False)
+    rank = models.IntegerField(editable=False, null=True)
 
     def __str__(self):
         return str(self.syndicate_id)
@@ -58,17 +59,23 @@ class Staircase(models.Model):
 # corresponds to CRSid.
 
 class Student(models.Model):
+    YEAR_CHOICES = (
+        (1, 'Currently First Year'),
+        (2, 'Currently Second Year')
+    )
+
     user_id = models.CharField('CRSid', primary_key=True, max_length=10)
     first_name = models.CharField('First Name', max_length=20)
     surname = models.CharField('Surname', max_length=20)
+    year = models.IntegerField(choices=YEAR_CHOICES)
     in_ballot = models.BooleanField(default=True)
     has_allocated = models.BooleanField(default=False)
-    rank = models.IntegerField(editable=False)
-    syndicate = models.ForeignKey(Syndicate, on_delete=models.CASCADE)
+    rank = models.IntegerField(editable=False, null=True)
+    syndicate = models.ForeignKey(Syndicate, on_delete=models.CASCADE, default=None, null=True, blank=True)
     accepted_syndicate = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user_id
+        return self.first_name + " " + self.surname
 
 
 # ================== ROOM ========================
@@ -101,9 +108,9 @@ class Room(models.Model):
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.CASCADE)
     band = models.IntegerField(choices=BAND_CHOICES)
-    taken = models.BooleanField(editable=False, default=False)
-    taken_by = models.ForeignKey(Student, on_delete=models.CASCADE, editable=False)
-    price = models.IntegerField(editable=False)
+    taken = models.BooleanField(default=False)
+    taken_by = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+    price = models.IntegerField(editable=False, default=0)
 
     def __str__(self):
         return self.staircase.__str__() + ", Room " + str(self.room_number)
@@ -128,7 +135,7 @@ class Review(models.Model):
 
 class AdminUser(models.Model):
     user_id = models.CharField('CRSid', primary_key=True, max_length=10)
-    role = models.CharField()
+    role = models.CharField(max_length=30)
 
     def __str__(self):
         return self.user_id
@@ -144,4 +151,4 @@ class Image(models.Model):
     file = models.ImageField(upload_to='room_images')
 
     def __str__(self):
-        return self.room.__str__() + str(self.image_id)
+        return self.room.__str__() + ", Image " + str(self.image_id)

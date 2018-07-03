@@ -12,7 +12,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
 
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" href="/roomballot">
         <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
              style="padding-right: 10px">
         Room Balloting System
@@ -23,7 +23,7 @@
 
     <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
         <ul class="nav navbar-nav">
-            <li class="mr-sm-2"><a class="nav-link" href="#">{{ username }}</a></li>
+            <li class="mr-sm-2"><a class="nav-link" href="../dashboard">Dashboard</a></li>
         </ul>
     </div>
 </nav>
@@ -31,12 +31,28 @@
 <div class="container">
 
     <div class="border-bottom">
-        <h1>{{ room }}</h1>
+        <div class="row">
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                <h2>{{ room }}</h2>
+                {% if room.taken %}
+                <p>This room has been taken by <b>{{ room.taken_by }}</b>.</p>
+                {% else %}
+                <p>This room is currently available for occupation.</p>
+                {% endif %}
+            </div>
+            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 text-center">
+                {% if room.taken %} <div class="alert alert-danger" role="alert"><h3>Unavailable</h3></div>
+                {% else %} <div class="alert alert-success" role="alert"><h3>Available</h3></div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <!--Images of room to go here-->
+            {% for i in images %}
+                <img src="{{ i }}" width="200px">
+            {% endfor %}
         </div>
         <div class="col-md-6">
             <table class="table table-bordered table-striped table-hover mt-4">
@@ -50,10 +66,6 @@
                 <tr>
                     <td><b>Room ID</b></td>
                     <td>{{ room.room_id }}</td>
-                </tr>
-                <tr>
-                    <td><b>Staircase</b></td>
-                    <td>{{ room.staircase }}</td>
                 </tr>
                 <tr>
                     <td><b>Floor</b></td>
@@ -98,7 +110,7 @@
                 </tr>
                 <tr>
                     <td><b>Price</b></td>
-                    <td>£{% room.price / 100 %} per week</td>
+                    <td>£{{ weekly_price }} per week</td>
                 </tr>
                 <tr>
                     <td><b>Contract Length</b></td>
@@ -106,16 +118,18 @@
                 </tr>
                 <tr>
                     <td><b>Total Price</b></td>
-                    <td>£{% room.price / 100 * room.staircase.contract_length %}</td>
+                    <td>£{{ total_price }}</td>
                 </tr>
                 </tbody>
             </table>
+            {% if not room.taken and not student.has_allocated %}
+            <div align="right">
+                <a class="btn btn-primary mb-5" href="{{ room.room_id }}/confirm-selection">Select this room</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
-
-
-
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

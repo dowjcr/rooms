@@ -16,11 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from .views import get_home
+from django.conf import settings
+from django.views.static import serve
 
 app_name = 'roomsurvey'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', get_home),
     path('roomsurvey/', include('roomsurvey.urls')),
+    path('roomballot/', include('roomballot.urls')),
     path(r'', include('ucamwebauth.urls'))
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]
