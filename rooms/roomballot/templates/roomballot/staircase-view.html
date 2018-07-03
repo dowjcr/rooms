@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>{{ staircase }}</title>
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
+
+    <a class="navbar-brand" href="/roomballot">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
+             style="padding-right: 10px">
+        Room Balloting System
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="nav navbar-nav">
+            <li class="mr-sm-2"><a class="nav-link" href="/roomballot/dashboard">Dashboard</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="border-bottom">
+        <div class="row">
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                <h2>{{ staircase }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-4">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Room Number</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Size</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Ensuite</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Bed Type</th>
+                    <th scope="col">Occupant</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for room in rooms %}
+                    {% if room.taken %}
+                    <tr class="alert-danger">
+                    {% else %}
+                    <tr class="alert-success">
+                    {% endif %}
+                    <td><b>{{ room.room_number }}</b></td>
+                    <td class="d-none d-sm-table-cell">{{ room.size }}</td>
+                    <td class="d-none d-sm-table-cell">{% if room.is_ensuite %}Yes{% else %}No{% endif %}</td>
+                    <td class="d-none d-sm-table-cell">{% if room.is_double_bed %}Double{% else %}Single{% endif %}</td>
+                    <td>{{ room.taken_by }}</td>
+                    <td class="text-center">
+                        <a class="btn btn-primary" href="../room/{{ room.room_id }}">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 mt-4 alert-warning">
+            <h4 class="mt-2">Important Information</h4>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
