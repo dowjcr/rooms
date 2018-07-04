@@ -43,9 +43,17 @@ def room_selection_confirm(request, room_id):
         return HttpResponseRedirect('/roomballot')
     room = get_object_or_404(Room, pk=room_id)
     student = Student.objects.get(user_id=request.user.username)
-    return render(request, 'roomballot/room-select-confirm.html', {'room': room,
-                                                                   'username': request.user.first_name,
-                                                                   'student': student})
+    if request.method == 'POST':
+        try:
+            allocate_room(room, student)
+            response_code = 1
+        except ConcurrencyException:
+            response_code = 900
+        return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+    else:
+        return render(request, 'roomballot/room-select-confirm.html', {'room': room,
+                                                                       'username': request.user.first_name,
+                                                                       'student': student})
 
 
 # =============== LANDING PAGE ===================
@@ -117,7 +125,7 @@ def create_syndicate(request):
             create_new_syndicate(usernames, request.user.username)
             response_code = 1
         except ConcurrencyException:
-            response_code = 2
+            response_code = 901
         return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
     else:
         student = Student.objects.get(user_id=request.user.username)
@@ -139,15 +147,15 @@ def syndicate_detail(request):
                 accept_syndicate(student)
                 response_code = 1
             except ConcurrencyException:
-                response_code = 2
+                response_code = 905
         elif request.POST.get('response') == '2':
             decline_syndicate(student)
             response_code = 1
         elif request.POST.get('response') == '3':
             dissolve_syndicate(student.syndicate)
-            response_code = 3
+            response_code = 2
         else:
-            response_code = 4
+            response_code = 900
         return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
     else:
         if student.syndicate is None:

@@ -1,14 +1,49 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
-    <title>Room Detail View</title>
-    <link rel="stylesheet" href="../../../static/css/bootstrap.css">
+    <title>Confirm Selection | Downing JCR RBS</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
+          media="all"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
+            type="text/javascript"></script>
 </head>
 <body>
+
+<script>
+
+    $(document).ready(function () {
+
+        // Defining CSRF token.
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        function HandleResponse(responseCode) {
+            if (responseCode === 1) location.replace('/roomballot/dashboard');
+            else location.replace('../../error/' + responseCode.toString());
+        }
+
+        $('#confirm').click(function() {
+            $.ajax({
+                url: '/roomballot/room/{{ room.room_id }}/confirm-selection',
+                type: 'POST',
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                success: function (response) {
+                    HandleResponse(response.responseCode);
+                }
+            });
+        });
+
+    });
+</script>
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
 
@@ -49,23 +84,11 @@
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6">
             <div align="right">
-                <form action="post">
-                    <a class="btn btn-primary mb-5" href="../../dashboard">Confirm</a>
-                </form>
+                <button class="btn btn-primary mb-5" id="confirm">Confirm</button>
             </div>
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-        crossorigin="anonymous"></script>
 
 </body>
 </html>

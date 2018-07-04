@@ -19,17 +19,15 @@ class ConcurrencyException(Exception):
 # or student already has a room, then raises exception.
 
 def allocate_room(room, student):
-    if room.taken:
-        raise Exception()   # TODO: handle this error.
-    elif student.has_allocated:
-        raise Exception()   # TODO: handle this error.
+    if student.has_allocated or room.taken_by is not None or student.syndicate is None \
+            or not student.accepted_syndicate or not student.syndicate.complete:
+        raise ConcurrencyException()
     else:
-        room.taken = True
         room.taken_by = student
         room.save()
         student.has_allocated = True
         student.save()
-        selected_room(student)
+        #selected_room(student)
 
 
 # ============= DEALLOCATE ROOM ==================
@@ -37,13 +35,12 @@ def allocate_room(room, student):
 # exception if no student has been allocated to it.
 
 def deallocate_room(room):
-    if not room.taken:
+    if room.taken_by is None:
         raise Exception()   # TODO: handle this error.
     else:
         student = room.taken_by
         student.has_allocated = False
         student.save()
-        room.taken = False
         room.taken_by = None
         room.save()
 
@@ -217,12 +214,15 @@ def readd_to_ballot(student, syndicate):
 
 def create_new_syndicate(student_ids, owner_id):
     owner = Student.objects.get(user_id=owner_id)
-    if owner.syndicate is not None or owner.accepted_syndicate:
+    size = len(student_ids)
+    if owner.syndicate is not None or owner.accepted_syndicate or size > 6 or size < 1:
         raise ConcurrencyException()
     else:
         syndicate = Syndicate()
         syndicate.year = 1
         syndicate.owner_id = owner_id
+        if len(student_ids) == 1:
+            syndicate.complete = True
         syndicate.save()
         for student_id in student_ids:
             student = Student.objects.get(user_id=student_id)

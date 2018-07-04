@@ -46,7 +46,7 @@ class Syndicate(models.Model):
 class Staircase(models.Model):
     staircase_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
-    price_category = models.ForeignKey(PriceCategory, on_delete=models.CASCADE)
+    price_category = models.ForeignKey(PriceCategory, on_delete=models.SET_DEFAULT, default=None)
     contract_length = models.IntegerField('Number of contract weeks?')
 
     def __str__(self):
@@ -71,7 +71,7 @@ class Student(models.Model):
     in_ballot = models.BooleanField(default=True)
     has_allocated = models.BooleanField(default=False)
     rank = models.IntegerField(editable=False, null=True)
-    syndicate = models.ForeignKey(Syndicate, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
     accepted_syndicate = models.BooleanField(default=False)
 
     def __str__(self):
@@ -106,10 +106,9 @@ class Room(models.Model):
     is_double_bed = models.BooleanField('Has double bed?')
     has_disabled_facilities = models.BooleanField('Has disabled facilities?')
     size = models.FloatField()
-    staircase = models.ForeignKey(Staircase, on_delete=models.CASCADE)
+    staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
     band = models.IntegerField(choices=BAND_CHOICES)
-    taken = models.BooleanField(default=False)
-    taken_by = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+    taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None)
     price = models.IntegerField(editable=False, default=0)
 
     def __str__(self):
@@ -122,7 +121,7 @@ class Room(models.Model):
 
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.SET_DEFAULT, default=None)
     # TODO: add review attributes as required.
 
     def __str__(self):
@@ -147,7 +146,7 @@ class AdminUser(models.Model):
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key=True)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.SET_DEFAULT, default=None)
     file = models.ImageField(upload_to='room_images')
 
     def __str__(self):

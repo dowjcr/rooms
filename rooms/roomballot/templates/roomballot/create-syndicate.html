@@ -1,11 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
-    <title>Create Syndicate</title>
-    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <title>Create Syndicate | Downing JCR RBS</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
           media="all"/>
@@ -34,9 +35,7 @@
         function HandleResponse(responseCode) {
             // Successfully created syndicate.
             if (responseCode === 1) location.replace('syndicate');
-            // Concurrency error when creating syndicate.
-            else if (responseCode === 2) location.replace('../error/901');
-            else location.replace('../error/900');
+            else location.replace('../error/' + responseCode.toString());
         }
 
         // Called when the user confirms they have inputted all members.
@@ -55,26 +54,6 @@
         }
 
         $(function () {
-
-            // Confirmation dialog.
-            $("#dialog-confirm").dialog({
-                autoOpen: false,
-                resizable: false,
-                show: 'blind',
-                hide: 'blind',
-                height: "auto",
-                width: 400,
-                modal: true,
-                buttons: {
-                    "Proceed": function () {
-                        CreateSyndicateAjaxResponse();
-                        $(this).dialog("close");
-                    },
-                    Cancel: function () {
-                        $(this).dialog("close");
-                    }
-                }
-            });
 
             // Generate JSON of students who can be added to this syndicate.
             var availableStudents = [
@@ -117,11 +96,10 @@
             });
         });
 
-        // When 'continue' button is clicked, open confirmation dialog.
+        // When 'continue' button is clicked, send response.
         $('#continue').click(function () {
-            $('#dialog-confirm').dialog('open');
-            return false;
-        })
+            CreateSyndicateAjaxResponse();
+        });
     });
 </script>
 
@@ -154,14 +132,11 @@
 
     <div class="row mt-3">
 
-        <div id="dialog-confirm" title="Confirm Syndicate">
-            <p>Do you wish to create this syndicate?</p>
-        </div>
-
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
             <p>
-                A syndicate can comprise a maximum of <b>6</b> people. <br>
-                To add a student to your syndicate, search for them in the box below.
+                A syndicate can comprise a maximum of <b>6</b> people.<br>
+                To add a student to your syndicate, search for them in the box below.<br>
+                When you're done, click Create.
             </p>
             <div class="ui-widget mb-2">
                 <input id="student"><br>
@@ -175,7 +150,7 @@
             </div>
 
             <div align="right">
-                <button class="btn btn-primary" id="continue">Continue</button>
+                <button class="btn btn-primary" id="continue">Create</button>
             </div>
         </div>
     </div>

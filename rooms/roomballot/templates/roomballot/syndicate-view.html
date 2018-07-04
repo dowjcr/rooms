@@ -1,11 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
-    <title>View Syndicate</title>
-    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <title>Your Syndicate | Downing JCR RBS</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
           media="all"/>
@@ -26,13 +27,9 @@
 
         // Handle response received after POST request.
         function HandleResponse(responseCode) {
-            // Successfully accepted invite.
             if (responseCode === 1) location.reload(true);
-            // Student had already accepted invite.
-            else if (responseCode === 2) location.replace('../error/905');
-            // Successfully dissolved syndicate.
-            else if (responseCode === 3) location.replace('../dashboard');
-            else location.replace('../error/900');
+            else if (responseCode === 2) location.replace('../dashboard');
+            else location.replace('../error/' + responseCode.toString());
         }
 
         function MakeAjaxRequest(code) {
@@ -47,11 +44,6 @@
             });
         }
 
-        // When decline clicked, declines syndicate and returns to dashboard.
-        $('#dissolve').click(function () {
-            MakeAjaxRequest(3);
-        });
-
         // When accept clicked, accepts syndicate and refreshes.
         $('#accept').click(function () {
             MakeAjaxRequest(1);
@@ -62,6 +54,10 @@
             MakeAjaxRequest(2);
         });
 
+        // When decline clicked, declines syndicate and returns to dashboard.
+        $('#dissolve').click(function () {
+            MakeAjaxRequest(3);
+        });
 
     });
 </script>
