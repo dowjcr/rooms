@@ -8,6 +8,8 @@ This system manages the allocation of college rooms during ballot weekend. It co
 
 - [**Django**](https://www.djangoproject.com/)
 - [**django-ucamwebauth**](https://pypi.org/project/django-ucamwebauth/)
+- [**jQuery**](https://jquery.com/)
+- [**Bootstrap 4.1.1**](https://getbootstrap.com)
 
 ## Authors
 
