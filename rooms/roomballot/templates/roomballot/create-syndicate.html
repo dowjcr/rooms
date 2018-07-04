@@ -23,11 +23,12 @@
 
         // Defining CSRF token.
         $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
         });
 
         // Students' CRSids who have been added to syndicate.
         var members = ["{{ student.user_id }}"];
+        var membersCount = 1;
 
         // Called when the user confirms they have inputted all members.
         // Sends POST to create_syndicate view, which executes method.
@@ -38,7 +39,7 @@
                 data: {'crsids': members},
                 dataType: 'json',
                 csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function(result) {
+                success: function (result) {
                     alert(result);
                 }
             });
@@ -59,6 +60,7 @@
                     "Proceed": function () {
                         CreateSyndicateAjaxResponse();
                         $(this).dialog("close");
+                        location.replace("syndicate");
                     },
                     Cancel: function () {
                         $(this).dialog("close");
@@ -83,21 +85,32 @@
             $('#student').autocomplete({
                 source: availableStudents,
                 select: function (event, ui) {
+                    let box = $('#student');
                     $('#members').append('<br>' + ui.item.label);
                     members.push(ui.item.value);
-                    $('#student').val("");
-                    // Remove this student from those available to be added.
-                    availableStudents = availableStudents.filter(function (jsonObject) {
-                        return jsonObject.value !== ui.item.value;
-                    });
-                    $('#student').autocomplete({source: availableStudents});
-                    return false;
+                    membersCount++;
+
+                    if (membersCount === 6) {
+                        box.val("Maximum Size Reached");
+                        box.attr('disabled', true);
+                        box.autocomplete({source: null});
+                        return false;
+                    }
+                    else {
+                        box.val("");
+                        // Remove this student from those available to be added.
+                        availableStudents = availableStudents.filter(function (jsonObject) {
+                            return jsonObject.value !== ui.item.value;
+                        });
+                        box.autocomplete({source: availableStudents});
+                        return false;
+                    }
                 }
             });
         });
 
         // When 'continue' button is clicked, open confirmation dialog.
-        $('#continue').click(function() {
+        $('#continue').click(function () {
             $('#dialog-confirm').dialog('open');
             return false;
         })
@@ -138,7 +151,10 @@
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-            <p>To add a student to your syndicate, search for them in the box below.</p>
+            <p>
+                A syndicate can have maximum size <b>6</b>. <br>
+                To add a student to your syndicate, search for them in the box below.
+            </p>
             <div class="ui-widget mb-2">
                 <input id="student"><br>
             </div>

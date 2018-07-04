@@ -27,10 +27,3 @@ urlpatterns = [
     path('roomballot/', include('roomballot.urls')),
     path(r'', include('ucamwebauth.urls'))
 ]
-
-if settings.DEBUG:
-    urlpatterns += [
-        path(r'^media/(?P<path>.*)$', serve, {
-            'document_root': settings.MEDIA_ROOT,
-        }),
-    ]

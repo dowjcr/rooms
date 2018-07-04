@@ -129,14 +129,22 @@ def syndicate_detail(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/roomballot')
     student = Student.objects.get(user_id=request.user.username)
-    if student.syndicate is None:
-        return error(request, 903)
-    students = []
-    for st in Student.objects.filter(syndicate=student.syndicate).order_by('surname'):
-        students.append(st)
-    return render(request, 'roomballot/syndicate-view.html', {'student': student,
-                                                              'syndicate': student.syndicate,
-                                                              'students': students})
+    if request.method == 'POST':
+        if request.POST.get('response') == 1:
+            accept_syndicate(student)
+        elif request.POST.get('response') == 2:
+            decline_syndicate(student)
+        else:
+            dissolve_syndicate(student.syndicate)
+    else:
+        if student.syndicate is None:
+            return error(request, 903)
+        students = []
+        for st in Student.objects.filter(syndicate=student.syndicate).order_by('surname'):
+            students.append(st)
+        return render(request, 'roomballot/syndicate-view.html', {'student': student,
+                                                                  'syndicate': student.syndicate,
+                                                                  'students': students})
 
 
 # ================= ERROR =====================

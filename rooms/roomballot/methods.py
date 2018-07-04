@@ -277,5 +277,6 @@ def decline_syndicate(student):
         for student in Student.objects.filter(syndicate=syndicate):
             student.syndicate = None
             student.accepted_syndicate = False
-        failed_syndicate(syndicate)
+            student.save()
+        # failed_syndicate(syndicate)
         syndicate.delete()

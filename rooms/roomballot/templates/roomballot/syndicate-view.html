@@ -16,6 +16,49 @@
 </head>
 <body>
 
+<script>
+    $(document).ready(function () {
+
+        // Defining CSRF token.
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        // When accept clicked, accepts syndicate and refreshes.
+        $('#accept').click(function () {
+            $.ajax({
+                url: '/roomballot/dashboard/syndicate',
+                type: 'POST',
+                data: {response: 1},
+                dataType: 'json'
+            });
+            location.reload(true);
+        });
+
+        // When decline clicked, declines syndicate and returns to dashboard.
+        $('#decline').click(function () {
+            $.ajax({
+                url: '/roomballot/dashboard/syndicate',
+                type: 'POST',
+                data: {response: 2},
+                dataType: 'json'
+            });
+            location.reload(true);
+        });
+
+        // When decline clicked, declines syndicate and returns to dashboard.
+        $('#dissolve').click(function () {
+            $.ajax({
+                url: '/roomballot/dashboard/syndicate',
+                type: 'POST',
+                data: {response: 3},
+                dataType: 'json'
+            });
+            location.reload(true);
+        });
+    });
+</script>
+
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
 
     <a class="navbar-brand" href="/roomballot">
@@ -52,23 +95,35 @@
                 {% if syndicate.complete %}
                     This syndicate is now complete.
                 {% else %}
-                    {% if student.accepted_syndicate %}
-                        <div class="alert alert-success" role="alert">
-                            <b>Well done!</b> You've accepted your invite to this syndicate.
-                        </div>
-                    {% else %}
-                        <div class="alert alert-danger" role="alert">
-                            <b>For shame!</b> You haven't accepted your invite to this syndicate yet.
-                        </div>
-                    {% endif %}
                     This syndicate is not yet complete - we're still waiting on people to accept
                     their invitations.
+                    {% if student.accepted_syndicate %}
+                        {% if syndicate.owner_id != student.user_id %}
+                            <div class="alert alert-success" role="alert">
+                                <b>Well done!</b> You've accepted your invite to this syndicate.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info" role="alert">
+                                You are this syndicate's owner.<br>
+                                <button class="btn btn-primary mt-2" id="dissolve">Dissolve This Syndicate</button>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-danger" role="alert">
+                            <b>For shame!</b> You haven't accepted your invite to this syndicate yet. <br>You were
+                            invited
+                            by {{ syndicate.owner_id }}.
+                        </div>
+                        <button class="btn btn-primary" id="accept">Accept Invite</button>
+                        <button class="btn btn-primary" id="decline">Decline Invite</button>
+                    {% endif %}
+
                 {% endif %}
             </p>
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-striped">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -78,15 +133,11 @@
                 </thead>
                 <tbody>
                 {% for st in students %}
-                    {% if st.accepted_syndicate %}
-                        <tr class="alert-success">
-                    {% else %}
-                        <tr class="alert-danger">
-                    {% endif %}
-                <td><b>{{ st.first_name }} {{ st.surname }}</b></td>
-                <td class="d-none d-sm-table-cell">{{ st.user_id }}</td>
-                <td>{% if st.accepted_syndicate %}Yes{% else %}No{% endif %}</td>
-                </tr>
+                    <tr>
+                        <td><b>{{ st.first_name }} {{ st.surname }}</b></td>
+                        <td class="d-none d-sm-table-cell">{{ st.user_id }}</td>
+                        <td>{% if st.accepted_syndicate %}Yes{% else %}No{% endif %}</td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
