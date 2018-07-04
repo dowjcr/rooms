@@ -5,10 +5,11 @@ Author Cameron O'Connor
 """
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import Room, Image, Staircase, Student, Syndicate
 from django.conf import settings
 from .methods import *
+import json
 
 
 # ================ ROOM DETAIL ===================
@@ -112,9 +113,12 @@ def create_syndicate(request):
     if request.method == 'POST':
         # TODO: implement some error handling here.
         usernames = request.POST.getlist('crsids[]')
-        print(usernames)
-        create_new_syndicate(usernames, request.user.username)
-        return HttpResponseRedirect('/roomballot/dashboard')
+        try:
+            create_new_syndicate(usernames, request.user.username)
+            response_code = 1
+        except ConcurrencyException:
+            response_code = 2
+        return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
     else:
         student = Student.objects.get(user_id=request.user.username)
         return render(request, 'roomballot/create-syndicate.html', {'student': student,
@@ -130,12 +134,21 @@ def syndicate_detail(request):
         return HttpResponseRedirect('/roomballot')
     student = Student.objects.get(user_id=request.user.username)
     if request.method == 'POST':
-        if request.POST.get('response') == 1:
-            accept_syndicate(student)
-        elif request.POST.get('response') == 2:
+        if request.POST.get('response') == '1':
+            try:
+                accept_syndicate(student)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 2
+        elif request.POST.get('response') == '2':
             decline_syndicate(student)
-        else:
+            response_code = 1
+        elif request.POST.get('response') == '3':
             dissolve_syndicate(student.syndicate)
+            response_code = 3
+        else:
+            response_code = 4
+        return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
     else:
         if student.syndicate is None:
             return error(request, 903)
@@ -154,9 +167,11 @@ def syndicate_detail(request):
 def error(request, code):
     messages = {
         404: "Page not found",
+        900: "Generic error.",
         901: "Concurrency error when creating syndicate.",
         902: "You're already part of a syndicate.",
         903: "You're not part of a syndicate.",
-        904: "You're not registered as a student."
+        904: "You're not registered as a student.",
+        905: "You've already accepted this syndicate."
     }
     return render(request, 'roomballot/error.html', {'message': messages[code]})

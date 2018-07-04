@@ -30,6 +30,15 @@
         var members = ["{{ student.user_id }}"];
         var membersCount = 1;
 
+        // Handle response received after POST request.
+        function HandleResponse(responseCode) {
+            // Successfully created syndicate.
+            if (responseCode === 1) location.replace('syndicate');
+            // Concurrency error when creating syndicate.
+            else if (responseCode === 2) location.replace('../error/901');
+            else location.replace('../error/900');
+        }
+
         // Called when the user confirms they have inputted all members.
         // Sends POST to create_syndicate view, which executes method.
         function CreateSyndicateAjaxResponse() {
@@ -39,8 +48,8 @@
                 data: {'crsids': members},
                 dataType: 'json',
                 csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function (result) {
-                    alert(result);
+                success: function (response) {
+                    HandleResponse(response.responseCode);
                 }
             });
         }
@@ -60,7 +69,6 @@
                     "Proceed": function () {
                         CreateSyndicateAjaxResponse();
                         $(this).dialog("close");
-                        location.replace("syndicate");
                     },
                     Cancel: function () {
                         $(this).dialog("close");
@@ -89,7 +97,7 @@
                     $('#members').append('<br>' + ui.item.label);
                     members.push(ui.item.value);
                     membersCount++;
-
+                    // If syndicate is now full.
                     if (membersCount === 6) {
                         box.val("Maximum Size Reached");
                         box.attr('disabled', true);
@@ -152,7 +160,7 @@
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
             <p>
-                A syndicate can have maximum size <b>6</b>. <br>
+                A syndicate can comprise a maximum of <b>6</b> people. <br>
                 To add a student to your syndicate, search for them in the box below.
             </p>
             <div class="ui-widget mb-2">

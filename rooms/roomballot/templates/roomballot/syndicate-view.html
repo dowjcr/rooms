@@ -24,38 +24,45 @@
             data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
         });
 
-        // When accept clicked, accepts syndicate and refreshes.
-        $('#accept').click(function () {
+        // Handle response received after POST request.
+        function HandleResponse(responseCode) {
+            // Successfully accepted invite.
+            if (responseCode === 1) location.reload(true);
+            // Student had already accepted invite.
+            else if (responseCode === 2) location.replace('../error/905');
+            // Successfully dissolved syndicate.
+            else if (responseCode === 3) location.replace('../dashboard');
+            else location.replace('../error/900');
+        }
+
+        function MakeAjaxRequest(code) {
             $.ajax({
                 url: '/roomballot/dashboard/syndicate',
                 type: 'POST',
-                data: {response: 1},
-                dataType: 'json'
+                data: {response: code},
+                dataType: 'json',
+                success: function(response) {
+                    HandleResponse(response.responseCode);
+                }
             });
-            location.reload(true);
+        }
+
+        // When decline clicked, declines syndicate and returns to dashboard.
+        $('#dissolve').click(function () {
+            MakeAjaxRequest(3);
+        });
+
+        // When accept clicked, accepts syndicate and refreshes.
+        $('#accept').click(function () {
+            MakeAjaxRequest(1);
         });
 
         // When decline clicked, declines syndicate and returns to dashboard.
         $('#decline').click(function () {
-            $.ajax({
-                url: '/roomballot/dashboard/syndicate',
-                type: 'POST',
-                data: {response: 2},
-                dataType: 'json'
-            });
-            location.reload(true);
+            MakeAjaxRequest(2);
         });
 
-        // When decline clicked, declines syndicate and returns to dashboard.
-        $('#dissolve').click(function () {
-            $.ajax({
-                url: '/roomballot/dashboard/syndicate',
-                type: 'POST',
-                data: {response: 3},
-                dataType: 'json'
-            });
-            location.reload(true);
-        });
+
     });
 </script>
 
@@ -103,13 +110,13 @@
                                 <b>Well done!</b> You've accepted your invite to this syndicate.
                             </div>
                         {% else %}
-                            <div class="alert alert-info" role="alert">
+                            <div class="alert alert-info" role="alert" id="alert2">
                                 You are this syndicate's owner.<br>
-                                <button class="btn btn-primary mt-2" id="dissolve">Dissolve This Syndicate</button>
+                                <button class="btn btn-primary mt-2" id="dissolve">Dissolve</button>
                             </div>
                         {% endif %}
                     {% else %}
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger" role="alert" id="alert">
                             <b>For shame!</b> You haven't accepted your invite to this syndicate yet. <br>You were
                             invited
                             by {{ syndicate.owner_id }}.

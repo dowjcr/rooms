@@ -9,6 +9,10 @@ from .email import *
 import random
 
 
+class ConcurrencyException(Exception):
+    pass
+
+
 # ============== ALLOCATE ROOM ===================
 # Takes a room and student, and tries to allocate that
 # room to that student. If room has already been allocated,
@@ -212,22 +216,28 @@ def readd_to_ballot(student, syndicate):
 # to the concerned students.
 
 def create_new_syndicate(student_ids, owner_id):
-    #if owner.syndicate != None or owner.accepted_syndicate:
-        #raise Exception()   # TODO: handle this error (user already associated with a syndicate).
-    #else:
+    owner = Student.objects.get(user_id=owner_id)
+    if owner.syndicate is not None or owner.accepted_syndicate:
+        raise ConcurrencyException()
+    else:
         syndicate = Syndicate()
         syndicate.year = 1
         syndicate.owner_id = owner_id
         syndicate.save()
         for student_id in student_ids:
             student = Student.objects.get(user_id=student_id)
-            student.syndicate = syndicate
-            student.accepted_syndicate = False
-            student.save()
+            if student.syndicate is not None or student.accepted_syndicate:
+                # If we get to a student who already has a syndicate
+                dissolve_syndicate(syndicate)
+                raise ConcurrencyException()
+            else:
+                student.syndicate = syndicate
+                student.accepted_syndicate = False
+                student.save()
         owner = Student.objects.get(user_id=owner_id)
         owner.accepted_syndicate = True
         owner.save()
-        invite_syndicate(syndicate)
+        #invite_syndicate(syndicate)
 
 
 # ============ DISSOLVE SYNDICATE ================
@@ -250,7 +260,8 @@ def dissolve_syndicate(syndicate):
 
 def accept_syndicate(student):
     if student.accepted_syndicate:
-        raise Exception()   # TODO: handle this error (already accepted).
+        print("oops")
+        raise ConcurrencyException()
     else:
         student.accepted_syndicate = True
         student.save()
@@ -262,7 +273,7 @@ def accept_syndicate(student):
         if accepted:
             syndicate.complete = True
             syndicate.save()
-            completed_syndicate(syndicate)
+            #completed_syndicate(syndicate)
 
 
 # ============= DECLINE SYNDICATE =================
