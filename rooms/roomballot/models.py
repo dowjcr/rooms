@@ -70,7 +70,7 @@ class Student(models.Model):
     year = models.IntegerField(choices=YEAR_CHOICES)
     in_ballot = models.BooleanField(default=True)
     has_allocated = models.BooleanField(default=False)
-    rank = models.IntegerField(editable=False, null=True)
+    rank = models.IntegerField(null=True, blank=True)
     syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
     accepted_syndicate = models.BooleanField(default=False)
 

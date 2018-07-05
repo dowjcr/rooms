@@ -3,6 +3,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('admin', views.admin_dashboard, name='admin'),
+    path('ranking', views.ballot_ranking, name='ranking'),
     path('room/<str:room_id>/confirm-selection', views.room_selection_confirm, name='confirm-room-selection'),
     path('room/<str:room_id>', views.room_detail, name='room-detail'),
     path('', views.landing, name='landing'),
@@ -11,5 +13,7 @@ urlpatterns = [
     path('staircase/<int:staircase_id>', views.staircase_detail, name='staircase-detail'),
     path('dashboard', views.student_dashboard, name='dashboard'),
     path('error/<int:code>', views.error, name='error'),
-    path('dashboard/syndicate', views.syndicate_detail, name='syndicate')
+    path('dashboard/syndicate', views.syndicate_detail, name='syndicate'),
+    path('student/<str:user_id>', views.student_detail, name='student-detail'),
+    path('admin/manage-student/<str:user_id>', views.manage_student, name='manage-student')
 ]

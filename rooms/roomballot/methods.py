@@ -19,8 +19,7 @@ class ConcurrencyException(Exception):
 # or student already has a room, then raises exception.
 
 def allocate_room(room, student):
-    if student.has_allocated or room.taken_by is not None or student.syndicate is None \
-            or not student.accepted_syndicate or not student.syndicate.complete:
+    if student.has_allocated or room.taken_by is not None:
         raise ConcurrencyException()
     else:
         room.taken_by = student
@@ -31,16 +30,16 @@ def allocate_room(room, student):
 
 
 # ============= DEALLOCATE ROOM ==================
-# Takes a room and tries to deallocate it. Raises
-# exception if no student has been allocated to it.
+# Takes a student and tries to deallocate their room.
+# Raises exception if no room allocated.
 
-def deallocate_room(room):
-    if room.taken_by is None:
-        raise Exception()   # TODO: handle this error.
+def deallocate_room(student):
+    if not student.has_allocated:
+        raise ConcurrencyException()
     else:
-        student = room.taken_by
         student.has_allocated = False
         student.save()
+        room = Room.objects.get(taken_by=student)
         room.taken_by = None
         room.save()
 
@@ -59,12 +58,12 @@ def generate_price(room):
 
 def get_num_first_years_in_ballot():
     qset = Student.objects.filter(year=1, in_ballot=True)
-    return qset.len()
+    return qset.count()
 
 
 def get_num_first_year_syndicates():
     qset = Syndicate.objects.filter(year=1)
-    return qset.len()
+    return qset.count()
 
 
 # ========== SECOND YEARS IN BALLOT ==============
@@ -74,12 +73,12 @@ def get_num_first_year_syndicates():
 
 def get_num_second_years_in_ballot():
     qset = Student.objects.filter(year=2, in_ballot=True)
-    return qset.len()
+    return qset.count()
 
 
 def get_num_second_year_syndicates():
     qset = Syndicate.objects.filter(year=2)
-    return qset.len()
+    return qset.count()
 
 
 # =============== SYNDICATE SIZE =================
@@ -88,11 +87,11 @@ def get_num_second_year_syndicates():
 
 def get_syndicate_size(syndicate):
     qset = Student.objects.filter(syndicate=syndicate)
-    return qset.len()
+    return qset.count()
 
 def get_num_syndicates():
     qset = Syndicate.objects.all()
-    return qset.len()
+    return qset.count()
 
 
 # ============= RANDOMISE ORDER ==================
@@ -168,27 +167,34 @@ def remove_from_ballot(student):
     student_syndicate = student.syndicate
     student.rank = None
     student.syndicate = None
+    student.accepted_syndicate = False
     student.in_ballot = False
     student.save()
     number_in_ballot = get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
     # Now decrease rank of all subsequent students.
-    for rank in range(student_rank+1, number_in_ballot+1):
-        st = Student.objects.get(rank=rank)
-        st.rank -= 1
-        st.save()
-    # If syndicate is now empty, delete it and update ranks.
-    if get_syndicate_size(student_syndicate) == 0:
-        syndicate_rank = student_syndicate.rank
-        student_syndicate.delete()
-        for rank in range(syndicate_rank+1, get_num_syndicates()+2):
-            sy = Syndicate.objects.get(rank=rank)
-            sy.rank -= 1
-            sy.save()
+    if student_rank is not None:
+        for rank in range(student_rank+1, number_in_ballot+1):
+            st = Student.objects.get(rank=rank)
+            st.rank -= 1
+            st.save()
+    if student_syndicate is not None:
+        # If syndicate is now empty, delete it and update ranks.
+        if get_syndicate_size(student_syndicate) == 0:
+            syndicate_rank = student_syndicate.rank
+            student_syndicate.delete()
+            if syndicate_rank is not None:
+                for rank in range(syndicate_rank+1, get_num_syndicates()+2):
+                    sy = Syndicate.objects.get(rank=rank)
+                    sy.rank -= 1
+                    sy.save()
+        else:
+            if student_syndicate.owner_id == student.user_id:
+                reallocate_syndicate_owner(student_syndicate)
 
 
 # ============= RE-ADD TO BALLOT =================
 # Re-adds a student who has been removed from the
-# ballot. A pre-existing syndicate MUST be specified,
+# ballot. A pre-existing syndicate must be specified,
 # then the student will be added last in the syndicate.
 
 def readd_to_ballot(student, syndicate):
@@ -196,16 +202,20 @@ def readd_to_ballot(student, syndicate):
     syndicate_rank = syndicate.rank
     # Increments the student rank of all students in subsequent syndicates.
     new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-    for rank in range(syndicate_rank+1, get_num_syndicates()+1):
-        sy = Syndicate.objects.get(rank=rank)
-        for st in Student.objects.filter(syndicate=sy):
-            new_rank = min(new_rank, st.rank)
-            st.rank += 1
-            st.save()
+    if syndicate_rank is not None:
+        new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+        for rank in range(syndicate_rank+1, get_num_syndicates()+1):
+            sy = Syndicate.objects.get(rank=rank)
+            for st in Student.objects.filter(syndicate=sy):
+                new_rank = min(new_rank, st.rank)
+                st.rank += 1
+                st.save()
+        student.rank = new_rank
     student.in_ballot = True
     student.syndicate = syndicate
-    student.rank = new_rank
     student.save()
+    syndicate.complete = False
+    syndicate.save()
 
 
 # ============= CREATE SYNDICATE =================
@@ -291,3 +301,14 @@ def decline_syndicate(student):
             student.save()
         # failed_syndicate(syndicate)
         syndicate.delete()
+
+
+# ======== RE-ALLOCATE SYNDICATE OWNER ============
+# Takes a syndicate whose owner has just been removed
+# from the ballot, and re-allocates ownership.
+# Inductively, syndicate must be non-empty.
+
+def reallocate_syndicate_owner(syndicate):
+    students = Student.objects.filter(syndicate=syndicate)
+    syndicate.owner_id = students[0].user_id
+    syndicate.save()

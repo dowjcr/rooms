@@ -19,11 +19,10 @@ from .views import get_home
 from django.conf import settings
 from django.views.static import serve
 
-app_name = 'roomsurvey'
+app_name = 'roomballot'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', get_home),
-    path('roomsurvey/', include('roomsurvey.urls')),
     path('roomballot/', include('roomballot.urls')),
     path(r'', include('ucamwebauth.urls'))
 ]

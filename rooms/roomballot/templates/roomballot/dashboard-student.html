@@ -89,9 +89,10 @@
                 {% if student.in_ballot %}
                     {% if student.rank == None %}
                     <p>Your ranking hasn't been generated yet. Check back soon!</p>
+                    <a href="ranking" class="btn btn-primary">View Ranking</a>
                     {% else %}
                     <p>You are ranked <b>{{ student.rank }} out of all students.</b></p>
-                    <a href="#" class="btn btn-primary">View Rankings</a>
+                    <a href="ranking" class="btn btn-primary">View Ranking</a>
                     {% endif %}
                 {% else %}
                     <p>You've been removed from the ballot.</p>

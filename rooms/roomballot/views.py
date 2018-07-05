@@ -45,8 +45,11 @@ def room_selection_confirm(request, room_id):
     student = Student.objects.get(user_id=request.user.username)
     if request.method == 'POST':
         try:
-            allocate_room(room, student)
-            response_code = 1
+            if student.syndicate is None or not student.accepted_syndicate or not student.syndicate.complete:
+                raise ConcurrencyException()
+            else:
+                allocate_room(room, student)
+                response_code = 1
         except ConcurrencyException:
             response_code = 900
         return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
@@ -183,3 +186,99 @@ def error(request, code):
         905: "You've already accepted this syndicate."
     }
     return render(request, 'roomballot/error.html', {'message': messages[code]})
+
+
+# ============== ADMIN DASHBOARD ==============
+# Displays dashboard allowing system management.
+
+def admin_dashboard(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/roomballot')
+    return render(request, 'roomballot/dashboard-admin.html')
+
+
+# ============== BALLOT RANKING ===============
+# Displays students ranked by ballot order.
+
+def ballot_ranking(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/roomballot')
+    ranked_students = Student.objects.filter(in_ballot=True).order_by('rank')
+    return render(request, 'roomballot/ranking.html', {'students': ranked_students})
+
+
+# ============== STUDENT DETAIL ===============
+# Displays student metadata.
+
+def student_detail(request, user_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/roomballot')
+    student = get_object_or_404(Student, user_id=user_id)
+    room = None
+    if student.has_allocated:
+        room = Room.objects.get(taken_by=student)
+    return render(request, 'roomballot/student-detail.html', {'student': student,
+                                                              'room': room})
+
+# ============== MANAGE STUDENT ===============
+# Allows registered admins to perform operations
+# on given student.
+# TODO: sort out error codes.
+
+def manage_student(request, user_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/roomballot')
+    student = get_object_or_404(Student, user_id=user_id)
+    if request.method == 'POST':
+        # Clicked 'Remove from Ballot'.
+        if request.POST.get('response') == '1':
+            try:
+                remove_from_ballot(student)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 905
+
+        # Clicked 'Deallocate Room'.
+        elif request.POST.get('response') == '2':
+            try:
+                deallocate_room(student)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 905
+
+        # Selected a room to allocate.
+        elif request.POST.get('response') == '3':
+            try:
+                room = get_object_or_404(Room, pk=request.POST.get('id'))
+                allocate_room(room, student)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 905
+
+        # Selected a syndicate to allocate.
+        elif request.POST.get('response') == '4':
+            try:
+                syndicate = get_object_or_404(Syndicate, pk=request.POST.get('id'))
+                readd_to_ballot(student, syndicate)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 905
+
+        # Clicked 'Add to Ballot'.
+        elif request.POST.get('response') == '5':
+            student.in_ballot = True        # TODO: put some error handling in here.
+            student.save()
+            response_code = 1
+        else:
+            response_code = 900
+        return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+    else:
+        room = None
+        if student.has_allocated:
+            room = Room.objects.get(taken_by=student)
+        rooms = Room.objects.filter(taken_by=None)
+        syndicates = Syndicate.objects.all()
+        return render(request, 'roomballot/student-manage.html', {'student': student,
+                                                                  'room': room,
+                                                                  'rooms': rooms,
+                                                                  'syndicates': syndicates})
