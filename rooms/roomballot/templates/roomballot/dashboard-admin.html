@@ -17,6 +17,77 @@
 </head>
 <body>
 
+<script>
+    window.CSRF_TOKEN = "{{ csrf_token }}";
+
+    $(document).ready(function () {
+
+        // Defining CSRF token.
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        // Handle response received after POST request.
+        function HandleResponse(responseCode) {
+            // Successfully created syndicate.
+            if (responseCode === 1) location.reload(true);
+            else location.replace('/roomballot/error/' + responseCode.toString());
+        }
+
+        // Called when the user clicks a button.
+        function CreateButtonAjaxResponse(code) {
+            $.ajax({
+                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
+                type: 'POST',
+                data: {'response': code},
+                dataType: 'json',
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                success: function (response) {
+                    HandleResponse(response.responseCode);
+                }
+            });
+        }
+
+        // Called when the user selects a room/syndicate to allocate.
+        function CreateSelectionAjaxResponse(code, id) {
+            $.ajax({
+                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
+                type: 'POST',
+                data: {'response': code, 'id': id},
+                dataType: 'json',
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                success: function (response) {
+                    HandleResponse(response.responseCode);
+                }
+            });
+        }
+
+        $(function () {
+
+            // Generate JSON of rooms which can be allocated.
+            var availableStudents = [
+                {% for s in students %}
+                    {
+                        value: "{{ s.user_id }}",
+                        label: "{{ s }} ({{ s.user_id }})"
+                    }
+                    {% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            // Set parameters of autocomplete field.
+            $('#student').autocomplete({
+                source: availableStudents,
+                select: function (event, ui) {
+                    location.replace('admin/manage-student/' + ui.item.value);
+                }
+            });
+
+        });
+
+    });
+</script>
+
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
 
     <a class="navbar-brand" href="/roomballot">
@@ -30,29 +101,30 @@
 
     <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
         <ul class="nav navbar-nav">
-            <li class="mr-sm-2"><a class="nav-link active" href="/roomballot/dashboard">Admin Dashboard</a></li>
+            <li class="mr-sm-2"><a class="nav-link active" href="/roomballot/admin">Admin Dashboard</a></li>
         </ul>
     </div>
 </nav>
 
 
 <div class="container">
-
     <div class="border-bottom mb-3">
-        <h2>Admin Dashboard</h2>
+            <h2>Admin Dashboard</h2>
+        </div>
+
+    <div class="row mt-3">
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Manage Student</h3>
+                <div class="ui-widget mb-3" id="student-search-widget">
+                    <p>Start typing the student's name below:</p>
+                    <input id="student"><br>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-        crossorigin="anonymous"></script>
 
 </body>
 </html>

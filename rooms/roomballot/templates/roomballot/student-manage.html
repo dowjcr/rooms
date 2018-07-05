@@ -31,7 +31,7 @@
         function HandleResponse(responseCode) {
             // Successfully created syndicate.
             if (responseCode === 1) location.reload(true);
-            else location.replace('/roomballot/error/' + responseCode.toString());
+            else location.href('/roomballot/error/' + responseCode.toString());
         }
 
         // Called when the user clicks a button.

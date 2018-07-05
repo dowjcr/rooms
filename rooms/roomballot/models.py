@@ -133,7 +133,8 @@ class Review(models.Model):
 # to access the backend management system.
 
 class AdminUser(models.Model):
-    user_id = models.CharField('CRSid', primary_key=True, max_length=10)
+    entry_id = models.AutoField(primary_key=True)
+    user_id = models.CharField('CRSid', max_length=10)
     role = models.CharField(max_length=30)
 
     def __str__(self):
