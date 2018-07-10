@@ -65,15 +65,15 @@
             $('#student').autocomplete({
                 source: availableStudents,
                 select: function (event, ui) {
-                    location.replace('admin/manage-student/' + ui.item.value);
+                    location.assign('admin/manage-student/' + ui.item.value);
                 }
             });
 
-            $('#randomise').click(function() {
+            $('#randomise').click(function () {
                 CreateButtonAjaxResponse(1);
             });
 
-            $('#advance').click(function() {
+            $('#advance').click(function () {
                 CreateButtonAjaxResponse(2);
             });
 
@@ -103,8 +103,8 @@
 
 <div class="container">
     <div class="border-bottom mb-3">
-            <h2>Admin Dashboard</h2>
-        </div>
+        <h2>Admin Dashboard</h2>
+    </div>
 
     <div class="row mt-3">
         <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
@@ -125,9 +125,9 @@
                         <tr>
                             <td>
                                 {% if randomised %}
-                                Yes
+                                    Yes
                                 {% else %}
-                                No
+                                    No
                                 {% endif %}
                             </td>
                             <td>Randomised</td>
@@ -135,9 +135,9 @@
                         <tr>
                             <td>
                                 {% if in_progress %}
-                                Yes
+                                    Yes
                                 {% else %}
-                                No
+                                    No
                                 {% endif %}</td>
                             <td>Ballot In Progress</td>
                         </tr>
@@ -159,7 +159,8 @@
         <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
             <div class="jumbotron">
                 <h3 class="mb-3">Tasks</h3>
-                <button class="btn btn-primary mb-3" id="randomise">Randomise First-Years</button><br>
+                <button class="btn btn-primary mb-3" id="randomise">Randomise First-Years</button>
+                <br>
                 <button class="btn btn-primary" id="advance">Advance</button>
             </div>
         </div>

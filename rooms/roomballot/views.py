@@ -22,7 +22,7 @@ def room_detail(request, room_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/roomballot')
     try:
-        Student.objects.get(user_id=request.user.username)
+        student = Student.objects.get(user_id=request.user.username)
         room = get_object_or_404(Room, pk=room_id)
         reviews = Review.objects.filter(room=room)
         if settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username:
@@ -35,7 +35,6 @@ def room_detail(request, room_id):
         for image in Image.objects.filter(room=room):
             image_urls.append(settings.MEDIA_ROOT + image.file.url)
         occupant = None
-        student = Student.objects.get(user_id=request.user.username)
         return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                     'username': request.user.first_name,
                                                                     'total_price': total_price,
@@ -100,9 +99,10 @@ def staircase_list(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/roomballot')
     try:
-        Student.objects.get(user_id=request.user.username)
+        student = Student.objects.get(user_id=request.user.username)
         return render(request, 'roomballot/staircase-list.html', {'staircases': Staircase.objects.order_by('name'),
-                                                                  'username': request.user.first_name})
+                                                                  'username': request.user.first_name,
+                                                                  'student': student})
     except Student.DoesNotExist:
         return error(request, 906)
 
@@ -115,11 +115,12 @@ def staircase_detail(request, staircase_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/roomballot')
     try:
-        Student.objects.get(user_id=request.user.username)
+        student = Student.objects.get(user_id=request.user.username)
         staircase = get_object_or_404(Staircase, pk=staircase_id)
         return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
                                                                   'rooms': Room.objects.filter(staircase=staircase).order_by('room_number'),
-                                                                  'username': request.user.first_name})
+                                                                  'username': request.user.first_name,
+                                                                  'student': student})
     except Student.DoesNotExist:
         return error(request, 906)
 

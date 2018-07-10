@@ -53,6 +53,7 @@
                     <th scope="col">Rank</th>
                     <th scope="col">Name</th>
                     <th scope="col" class="d-none d-sm-table-cell">CRSid</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Picks at</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
@@ -62,6 +63,7 @@
                     <td>{{ student.rank }}</td>
                     <td>{{ student.first_name }} {{ student.surname }}</td>
                     <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
+                    <td class="d-none d-sm-table-cell">{{ student.picks_at }}</td>
                     <td class="text-center">
                         <a class="btn btn-primary" href="student/{{ student.user_id }}">View</a>
                     </td>

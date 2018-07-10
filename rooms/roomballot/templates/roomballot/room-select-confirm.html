@@ -28,7 +28,7 @@
 
         function HandleResponse(responseCode) {
             if (responseCode === 1) location.replace('/roomballot/dashboard');
-            else location.replace('../../error/' + responseCode.toString());
+            else location.assign('../../error/' + responseCode.toString());
         }
 
         $('#confirm').click(function() {

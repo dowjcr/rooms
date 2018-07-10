@@ -32,7 +32,7 @@ class Syndicate(models.Model):
     owner_id = models.CharField(max_length=10)
     complete = models.BooleanField(default=False)
     year = models.IntegerField(choices=YEAR_CHOICES)
-    rank = models.IntegerField(editable=False, null=True)
+    rank = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return str(self.syndicate_id)
@@ -73,6 +73,7 @@ class Student(models.Model):
     rank = models.IntegerField(null=True, blank=True)
     syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
     accepted_syndicate = models.BooleanField(default=False)
+    picks_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.first_name + " " + self.surname

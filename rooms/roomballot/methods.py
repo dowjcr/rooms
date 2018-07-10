@@ -6,7 +6,7 @@ Defines helper methods which are relied on for function.
 
 from .models import *
 from .email import *
-import random
+import random, datetime
 from modeldict import ModelDict
 
 
@@ -138,6 +138,7 @@ def randomise_order():
         syndicate.save()
         current_rank_syndicate += 1
     settings['randomised'] = 'true'
+    generate_times()
 
 
 # =============== ADVANCE YEAR ===================
@@ -338,3 +339,34 @@ def reallocate_syndicate_owner(syndicate):
     students = Student.objects.filter(syndicate=syndicate)
     syndicate.owner_id = students[0].user_id
     syndicate.save()
+
+
+# =============== GENERATE TIMES ==================
+# Takes a start date, and generates the times at which
+# each person is to choose their room. Second years on
+# the first day, first years on the second.
+# Date in datetime format.
+
+def generate_times():
+    start_date = settings['start_date']
+    # Generate times for second years.
+    second_years = Student.objects.filter(year=2, in_ballot=True).order_by('rank')
+    dt = datetime.datetime.strptime(start_date + " 09:30", "%d/%m/%y %H:%M")
+    for student in second_years:
+        student.picks_at = dt
+        student.save()
+        dt += datetime.timedelta(0,300)
+
+    # Generate times for first years.
+    first_years = Student.objects.filter(year=1, in_ballot=True).order_by('rank')
+    dt = datetime.datetime.strptime(start_date + " 09:30", "%d/%m/%y %H:%M") + datetime.timedelta(1)
+    for student in first_years:
+        student.picks_at = dt
+        student.save()
+        dt += datetime.timedelta(0, 300)
+
+
+# ================ RUN BALLOT =====================
+# Takes a syndicate whose owner has just been removed
+# from the ballot, and re-allocates ownership.
+# Inductively, syndicate must be non-empty.
