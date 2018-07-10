@@ -42,14 +42,17 @@
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
                 <h2>{{ room }}</h2>
                 {% if room.taken_by is not None %}
-                <p>This room has been taken by <b>{{ room.taken_by }}</b>.</p>
+                    <p>This room has been taken by <b>{{ room.taken_by }}</b>.</p>
                 {% else %}
-                <p>This room is currently available for occupation.</p>
+                    <p>This room is currently available for occupation.</p>
                 {% endif %}
             </div>
             <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 text-center">
-                {% if room.taken_by is not None %} <div class="alert alert-danger" role="alert"><h3>Unavailable</h3></div>
-                {% else %} <div class="alert alert-success" role="alert"><h3>Available</h3></div>
+                {% if not room.taken and not student.has_allocated and selectable %}
+                    <div align="right">
+                        <a class="btn btn-primary mt-3 mb-2" href="{{ room.room_id }}/confirm-selection">Select this
+                            room</a>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -129,11 +132,16 @@
                 </tr>
                 </tbody>
             </table>
-            {% if not room.taken and not student.has_allocated %}
-            <div align="right">
-                <a class="btn btn-primary mb-5" href="{{ room.room_id }}/confirm-selection">Select this room</a>
-            </div>
-            {% endif %}
+        </div>
+        <div class="col-md-12">
+            <h3 class="border-bottom mb-3">Reviews</h3>
+            {% for review in reviews %}
+                <div class="alert alert-info">
+                    <p>"{{ review.text }}"<br>
+                        <i>- {{ review.author_name }}</i>
+                    </p>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

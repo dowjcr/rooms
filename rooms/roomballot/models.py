@@ -122,10 +122,12 @@ class Room(models.Model):
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(Room, on_delete=models.SET_DEFAULT, default=None)
+    author_name = models.CharField(max_length=40)
+    text = models.CharField(max_length=1000)
     # TODO: add review attributes as required.
 
     def __str__(self):
-        return self.room.__str__() + str(self.review_id)
+        return self.room.__str__() + ", Review " + str(self.review_id)
 
 
 # =================== ADMIN ======================
@@ -152,3 +154,15 @@ class Image(models.Model):
 
     def __str__(self):
         return self.room.__str__() + ", Image " + str(self.image_id)
+
+
+# ================== SETTING =====================
+# Stores settings required for app's function, using
+# django-modeldict-yplan.
+
+class Setting(models.Model):
+    key = models.CharField(max_length=32)
+    value = models.CharField(max_length=200)
+
+    def __str__(self):
+        return str(self.key)

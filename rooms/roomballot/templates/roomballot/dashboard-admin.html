@@ -31,29 +31,15 @@
         function HandleResponse(responseCode) {
             // Successfully created syndicate.
             if (responseCode === 1) location.reload(true);
-            else location.replace('/roomballot/error/' + responseCode.toString());
+            else location.assign('/roomballot/error/' + responseCode.toString());
         }
 
         // Called when the user clicks a button.
         function CreateButtonAjaxResponse(code) {
             $.ajax({
-                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
+                url: '/roomballot/admin',
                 type: 'POST',
                 data: {'response': code},
-                dataType: 'json',
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function (response) {
-                    HandleResponse(response.responseCode);
-                }
-            });
-        }
-
-        // Called when the user selects a room/syndicate to allocate.
-        function CreateSelectionAjaxResponse(code, id) {
-            $.ajax({
-                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
-                type: 'POST',
-                data: {'response': code, 'id': id},
                 dataType: 'json',
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 success: function (response) {
@@ -81,6 +67,14 @@
                 select: function (event, ui) {
                     location.replace('admin/manage-student/' + ui.item.value);
                 }
+            });
+
+            $('#randomise').click(function() {
+                CreateButtonAjaxResponse(1);
+            });
+
+            $('#advance').click(function() {
+                CreateButtonAjaxResponse(2);
             });
 
         });
@@ -115,11 +109,58 @@
     <div class="row mt-3">
         <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
             <div class="jumbotron">
+                <h3 class="mb-3">Status</h3>
+                <div class="ui-widget mb-3" id="student-search-widget">
+                    <table>
+                        <tr>
+                            <td>
+                                {% if syndicates_complete %}
+                                    Yes
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </td>
+                            <td>First Year Syndicates Complete</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {% if randomised %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                            <td>Randomised</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {% if in_progress %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}</td>
+                            <td>Ballot In Progress</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron">
                 <h3 class="mb-3">Manage Student</h3>
                 <div class="ui-widget mb-3" id="student-search-widget">
                     <p>Start typing the student's name below:</p>
                     <input id="student"><br>
                 </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Tasks</h3>
+                <button class="btn btn-primary mb-3" id="randomise">Randomise First-Years</button><br>
+                <button class="btn btn-primary" id="advance">Advance</button>
             </div>
         </div>
     </div>

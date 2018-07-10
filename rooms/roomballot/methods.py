@@ -7,9 +7,19 @@ Defines helper methods which are relied on for function.
 from .models import *
 from .email import *
 import random
+from modeldict import ModelDict
+
+
+settings = ModelDict(Setting, key='key', value='value', instances=False)
 
 
 class ConcurrencyException(Exception):
+    pass
+
+class BallotInProgressException(Exception):
+    pass
+
+class NotReadyToRandomiseException(Exception):
     pass
 
 
@@ -103,7 +113,14 @@ def get_num_syndicates():
 
 def randomise_order():
     syndicates = []
+    # First check all students either in syndicate or removed from ballot.
+    for s in Student.objects.filter(year=1):
+        if s.in_ballot and not s.accepted_syndicate:
+            raise NotReadyToRandomiseException()
+    # Now get all first-year syndicates.
     for s in Syndicate.objects.filter(year=1):
+        if not s.complete:
+            raise NotReadyToRandomiseException()
         syndicates.append(s)
     random.shuffle(syndicates)
     current_rank_student = 1 + get_num_second_years_in_ballot()
@@ -111,7 +128,7 @@ def randomise_order():
     for syndicate in syndicates:
         students = []
         for student in Student.objects.filter(syndicate=syndicate):
-            student.append(student)
+            students.append(student)
             random.shuffle(students)
         for student in students:
             student.rank = current_rank_student
@@ -120,6 +137,7 @@ def randomise_order():
         syndicate.rank = current_rank_syndicate
         syndicate.save()
         current_rank_syndicate += 1
+    settings['randomised'] = 'true'
 
 
 # =============== ADVANCE YEAR ===================
@@ -129,32 +147,35 @@ def randomise_order():
 # delete them from Student table.
 
 def advance_year():
-    # First clear data pertaining to current second-years.
-    second_year_students = Student.objects.filter(year=2)
-    for student in second_year_students:
-        student.syndicate = None
-        student.rank = None
-        student.year = None
-        student.save()
-    second_year_syndicates = Syndicate.objects.filter(year=2)
-    for syndicate in second_year_syndicates:
-        syndicate.year = None
-        syndicate.save()
-    # Now convert rankings and update year attributes.
-    ranked_first_year_students = Student.objects.filter(year=1, in_ballot=True).order_by('-rank')
-    current_rank_student = 1
-    for student in ranked_first_year_students:
-        student.rank = current_rank_student
-        student.year = 2
-        current_rank_student += 1
-        student.save()
-    ranked_first_year_syndicates = Syndicate.objects.filter(year=1).order_by('-rank')
-    current_rank_syndicate = 1
-    for syndicate in ranked_first_year_syndicates:
-        syndicate.rank = current_rank_syndicate
-        syndicate.year = 2
-        current_rank_syndicate += 1
-        syndicate.save()
+    if settings['ballot_in_progress'] == 'false':
+        # First clear data pertaining to current second-years.
+        second_year_students = Student.objects.filter(year=2)
+        for student in second_year_students:
+            student.syndicate = None
+            student.rank = None
+            student.year = 3
+            student.save()
+        second_year_syndicates = Syndicate.objects.filter(year=2)
+        for syndicate in second_year_syndicates:
+            syndicate.year = 3
+            syndicate.save()
+        # Now convert rankings and update year attributes.
+        ranked_first_year_students = Student.objects.filter(year=1, in_ballot=True).order_by('-rank')
+        current_rank_student = 1
+        for student in ranked_first_year_students:
+            student.rank = current_rank_student
+            student.year = 2
+            current_rank_student += 1
+            student.save()
+        ranked_first_year_syndicates = Syndicate.objects.filter(year=1).order_by('-rank')
+        current_rank_syndicate = 1
+        for syndicate in ranked_first_year_syndicates:
+            syndicate.rank = current_rank_syndicate
+            syndicate.year = 2
+            current_rank_syndicate += 1
+            syndicate.save()
+    else:
+        raise BallotInProgressException()
 
 
 # ============ REMOVE FROM BALLOT ================
@@ -162,34 +183,36 @@ def advance_year():
 # by removing them from rankings and their syndicate.
 
 def remove_from_ballot(student):
-    # TODO: don't allow this if the ballot has already started!
-    student_rank = student.rank
-    student_syndicate = student.syndicate
-    student.rank = None
-    student.syndicate = None
-    student.accepted_syndicate = False
-    student.in_ballot = False
-    student.save()
-    number_in_ballot = get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-    # Now decrease rank of all subsequent students.
-    if student_rank is not None:
-        for rank in range(student_rank+1, number_in_ballot+1):
-            st = Student.objects.get(rank=rank)
-            st.rank -= 1
-            st.save()
-    if student_syndicate is not None:
-        # If syndicate is now empty, delete it and update ranks.
-        if get_syndicate_size(student_syndicate) == 0:
-            syndicate_rank = student_syndicate.rank
-            student_syndicate.delete()
-            if syndicate_rank is not None:
-                for rank in range(syndicate_rank+1, get_num_syndicates()+2):
-                    sy = Syndicate.objects.get(rank=rank)
-                    sy.rank -= 1
-                    sy.save()
-        else:
-            if student_syndicate.owner_id == student.user_id:
-                reallocate_syndicate_owner(student_syndicate)
+    if settings['ballot_in_progress'] == 'false':
+        student_rank = student.rank
+        student_syndicate = student.syndicate
+        student.rank = None
+        student.syndicate = None
+        student.accepted_syndicate = False
+        student.in_ballot = False
+        student.save()
+        number_in_ballot = get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+        # Now decrease rank of all subsequent students.
+        if student_rank is not None:
+            for rank in range(student_rank+1, number_in_ballot+1):
+                st = Student.objects.get(rank=rank)
+                st.rank -= 1
+                st.save()
+        if student_syndicate is not None:
+            # If syndicate is now empty, delete it and update ranks.
+            if get_syndicate_size(student_syndicate) == 0:
+                syndicate_rank = student_syndicate.rank
+                student_syndicate.delete()
+                if syndicate_rank is not None:
+                    for rank in range(syndicate_rank+1, get_num_syndicates()+2):
+                        sy = Syndicate.objects.get(rank=rank)
+                        sy.rank -= 1
+                        sy.save()
+            else:
+                if student_syndicate.owner_id == student.user_id:
+                    reallocate_syndicate_owner(student_syndicate)
+    else:
+        raise BallotInProgressException()
 
 
 # ============= RE-ADD TO BALLOT =================
@@ -198,24 +221,26 @@ def remove_from_ballot(student):
 # then the student will be added last in the syndicate.
 
 def readd_to_ballot(student, syndicate):
-    # TODO: don't allow this if the ballot has already started!
-    syndicate_rank = syndicate.rank
-    # Increments the student rank of all students in subsequent syndicates.
-    new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-    if syndicate_rank is not None:
+    if settings['ballot_in_progress'] == 'false':
+        syndicate_rank = syndicate.rank
+        # Increments the student rank of all students in subsequent syndicates.
         new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-        for rank in range(syndicate_rank+1, get_num_syndicates()+1):
-            sy = Syndicate.objects.get(rank=rank)
-            for st in Student.objects.filter(syndicate=sy):
-                new_rank = min(new_rank, st.rank)
-                st.rank += 1
-                st.save()
-        student.rank = new_rank
-    student.in_ballot = True
-    student.syndicate = syndicate
-    student.save()
-    syndicate.complete = False
-    syndicate.save()
+        if syndicate_rank is not None:
+            new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+            for rank in range(syndicate_rank+1, get_num_syndicates()+1):
+                sy = Syndicate.objects.get(rank=rank)
+                for st in Student.objects.filter(syndicate=sy):
+                    new_rank = min(new_rank, st.rank)
+                    st.rank += 1
+                    st.save()
+            student.rank = new_rank
+        student.in_ballot = True
+        student.syndicate = syndicate
+        student.save()
+        syndicate.complete = False
+        syndicate.save()
+    else:
+        raise BallotInProgressException()
 
 
 # ============= CREATE SYNDICATE =================
@@ -223,31 +248,34 @@ def readd_to_ballot(student, syndicate):
 # to the concerned students.
 
 def create_new_syndicate(student_ids, owner_id):
-    owner = Student.objects.get(user_id=owner_id)
-    size = len(student_ids)
-    if owner.syndicate is not None or owner.accepted_syndicate or size > 6 or size < 1:
-        raise ConcurrencyException()
-    else:
-        syndicate = Syndicate()
-        syndicate.year = 1
-        syndicate.owner_id = owner_id
-        if len(student_ids) == 1:
-            syndicate.complete = True
-        syndicate.save()
-        for student_id in student_ids:
-            student = Student.objects.get(user_id=student_id)
-            if student.syndicate is not None or student.accepted_syndicate:
-                # If we get to a student who already has a syndicate
-                dissolve_syndicate(syndicate)
-                raise ConcurrencyException()
-            else:
-                student.syndicate = syndicate
-                student.accepted_syndicate = False
-                student.save()
+    if settings['ballot_in_progress'] == 'false':
         owner = Student.objects.get(user_id=owner_id)
-        owner.accepted_syndicate = True
-        owner.save()
-        #invite_syndicate(syndicate)
+        size = len(student_ids)
+        if owner.syndicate is not None or owner.accepted_syndicate or size > 6 or size < 1:
+            raise ConcurrencyException()
+        else:
+            syndicate = Syndicate()
+            syndicate.year = 1
+            syndicate.owner_id = owner_id
+            if len(student_ids) == 1:
+                syndicate.complete = True
+            syndicate.save()
+            for student_id in student_ids:
+                student = Student.objects.get(user_id=student_id)
+                if student.syndicate is not None or student.accepted_syndicate:
+                    # If we get to a student who already has a syndicate
+                    dissolve_syndicate(syndicate)
+                    raise ConcurrencyException()
+                else:
+                    student.syndicate = syndicate
+                    student.accepted_syndicate = False
+                    student.save()
+            owner = Student.objects.get(user_id=owner_id)
+            owner.accepted_syndicate = True
+            owner.save()
+            #invite_syndicate(syndicate)
+    else:
+        raise BallotInProgressException()
 
 
 # ============ DISSOLVE SYNDICATE ================
@@ -255,7 +283,6 @@ def create_new_syndicate(student_ids, owner_id):
 # students' attributes.
 
 def dissolve_syndicate(syndicate):
-    # TODO: don't allow this if the syndicates have already been randomised!
     for student in Student.objects.filter(syndicate=syndicate):
         student.syndicate = None
         student.accepted_syndicate = False
@@ -270,7 +297,6 @@ def dissolve_syndicate(syndicate):
 
 def accept_syndicate(student):
     if student.accepted_syndicate:
-        print("oops")
         raise ConcurrencyException()
     else:
         student.accepted_syndicate = True
@@ -292,7 +318,7 @@ def accept_syndicate(student):
 
 def decline_syndicate(student):
     if student.accepted_syndicate:
-        raise Exception()   # TODO: handle this error (already accepted).
+        raise ConcurrencyException()
     else:
         syndicate = student.syndicate
         for student in Student.objects.filter(syndicate=syndicate):
