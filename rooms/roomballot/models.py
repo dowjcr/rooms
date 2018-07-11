@@ -163,7 +163,7 @@ class Image(models.Model):
 
 class Setting(models.Model):
     key = models.CharField(max_length=32)
-    value = models.CharField(max_length=200)
+    value = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return str(self.key)

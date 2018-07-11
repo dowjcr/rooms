@@ -15,5 +15,6 @@ urlpatterns = [
     path('error/<int:code>', views.error, name='error'),
     path('dashboard/syndicate', views.syndicate_detail, name='syndicate'),
     path('student/<str:user_id>', views.student_detail, name='student-detail'),
-    path('admin/manage-student/<str:user_id>', views.manage_student, name='manage-student')
+    path('admin/manage-student/<str:user_id>', views.manage_student, name='manage-student'),
+    path('info', views.ballot_info, name='info')
 ]

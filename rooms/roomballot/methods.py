@@ -154,6 +154,7 @@ def advance_year():
         for student in second_year_students:
             student.syndicate = None
             student.rank = None
+            student.picks_at = None
             student.year = 3
             student.save()
         second_year_syndicates = Syndicate.objects.filter(year=2)
@@ -348,25 +349,41 @@ def reallocate_syndicate_owner(syndicate):
 # Date in datetime format.
 
 def generate_times():
-    start_date = settings['start_date']
-    # Generate times for second years.
-    second_years = Student.objects.filter(year=2, in_ballot=True).order_by('rank')
-    dt = datetime.datetime.strptime(start_date + " 09:30", "%d/%m/%y %H:%M")
-    for student in second_years:
-        student.picks_at = dt
-        student.save()
-        dt += datetime.timedelta(0,300)
+    if settings['ballot_in_progress'] == 'true':
+        raise BallotInProgressException()
+    else:
+        start_date = settings['start_date']
+        # Generate times for second years.
+        second_years = Student.objects.filter(year=2, in_ballot=True).order_by('rank')
+        dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M")
+        for student in second_years:
+            student.picks_at = dt
+            student.save()
+            dt += datetime.timedelta(0,300)
 
-    # Generate times for first years.
-    first_years = Student.objects.filter(year=1, in_ballot=True).order_by('rank')
-    dt = datetime.datetime.strptime(start_date + " 09:30", "%d/%m/%y %H:%M") + datetime.timedelta(1)
-    for student in first_years:
-        student.picks_at = dt
-        student.save()
-        dt += datetime.timedelta(0, 300)
+        # Generate times for first years.
+        first_years = Student.objects.filter(year=1, in_ballot=True).order_by('rank')
+        dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M") + datetime.timedelta(1)
+        for student in first_years:
+            student.picks_at = dt
+            student.save()
+            dt += datetime.timedelta(0, 300)
 
 
-# ================ RUN BALLOT =====================
-# Takes a syndicate whose owner has just been removed
-# from the ballot, and re-allocates ownership.
-# Inductively, syndicate must be non-empty.
+# ========== UPDATE CURRENT STUDENT ==============
+# When run, gets student who should be picking
+# at current time, and updates setting field.
+
+def update_current_student():
+    if settings['ballot_in_progress'] != 'true':
+        raise ConcurrencyException()
+    else:
+        current_datetime = datetime.datetime.now()
+        slot_datetime = current_datetime - datetime.timedelta(minutes=current_datetime.minute % 5,
+                                                              seconds=current_datetime.second,
+                                                              microseconds=current_datetime.microsecond)
+        try:
+            student_picking = Student.objects.get(picks_at=slot_datetime)
+            settings['current_student'] = student_picking.user_id
+        except Student.DoesNotExist:
+            settings['current_student'] = None

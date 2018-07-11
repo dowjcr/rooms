@@ -201,6 +201,14 @@
                             {{ student.rank }}
                         </td>
                     </tr>
+                    {% if not student.has_allocated %}
+                        <tr>
+                            <td><b>Picks At</b></td>
+                            <td>
+                                {{ student.picks_at }}
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endif %}
                 <tr>
                     <td><b>Room Allocated</b></td>

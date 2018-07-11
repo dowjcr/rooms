@@ -34,20 +34,6 @@
             else location.assign('/roomballot/error/' + responseCode.toString());
         }
 
-        // Called when the user clicks a button.
-        function CreateButtonAjaxResponse(code) {
-            $.ajax({
-                url: '/roomballot/admin',
-                type: 'POST',
-                data: {'response': code},
-                dataType: 'json',
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function (response) {
-                    HandleResponse(response.responseCode);
-                }
-            });
-        }
-
         $(function () {
 
             // Generate JSON of rooms which can be allocated.
@@ -68,15 +54,6 @@
                     location.assign('admin/manage-student/' + ui.item.value);
                 }
             });
-
-            $('#randomise').click(function () {
-                CreateButtonAjaxResponse(1);
-            });
-
-            $('#advance').click(function () {
-                CreateButtonAjaxResponse(2);
-            });
-
         });
 
     });
@@ -153,15 +130,6 @@
                     <p>Start typing the student's name below:</p>
                     <input id="student"><br>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="mb-3">Tasks</h3>
-                <button class="btn btn-primary mb-3" id="randomise">Randomise First-Years</button>
-                <br>
-                <button class="btn btn-primary" id="advance">Advance</button>
             </div>
         </div>
     </div>

@@ -6,7 +6,7 @@ Author Cameron O'Connor
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Room, Image, Staircase, Student, Syndicate
+from .models import *
 from django.conf import settings
 from .methods import *
 from modeldict import ModelDict
@@ -137,11 +137,13 @@ def student_dashboard(request):
         room = None
         if student.has_allocated:
             room = Room.objects.get(taken_by=student)
-        # TODO: make this throw an error if student not in table.
+        can_pick = True if settings['current_student'] == request.user.username \
+                           and settings['ballot_in_progress'] == 'true' else False
         # TODO: deal with edge case of admin (Beverley).
         return render(request, 'roomballot/dashboard-student.html', {'student': student,
                                                                      'username': request.user.first_name,
-                                                                     'room': room})
+                                                                     'room': room,
+                                                                     'can_pick': can_pick})
     except Student.DoesNotExist:
         return error(request, 906)
 
@@ -248,34 +250,16 @@ def admin_dashboard(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
         students = Student.objects.all()
-        if request.method == 'POST':
-            if request.POST.get('response') == '1':
-                global response_code
-                try:
-                    randomise_order()
-                    response_code = 1
-                except NotReadyToRandomiseException:
-                    response_code = 908
-                except BallotInProgressException:
-                    response_code = 907
-            elif request.POST.get('response') == '2':
-                try:
-                    advance_year()
-                    response_code = 1
-                except BallotInProgressException:
-                    response_code = 907
-            return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
-        else:
-            syndicates_complete = True
-            for s in Student.objects.filter(year=1, in_ballot=True):
-                if not s.accepted_syndicate:
-                    syndicates_complete = False
-            randomised = True if settings['randomised'] == 'true' else False
-            in_progress = True if settings['ballot_in_progress'] == 'true' else False
-            return render(request, 'roomballot/dashboard-admin.html', {'students': students,
-                                                                       'syndicates_complete': syndicates_complete,
-                                                                       'randomised': randomised,
-                                                                       'in_progress': in_progress})
+        syndicates_complete = True
+        for s in Student.objects.filter(year=1, in_ballot=True):
+            if not s.accepted_syndicate:
+                syndicates_complete = False
+        randomised = True if settings['randomised'] == 'true' else False
+        in_progress = True if settings['ballot_in_progress'] == 'true' else False
+        return render(request, 'roomballot/dashboard-admin.html', {'students': students,
+                                                                   'syndicates_complete': syndicates_complete,
+                                                                   'randomised': randomised,
+                                                                   'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -324,6 +308,7 @@ def manage_student(request, user_id):
         AdminUser.objects.get(user_id=request.user.username)
         student = get_object_or_404(Student, user_id=user_id)
         if request.method == 'POST':
+            response_code = 900
             # Clicked 'Remove from Ballot'.
             if request.POST.get('response') == '1':
                 try:
@@ -382,3 +367,15 @@ def manage_student(request, user_id):
                                                                       'syndicates': syndicates})
     except AdminUser.DoesNotExist:
         return error(request, 403)
+
+
+# ================ BALLOT INFO ================
+# Display page with information about ballot.
+
+def ballot_info(request):
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+        return render(request, 'roomballot/info.html', {'student': student,
+                                                        'date': settings['start_date']})
+    except Student.DoesNotExist:
+        return error(request, 904)
