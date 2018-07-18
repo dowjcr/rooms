@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'roomballot.middleware.AuthRequiredMiddleware'
 ]
 
 ROOT_URLCONF = 'rooms.urls'
@@ -74,6 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rooms.wsgi.application'
 
+LOGIN_EXEMPT_URLS = (
+    'accounts/login/',
+    'roomballot'
+)
+
+LOGIN_URL = 'accounts/login'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases

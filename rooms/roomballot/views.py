@@ -7,7 +7,6 @@ Author Cameron O'Connor
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import *
-from django.conf import settings
 from .methods import *
 from modeldict import ModelDict
 import json
@@ -19,32 +18,22 @@ settings = ModelDict(Setting, key='key', value='value', instances=False)
 # Displays room metadata.
 
 def room_detail(request, room_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        room = get_object_or_404(Room, pk=room_id)
-        reviews = Review.objects.filter(room=room)
-        if settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username:
-            selectable = True
-        else:
-            selectable = False
-        total_price = room.price * room.staircase.contract_length / 100
-        weekly_price = room.price / 100
-        image_urls = []
-        for image in Image.objects.filter(room=room):
-            image_urls.append(settings.MEDIA_ROOT + image.file.url)
-        occupant = None
-        return render(request, 'roomballot/room-detail-view.html', {'room': room,
-                                                                    'username': request.user.first_name,
-                                                                    'total_price': total_price,
-                                                                    'weekly_price': weekly_price,
-                                                                    'images': image_urls,
-                                                                    'student': student,
-                                                                    'reviews': reviews,
-                                                                    'selectable': selectable})
-    except Student.DoesNotExist:
-        return error(request, 906)
+    student = Student.objects.get(user_id=request.user.username)
+    room = get_object_or_404(Room, pk=room_id)
+    reviews = Review.objects.filter(room=room)
+    selectable = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
+    total_price = room.price * room.staircase.contract_length / 100
+    weekly_price = room.price / 100
+    image_urls = []     # TODO: implement image storage.
+    for image in Image.objects.filter(room=room):
+        image_urls.append(settings.MEDIA_ROOT + image.file.url)
+    return render(request, 'roomballot/room-detail-view.html', {'room': room,
+                                                                'total_price': total_price,
+                                                                'weekly_price': weekly_price,
+                                                                'images': image_urls,
+                                                                'student': student,
+                                                                'reviews': reviews,
+                                                                'selectable': selectable})
 
 
 # =========== ROOM SELECTION CONFIRM ==============
@@ -52,33 +41,28 @@ def room_detail(request, room_id):
 # correct room.
 
 def room_selection_confirm(request, room_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        room = get_object_or_404(Room, pk=room_id)
-        if request.method == 'POST':
-            try:
-                if student.syndicate is None or not student.accepted_syndicate or not student.syndicate.complete:
-                    raise ConcurrencyException()
-                else:
-                    if settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username:
-                        allocate_room(room, student)
-                        response_code = 1
-                    else:
-                        response_code = 404
-            except ConcurrencyException:
-                response_code = 900
-            return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
-        else:
-            if settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username:
-                return render(request, 'roomballot/room-select-confirm.html', {'room': room,
-                                                                               'username': request.user.first_name,
-                                                                               'student': student})
+    student = Student.objects.get(user_id=request.user.username)
+    room = get_object_or_404(Room, pk=room_id)
+    can_allocate = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
+    if request.method == 'POST':
+        try:
+            if student.syndicate is None or not student.accepted_syndicate or not student.syndicate.complete:
+                raise ConcurrencyException()
             else:
-                return error(request, 404)
-    except Student.DoesNotExist:
-        return error(request, 906)
+                if can_allocate:
+                    allocate_room(room, student)
+                    response_code = 1
+                else:
+                    response_code = 404
+        except ConcurrencyException:
+            response_code = 900
+        return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+    else:
+        if can_allocate:
+            return render(request, 'roomballot/room-select-confirm.html', {'room': room,
+                                                                           'student': student})
+        else:
+            return error(request, 404)
 
 
 # =============== LANDING PAGE ===================
@@ -96,15 +80,9 @@ def landing(request):
 # Lists all staircases, shows some metadata.
 
 def staircase_list(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        return render(request, 'roomballot/staircase-list.html', {'staircases': Staircase.objects.order_by('name'),
-                                                                  'username': request.user.first_name,
-                                                                  'student': student})
-    except Student.DoesNotExist:
-        return error(request, 906)
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/staircase-list.html', {'staircases': Staircase.objects.order_by('name'),
+                                                              'student': student})
 
 
 # ============= STAIRCASE DETAIL =================
@@ -112,17 +90,12 @@ def staircase_list(request):
 # given staircase.
 
 def staircase_detail(request, staircase_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        staircase = get_object_or_404(Staircase, pk=staircase_id)
-        return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
-                                                                  'rooms': Room.objects.filter(staircase=staircase).order_by('room_number'),
-                                                                  'username': request.user.first_name,
-                                                                  'student': student})
-    except Student.DoesNotExist:
-        return error(request, 906)
+    student = Student.objects.get(user_id=request.user.username)
+    staircase = get_object_or_404(Staircase, pk=staircase_id)
+    return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
+                                                              'rooms': Room.objects.filter(staircase=staircase)
+                                                                                   .order_by('room_number'),
+                                                              'student': student})
 
 
 # ============ STUDENT DASHBOARD =================
@@ -130,30 +103,18 @@ def staircase_detail(request, staircase_id):
 # room selection status, syndicate status etc.
 
 def student_dashboard(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        room = None
-        if student.has_allocated:
-            room = Room.objects.get(taken_by=student)
-        can_pick = True if settings['current_student'] == request.user.username \
-                           and settings['ballot_in_progress'] == 'true' else False
-        # TODO: deal with edge case of admin (Beverley).
-        return render(request, 'roomballot/dashboard-student.html', {'student': student,
-                                                                     'username': request.user.first_name,
-                                                                     'room': room,
-                                                                     'can_pick': can_pick})
-    except Student.DoesNotExist:
-        return error(request, 906)
+    student = Student.objects.get(user_id=request.user.username)
+    room = Room.objects.get(taken_by=student) if student.has_allocated else None
+    can_pick = settings['current_student'] == request.user.username and settings['ballot_in_progress'] == 'true'
+    return render(request, 'roomballot/dashboard-student.html', {'student': student,
+                                                                 'room': room,
+                                                                 'can_pick': can_pick})
 
 
 # ============ CREATE SYNDICATE ================
 # Allows user to create a new syndicate.
 
 def create_syndicate(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
     try:
         student = Student.objects.get(user_id=request.user.username)
         # If student already part of a syndicate, redirects to error page.
@@ -172,9 +133,9 @@ def create_syndicate(request):
         else:
             student = Student.objects.get(user_id=request.user.username)
             return render(request, 'roomballot/create-syndicate.html', {'student': student,
-                                                                        'students': Student.objects.filter(year=1, syndicate=None, in_ballot=True)})
-    except Student.DoesNotExist:
-        return error(request, 906)
+                                                                        'students': Student.objects.filter(year=1,
+                                                                                                           syndicate=None,
+                                                                                                           in_ballot=True)})
     except BallotInProgressException:
         return error(request, 907)
 
@@ -184,40 +145,35 @@ def create_syndicate(request):
 # user to accept if required.
 
 def syndicate_detail(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        if request.method == 'POST':
-            if request.POST.get('response') == '1':
-                try:
-                    accept_syndicate(student)
-                    response_code = 1
-                except ConcurrencyException:
-                    response_code = 905
-            elif request.POST.get('response') == '2':
-                try:
-                    decline_syndicate(student)
-                    response_code = 1
-                except ConcurrencyException:
-                    response_code = 905
-            elif request.POST.get('response') == '3':
-                dissolve_syndicate(student.syndicate)
-                response_code = 2
-            else:
-                response_code = 900
-            return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+    student = Student.objects.get(user_id=request.user.username)
+    if request.method == 'POST':
+        if request.POST.get('response') == '1':
+            try:
+                accept_syndicate(student)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 905
+        elif request.POST.get('response') == '2':
+            try:
+                decline_syndicate(student)
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 905
+        elif request.POST.get('response') == '3':
+            dissolve_syndicate(student.syndicate)
+            response_code = 2
         else:
-            if student.syndicate is None:
-                return error(request, 903)
-            students = []
-            for st in Student.objects.filter(syndicate=student.syndicate).order_by('surname'):
-                students.append(st)
-            return render(request, 'roomballot/syndicate-view.html', {'student': student,
-                                                                      'syndicate': student.syndicate,
-                                                                      'students': students})
-    except Student.DoesNotExist:
-        return error(request, 906)
+            response_code = 900
+        return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+    else:
+        if student.syndicate is None:
+            return error(request, 903)
+        students = []
+        for s in Student.objects.filter(syndicate=student.syndicate).order_by('surname'):
+            students.append(s)
+        return render(request, 'roomballot/syndicate-view.html', {'student': student,
+                                                                  'syndicate': student.syndicate,
+                                                                  'students': students})
 
 
 # ================= ERROR =====================
@@ -245,8 +201,6 @@ def error(request, code):
 # Displays dashboard allowing system management.
 
 def admin_dashboard(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
     try:
         AdminUser.objects.get(user_id=request.user.username)
         students = Student.objects.all()
@@ -268,42 +222,26 @@ def admin_dashboard(request):
 # Displays students ranked by ballot order.
 
 def ballot_ranking(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        Student.objects.get(user_id=request.user.username)
-        ranked_students = Student.objects.filter(in_ballot=True).order_by('rank')
-        return render(request, 'roomballot/ranking.html', {'students': ranked_students})
-    except Student.DoesNotExist:
-        return error(request, 906)
+    Student.objects.get(user_id=request.user.username)
+    ranked_students = Student.objects.filter(in_ballot=True).order_by('rank')
+    return render(request, 'roomballot/ranking.html', {'students': ranked_students})
 
 
 # ============== STUDENT DETAIL ===============
 # Displays student metadata.
 
 def student_detail(request, user_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
-    try:
-        Student.objects.get(user_id=request.user.username)
-        student = get_object_or_404(Student, user_id=user_id)
-        room = None
-        if student.has_allocated:
-            room = Room.objects.get(taken_by=student)
-        return render(request, 'roomballot/student-detail.html', {'student': student,
-                                                                  'room': room})
-    except Student.DoesNotExist:
-        return error(request, 906)
+    student = get_object_or_404(Student, user_id=user_id)
+    room = Room.objects.get(taken_by=student) if student.has_allocated else None
+    return render(request, 'roomballot/student-detail.html', {'student': student,
+                                                              'room': room})
 
 
 # ============== MANAGE STUDENT ===============
 # Allows registered admins to perform operations
 # on given student.
-# TODO: sort out error codes.
 
 def manage_student(request, user_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/roomballot')
     try:
         AdminUser.objects.get(user_id=request.user.username)
         student = get_object_or_404(Student, user_id=user_id)
@@ -373,9 +311,6 @@ def manage_student(request, user_id):
 # Display page with information about ballot.
 
 def ballot_info(request):
-    try:
-        student = Student.objects.get(user_id=request.user.username)
-        return render(request, 'roomballot/info.html', {'student': student,
-                                                        'date': settings['start_date']})
-    except Student.DoesNotExist:
-        return error(request, 904)
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/info.html', {'student': student,
+                                                    'date': settings['start_date']})

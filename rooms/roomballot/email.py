@@ -1,6 +1,7 @@
 """
 EMAIL
 Defines some methods to send email notifications to users.
+Author Cameron O'Connor.
 """
 
 

@@ -4,7 +4,6 @@ Defines database models to be used in the room ballot application.
 Author Cameron O'Connor
 """
 
-
 from django.db import models
 
 

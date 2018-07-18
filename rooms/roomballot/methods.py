@@ -1,14 +1,13 @@
 """
 METHODS
 Defines helper methods which are relied on for function.
+Author Cameron O'Connor
 """
-
 
 from .models import *
 from .email import *
 import random, datetime
 from modeldict import ModelDict
-
 
 settings = ModelDict(Setting, key='key', value='value', instances=False)
 

@@ -1,20 +1,26 @@
-from django.urls import path
+"""
+URLS
+Defines URL paths which match to Django views.
+Author Cameron O'Connor
+"""
 
+from django.urls import path
 from . import views
 
+
 urlpatterns = [
-    path('admin', views.admin_dashboard, name='admin'),
-    path('ranking', views.ballot_ranking, name='ranking'),
-    path('room/<str:room_id>/confirm-selection', views.room_selection_confirm, name='confirm-room-selection'),
-    path('room/<str:room_id>', views.room_detail, name='room-detail'),
     path('', views.landing, name='landing'),
+    path('dashboard', views.student_dashboard, name='dashboard'),
     path('dashboard/create-syndicate', views.create_syndicate, name='create-syndicate'),
+    path('dashboard/syndicate', views.syndicate_detail, name='syndicate'),
+    path('admin', views.admin_dashboard, name='admin'),
+    path('admin/manage-student/<str:user_id>', views.manage_student, name='manage-student'),
+    path('ranking', views.ballot_ranking, name='ranking'),
     path('staircases', views.staircase_list, name='staircases'),
     path('staircase/<int:staircase_id>', views.staircase_detail, name='staircase-detail'),
-    path('dashboard', views.student_dashboard, name='dashboard'),
+    path('room/<str:room_id>/confirm-selection', views.room_selection_confirm, name='confirm-room-selection'),
+    path('room/<str:room_id>', views.room_detail, name='room-detail'),
     path('error/<int:code>', views.error, name='error'),
-    path('dashboard/syndicate', views.syndicate_detail, name='syndicate'),
     path('student/<str:user_id>', views.student_detail, name='student-detail'),
-    path('admin/manage-student/<str:user_id>', views.manage_student, name='manage-student'),
     path('info', views.ballot_info, name='info')
 ]
