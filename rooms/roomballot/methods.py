@@ -112,6 +112,7 @@ def get_num_syndicates():
 
 def randomise_order():
     syndicates = []
+    settings['randomised'] = False
     # First check all students either in syndicate or removed from ballot.
     for s in Student.objects.filter(year=1):
         if s.in_ballot and not s.accepted_syndicate:
@@ -212,6 +213,14 @@ def remove_from_ballot(student):
             else:
                 if student_syndicate.owner_id == student.user_id:
                     reallocate_syndicate_owner(student_syndicate)
+                # Check if syndicate complete, and update if necessary.
+                complete = True
+                for student in Student.objects.filter(syndicate=student_syndicate):
+                    if not student.accepted_syndicate:
+                        complete = False
+                        break
+                student_syndicate.complete = complete
+                student_syndicate.save()
     else:
         raise BallotInProgressException()
 
@@ -351,9 +360,12 @@ def generate_times():
     if settings['ballot_in_progress'] == 'true':
         raise BallotInProgressException()
     else:
+        for s in Student.objects.filter(in_ballot=True):
+            s.picks_at = None
+            s.save()
         start_date = settings['start_date']
         # Generate times for second years.
-        second_years = Student.objects.filter(year=2, in_ballot=True).order_by('rank')
+        second_years = Student.objects.filter(year=2, in_ballot=True).exclude(rank=None).order_by('rank')
         dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M")
         for student in second_years:
             student.picks_at = dt
@@ -361,7 +373,7 @@ def generate_times():
             dt += datetime.timedelta(0,300)
 
         # Generate times for first years.
-        first_years = Student.objects.filter(year=1, in_ballot=True).order_by('rank')
+        first_years = Student.objects.filter(year=1, in_ballot=True).exclude(rank=None).order_by('rank')
         dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M") + datetime.timedelta(1)
         for student in first_years:
             student.picks_at = dt

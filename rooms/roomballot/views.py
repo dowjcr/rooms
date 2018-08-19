@@ -213,7 +213,8 @@ def admin_dashboard(request):
         return render(request, 'roomballot/dashboard-admin.html', {'students': students,
                                                                    'syndicates_complete': syndicates_complete,
                                                                    'randomised': randomised,
-                                                                   'in_progress': in_progress})
+                                                                   'in_progress': in_progress,
+                                                                   'syndicates': Syndicate.objects.all()})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -298,7 +299,7 @@ def manage_student(request, user_id):
             if student.has_allocated:
                 room = Room.objects.get(taken_by=student)
             rooms = Room.objects.filter(taken_by=None)
-            syndicates = Syndicate.objects.all()
+            syndicates = Syndicate.objects.filter(year=student.year)
             return render(request, 'roomballot/student-manage.html', {'student': student,
                                                                       'room': room,
                                                                       'rooms': rooms,
@@ -314,3 +315,49 @@ def ballot_info(request):
     student = Student.objects.get(user_id=request.user.username)
     return render(request, 'roomballot/info.html', {'student': student,
                                                     'date': settings['start_date']})
+
+
+# ================== STATUS ===================
+# Display page with ballot status - which students
+# haven't completed syndicate, which syndicates are
+# complete, etc.
+
+def status(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        incomplete_students = []
+        for student in Student.objects.filter(in_ballot=True).order_by('first_name'):
+            if not student.accepted_syndicate or not student.syndicate.complete:
+                incomplete_students.append(student)
+        return render(request, 'roomballot/status.html', {'syndicates': Syndicate.objects.all(),
+                                                          'incomplete_students': incomplete_students,
+                                                          'students_outside_ballot': Student.objects.filter(in_ballot=False),
+                                                          'incomplete_syndicates': Syndicate.objects.filter(complete=False)})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+
+
+# ============ MANAGE SYNDICATE ===============
+# Admin page to manage syndicate.
+
+def manage_syndicate(request, syndicate_id):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        syndicate = Syndicate.objects.get(syndicate_id=syndicate_id)
+        students = Student.objects.filter(syndicate=syndicate).order_by('first_name')
+        return render(request, 'roomballot/syndicate-manage.html', {'syndicate': syndicate,
+                                                                    'students': students})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+
+
+# ============= SYNDICATES LIST ===============
+# Admin page listing all syndicates.
+
+def syndicates_list(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        syndicates = Syndicate.objects.all().order_by('syndicate_id')
+        return render(request, 'roomballot/syndicate-list.html', {'syndicates': syndicates})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)

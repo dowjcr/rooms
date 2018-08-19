@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'rooms.wsgi.application'
 
 LOGIN_EXEMPT_URLS = (
     'accounts/login/',
-    'roomballot'
+    'roomballot/welcome'
 )
 
 LOGIN_URL = 'accounts/login'

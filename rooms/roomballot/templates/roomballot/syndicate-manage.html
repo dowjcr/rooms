@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
-    <title>{{ student.first_name }} {{ student.surname }} | Downing JCR RBS</title>
+    <title>Syndicate #{{ syndicate.syndicate_id }} | Downing JCR RBS</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
@@ -153,14 +153,14 @@
     <div class="border-bottom">
         <div class="row">
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-                <h2>{{ student.first_name }} {{ student.surname }}</h2>
+                <h2>Syndicate #{{ syndicate.syndicate_id }}</h2>
             </div>
         </div>
     </div>
 
     <div class="row mt-4">
         <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <table class="table table-bordered table-striped table-hover">
+            <table class="table table-bordered table-hover table-striped">
                 <thead style="display:none">
                 <tr>
                     <th scope="col"></th>
@@ -169,90 +169,40 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><b>CRSid</b></td>
-                    <td>{{ student.user_id }}</td>
+                    <td>Syndicate Owner</td>
+                    <td>{{ syndicate.owner_id }}</td>
                 </tr>
                 <tr>
-                    <td><b>In Ballot</b></td>
-                    <td>
-                        {% if student.in_ballot %} Yes
-                        {% else %} No
-                        {% endif %}
-                    </td>
+                    <td>Syndicate Complete?</td>
+                    <td>{% if syndicate.complete %}Yes{% else %}No{% endif %}</td>
                 </tr>
-                {% if student.in_ballot %}
-                    <tr>
-                        <td><b>Syndicate ID</b></td>
-                        <td>
-                            {{ student.syndicate_id }}
-                            {% if student.syndicate is not None %}
-                            <br><a href="../syndicate/{{ student.syndicate_id }}" class="btn btn-primary">Manage</a>
-                        {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Accepted Syndicate</b></td>
-                        <td>
-                            {% if student.accepted_syndicate %} Yes
-                            {% else %} No
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Rank</b></td>
-                        <td>
-                            {{ student.rank }}
-                        </td>
-                    </tr>
-                    {% if not student.has_allocated %}
-                        <tr>
-                            <td><b>Picks At</b></td>
-                            <td>
-                                {{ student.picks_at }}
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endif %}
-                <tr>
-                    <td><b>Room Allocated</b></td>
-                    <td>
-                        {{ room }} <br>
-                        {% if student.has_allocated %}
-                            <a href="../../room/{{ room.room_id }}" class="btn btn-primary">View</a>
-                        {% endif %}
-                    </td>
-                </tr>
-
                 </tbody>
             </table>
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="border-bottom mb-3">Tasks</h3>
-                {% if student.in_ballot %}
-                    <button class="btn btn-primary mb-3" id="remove">Remove from Ballot</button><br>
-                    {% if student.syndicate is None %}
-                        <button class="btn btn-primary mb-3" id="add-to-syndicate">Add to Syndicate</button><br>
-                        <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
-                             id="add-to-syndicate-widget">
-                            <p>Start typing the syndicate ID below:</p>
-                            <input id="syndicate"><br>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <button class="btn btn-primary mb-3" id="add-to-ballot">Add to Ballot</button><br>
-                {% endif %}
-                {% if student.has_allocated %}
-                    <button class="btn btn-primary mb-3" id="deallocate-room">Deallocate Room</button><br>
-                {% else %}
-                    <button class="btn btn-primary mb-3" id="allocate-room">Allocate Room</button><br>
-                    <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none" id="allocate-room-widget">
-                        <p>Start typing the room below:</p>
-                        <input id="room"><br>
-                    </div>
-                {% endif %}
-            </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 jumbotron">
+            <h4 class="mb-3">Syndicate Members</h4>
+            <table class="table table-bordered table-hover table-light">
+                <thead style="display:none">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                <tr>
+                    <td><b>{{ student.first_name }} {{ student.surname }}</b></td>
+                    <td>{{ student.user_id }}</td>
+                    <td>{% if student.accepted_syndicate %}Accepted{% else %}Not Accepted{% endif %}</td>
+                    <td><a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Manage</a></td>
+                </tr>
+                {% endfor %}
+
+            </table>
+
         </div>
+
     </div>
 </div>
 

@@ -9,12 +9,15 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.landing, name='landing'),
+    path('welcome', views.landing, name='landing'),
     path('dashboard', views.student_dashboard, name='dashboard'),
     path('dashboard/create-syndicate', views.create_syndicate, name='create-syndicate'),
     path('dashboard/syndicate', views.syndicate_detail, name='syndicate'),
     path('admin', views.admin_dashboard, name='admin'),
     path('admin/manage-student/<str:user_id>', views.manage_student, name='manage-student'),
+    path('admin/status', views.status, name='status'),
+    path('admin/syndicate/<int:syndicate_id>', views.manage_syndicate, name='manage-syndicate'),
+    path('admin/syndicates', views.syndicates_list, name='syndicates-list'),
     path('ranking', views.ballot_ranking, name='ranking'),
     path('staircases', views.staircase_list, name='staircases'),
     path('staircase/<int:staircase_id>', views.staircase_detail, name='staircase-detail'),

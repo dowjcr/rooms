@@ -28,7 +28,9 @@ class AuthRequiredMiddleware(object):
         if not request.user.is_authenticated:
             path = request.path_info.lstrip('/')
             if not any(m.match(path) for m in EXEMPT_URLS):
-                return HttpResponseRedirect('/roomballot')
+                return HttpResponseRedirect('/roomballot/welcome')
+            else:
+                return response
         # Check that user is registered as a student, excluding admin pages.
         ADMIN_URLS = [compile('roomballot/admin/')]
         try:

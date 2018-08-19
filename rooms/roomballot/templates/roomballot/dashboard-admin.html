@@ -36,12 +36,23 @@
 
         $(function () {
 
-            // Generate JSON of rooms which can be allocated.
+            // Generate JSON of students.
             var availableStudents = [
                 {% for s in students %}
                     {
                         value: "{{ s.user_id }}",
                         label: "{{ s }} ({{ s.user_id }})"
+                    }
+                    {% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            // Generate JSON of syndicates.
+            var availableSyndicates = [
+                {% for s in syndicates %}
+                    {
+                        value: "{{ s.syndicate_id }}",
+                        label: "{{ s.syndicate_id }}"
                     }
                     {% if not forloop.last %},{% endif %}
                 {% endfor %}
@@ -54,6 +65,14 @@
                     location.assign('admin/manage-student/' + ui.item.value);
                 }
             });
+
+            // Set parameters of autocomplete field.
+            $('#syndicate').autocomplete({
+                source: availableSyndicates,
+                select: function (event, ui) {
+                    location.assign('admin/syndicate/' + ui.item.value);
+                }
+            });
         });
 
     });
@@ -61,7 +80,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
 
-    <a class="navbar-brand" href="/roomballot">
+    <a class="navbar-brand" href="/roomballot/admin">
         <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
              style="padding-right: 10px">
         Room Balloting System
@@ -120,6 +139,7 @@
                         </tr>
                     </table>
                 </div>
+                <a href="admin/status" class="btn btn-primary">More Info</a>
             </div>
         </div>
 
@@ -130,6 +150,17 @@
                     <p>Start typing the student's name below:</p>
                     <input id="student"><br>
                 </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Manage Syndicate</h3>
+                <div class="ui-widget mb-3" id="student-search-widget">
+                    <p>Start typing the syndicate ID below:</p>
+                    <input id="syndicate"><br>
+                </div>
+                <a href="admin/syndicates" class="btn btn-primary">View All</a>
             </div>
         </div>
     </div>
