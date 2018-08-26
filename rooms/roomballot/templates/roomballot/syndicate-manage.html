@@ -160,7 +160,7 @@
 
     <div class="row mt-4">
         <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <table class="table table-bordered table-hover table-striped">
+            <table class="table table-bordered table-striped">
                 <thead style="display:none">
                 <tr>
                     <th scope="col"></th>
@@ -169,20 +169,20 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td>Syndicate Owner</td>
+                    <td><b>Syndicate Owner</b></td>
                     <td>{{ syndicate.owner_id }}</td>
                 </tr>
                 <tr>
-                    <td>Syndicate Complete?</td>
+                    <td><b>Syndicate Complete?</b></td>
                     <td>{% if syndicate.complete %}Yes{% else %}No{% endif %}</td>
                 </tr>
                 </tbody>
             </table>
-        </div>
 
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 jumbotron">
-            <h4 class="mb-3">Syndicate Members</h4>
-            <table class="table table-bordered table-hover table-light">
+            <hr size="5px" color="" noshade />
+
+
+            <table class="table table-bordered table-striped">
                 <thead style="display:none">
                 <tr>
                     <th scope="col"></th>
@@ -200,7 +200,13 @@
                 {% endfor %}
 
             </table>
+        </div>
 
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Tasks</h3>
+                <a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Dissolve Syndicate</a>
+            </div>
         </div>
 
     </div>
