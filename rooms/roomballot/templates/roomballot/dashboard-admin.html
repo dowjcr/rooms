@@ -78,92 +78,94 @@
     });
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
-
+<nav class="navbar navbar-dark justify-content-between mb-4">
     <a class="navbar-brand" href="/roomballot/admin">
-        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
-             style="padding-right: 10px">
-        Room Balloting System
+        Downing JCR RBS<br>
+        <p class="small">Administration Portal</p>
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-        <ul class="nav navbar-nav">
-            <li class="mr-sm-2"><a class="nav-link active" href="/roomballot/admin">Admin Dashboard</a></li>
-        </ul>
-    </div>
 </nav>
 
 
-<div class="container">
-    <div class="border-bottom mb-3">
-        <h2>Admin Dashboard</h2>
+<div class="container-fluid">
+
+    <div class="row mt-2">
+        <nav class="col-md-2 d-none d-md-block sidebar">
+            <div class="list-group">
+                <a href="#" class="list-group-item active"><i class="fa fa-key"></i> <span>Dashboard</span></a>
+                <a href="admin/status" class="list-group-item"><i class="fa fa-credit-card"></i> <span>Status</span></a>
+                <a href="admin/syndicates" class="list-group-item"><i class="fa fa-question-circle"></i> <span>Syndicates</span></a>
+                <a href="#" class="list-group-item"><i class="fa fa-arrow-circle-o-left"></i>
+                    <span>Students</span></a>
+            </div>
+        </nav>
+
+
+        <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="jumbotron">
+                        <h3 class="mb-3">Status</h3>
+                        <div class="ui-widget mb-3" id="student-search-widget">
+                            <table>
+                                <tr>
+                                    <td>
+                                        {% if syndicates_complete %}
+                                            Yes
+                                        {% else %}
+                                            No
+                                        {% endif %}
+                                    </td>
+                                    <td>First Year Syndicates Complete</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {% if randomised %}
+                                            Yes
+                                        {% else %}
+                                            No
+                                        {% endif %}
+                                    </td>
+                                    <td>Randomised</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {% if in_progress %}
+                                            Yes
+                                        {% else %}
+                                            No
+                                        {% endif %}</td>
+                                    <td>Ballot In Progress</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <a href="admin/status" class="btn btn-primary">More Info</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="jumbotron">
+                        <h3 class="mb-3">Manage Student</h3>
+                        <div class="ui-widget mb-3" id="student-search-widget">
+                            <p>Start typing the student's name below:</p>
+                            <input id="student"><br>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="jumbotron">
+                        <h3 class="mb-3">Manage Syndicate</h3>
+                        <div class="ui-widget mb-3" id="student-search-widget">
+                            <p>Start typing the syndicate ID below:</p>
+                            <input id="syndicate"><br>
+                        </div>
+                        <a href="admin/syndicates" class="btn btn-primary">View All</a>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <div class="row mt-3">
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="mb-3">Status</h3>
-                <div class="ui-widget mb-3" id="student-search-widget">
-                    <table>
-                        <tr>
-                            <td>
-                                {% if syndicates_complete %}
-                                    Yes
-                                {% else %}
-                                    No
-                                {% endif %}
-                            </td>
-                            <td>First Year Syndicates Complete</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                {% if randomised %}
-                                    Yes
-                                {% else %}
-                                    No
-                                {% endif %}
-                            </td>
-                            <td>Randomised</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                {% if in_progress %}
-                                    Yes
-                                {% else %}
-                                    No
-                                {% endif %}</td>
-                            <td>Ballot In Progress</td>
-                        </tr>
-                    </table>
-                </div>
-                <a href="admin/status" class="btn btn-primary">More Info</a>
-            </div>
-        </div>
-
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="mb-3">Manage Student</h3>
-                <div class="ui-widget mb-3" id="student-search-widget">
-                    <p>Start typing the student's name below:</p>
-                    <input id="student"><br>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="mb-3">Manage Syndicate</h3>
-                <div class="ui-widget mb-3" id="student-search-widget">
-                    <p>Start typing the syndicate ID below:</p>
-                    <input id="syndicate"><br>
-                </div>
-                <a href="admin/syndicates" class="btn btn-primary">View All</a>
-            </div>
-        </div>
-    </div>
+</div>
 
 </div>
 

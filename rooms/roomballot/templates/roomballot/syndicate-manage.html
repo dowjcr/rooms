@@ -130,85 +130,88 @@
     });
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
-
+<nav class="navbar navbar-dark justify-content-between mb-4">
     <a class="navbar-brand" href="/roomballot/admin">
-        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
-             style="padding-right: 10px">
-        Room Balloting System
+        Downing JCR RBS<br>
+        <p class="small">Administration Portal</p>
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-        <ul class="nav navbar-nav">
-            <li class="mr-sm-2"><a class="nav-link" href="/roomballot/admin">Admin Dashboard</a></li>
-        </ul>
-    </div>
 </nav>
 
-<div class="container">
-
-    <div class="border-bottom">
-        <div class="row">
-            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-                <h2>Syndicate #{{ syndicate.syndicate_id }}</h2>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid">
 
     <div class="row mt-4">
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <table class="table table-bordered table-striped">
-                <thead style="display:none">
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><b>Syndicate Owner</b></td>
-                    <td>{{ syndicate.owner_id }}</td>
-                </tr>
-                <tr>
-                    <td><b>Syndicate Complete?</b></td>
-                    <td>{% if syndicate.complete %}Yes{% else %}No{% endif %}</td>
-                </tr>
-                </tbody>
-            </table>
-
-            <hr size="5px" color="" noshade />
-
-
-            <table class="table table-bordered table-striped">
-                <thead style="display:none">
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for student in students %}
-                <tr>
-                    <td><b>{{ student.first_name }} {{ student.surname }}</b></td>
-                    <td>{{ student.user_id }}</td>
-                    <td>{% if student.accepted_syndicate %}Accepted{% else %}Not Accepted{% endif %}</td>
-                    <td><a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Manage</a></td>
-                </tr>
-                {% endfor %}
-
-            </table>
-        </div>
-
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="mb-3">Tasks</h3>
-                <a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Dissolve Syndicate</a>
+        <nav class="col-md-2 d-none d-md-block sidebar" id="navbarSupportedContent">
+            <div class="list-group">
+                <a href="/roomballot/admin" class="list-group-item"><i class="fa fa-key"></i> <span>Dashboard</span></a>
+                <a href="../status" class="list-group-item"><i class="fa fa-credit-card"></i> <span>Status</span></a>
+                <a href="../syndicates" class="list-group-item"><i class="fa fa-question-circle"></i>
+                    <span>Syndicates</span></a>
+                <a href="#" class="list-group-item"><i class="fa fa-arrow-circle-o-left"></i>
+                    <span>Students</span></a>
             </div>
-        </div>
+        </nav>
+        <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="row">
 
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
+                    <h2>Syndicate #{{ syndicate.syndicate_id }}</h2>
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                    <table class="table table-bordered table-striped">
+                        <thead style="display:none">
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><b>Syndicate Owner</b></td>
+                            <td>{{ syndicate.owner_id }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Syndicate Complete?</b></td>
+                            <td>{% if syndicate.complete %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <hr size="5px" color="" noshade/>
+
+
+                    <table class="table table-bordered table-striped">
+                        <thead style="display:none">
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td><b>{{ student.first_name }} {{ student.surname }}</b></td>
+                                <td>{{ student.user_id }}</td>
+                                <td>{% if student.accepted_syndicate %}Accepted{% else %}Not Accepted{% endif %}</td>
+                                <td><a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Manage</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                    <div class="jumbotron">
+                        <h3 class="mb-3">Tasks</h3>
+                        <a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Dissolve Syndicate</a>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 </div>
 

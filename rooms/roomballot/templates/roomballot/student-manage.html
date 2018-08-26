@@ -130,129 +130,131 @@
     });
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
-
+<nav class="navbar navbar-dark justify-content-between mb-4">
     <a class="navbar-brand" href="/roomballot/admin">
-        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
-             style="padding-right: 10px">
-        Room Balloting System
+        Downing JCR RBS<br>
+        <p class="small">Administration Portal</p>
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-        <ul class="nav navbar-nav">
-            <li class="mr-sm-2"><a class="nav-link" href="/roomballot/admin">Admin Dashboard</a></li>
-        </ul>
-    </div>
 </nav>
 
-<div class="container">
+<div class="container-fluid">
 
-    <div class="border-bottom">
-        <div class="row">
-            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-                <h2>{{ student.first_name }} {{ student.surname }}</h2>
-            </div>
-        </div>
-    </div>
 
     <div class="row mt-4">
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <table class="table table-bordered table-striped">
-                <thead style="display:none">
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><b>CRSid</b></td>
-                    <td>{{ student.user_id }}</td>
-                </tr>
-                <tr>
-                    <td><b>In Ballot</b></td>
-                    <td>
-                        {% if student.in_ballot %} Yes
-                        {% else %} No
-                        {% endif %}
-                    </td>
-                </tr>
-                {% if student.in_ballot %}
-                    <tr>
-                        <td><b>Syndicate ID</b></td>
-                        <td>
-                            {{ student.syndicate_id }}
-                            {% if student.syndicate is not None %}
-                            <br><a href="../syndicate/{{ student.syndicate_id }}" class="btn btn-primary">Manage</a>
-                        {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Accepted Syndicate</b></td>
-                        <td>
-                            {% if student.accepted_syndicate %} Yes
-                            {% else %} No
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Rank</b></td>
-                        <td>
-                            {{ student.rank }}
-                        </td>
-                    </tr>
-                    {% if not student.has_allocated %}
+
+        <nav class="col-md-2 d-none d-md-block sidebar" id="navbarSupportedContent">
+            <div class="list-group">
+                <a href="/roomballot/admin" class="list-group-item"><i class="fa fa-key"></i> <span>Dashboard</span></a>
+                <a href="../status" class="list-group-item"><i class="fa fa-credit-card"></i> <span>Status</span></a>
+                <a href="../syndicates" class="list-group-item"><i class="fa fa-question-circle"></i>
+                    <span>Syndicates</span></a>
+                <a href="#" class="list-group-item"><i class="fa fa-arrow-circle-o-left"></i>
+                    <span>Students</span></a>
+            </div>
+        </nav>
+        <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
+                    <h2>{{ student.first_name }} {{ student.surname }}</h2>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                    <table class="table table-bordered table-striped">
+                        <thead style="display:none">
                         <tr>
-                            <td><b>Picks At</b></td>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><b>CRSid</b></td>
+                            <td>{{ student.user_id }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>In Ballot</b></td>
                             <td>
-                                {{ student.picks_at }}
+                                {% if student.in_ballot %} Yes
+                                {% else %} No
+                                {% endif %}
                             </td>
                         </tr>
-                    {% endif %}
-                {% endif %}
-                <tr>
-                    <td><b>Room Allocated</b></td>
-                    <td>
-                        {{ room }} <br>
-                        {% if student.has_allocated %}
-                            <a href="../../room/{{ room.room_id }}" class="btn btn-primary">View</a>
+                        {% if student.in_ballot %}
+                            <tr>
+                                <td><b>Syndicate ID</b></td>
+                                <td>
+                                    {{ student.syndicate_id }}
+                                    {% if student.syndicate is not None %}
+                                        <br><a href="../syndicate/{{ student.syndicate_id }}" class="btn btn-primary">Manage</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Accepted Syndicate</b></td>
+                                <td>
+                                    {% if student.accepted_syndicate %} Yes
+                                    {% else %} No
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Rank</b></td>
+                                <td>
+                                    {{ student.rank }}
+                                </td>
+                            </tr>
+                            {% if not student.has_allocated %}
+                                <tr>
+                                    <td><b>Picks At</b></td>
+                                    <td>
+                                        {{ student.picks_at }}
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endif %}
-                    </td>
-                </tr>
+                        <tr>
+                            <td><b>Room Allocated</b></td>
+                            <td>
+                                {{ room }} <br>
+                                {% if student.has_allocated %}
+                                    <a href="../../room/{{ room.room_id }}" class="btn btn-primary">View</a>
+                                {% endif %}
+                            </td>
+                        </tr>
 
-                </tbody>
-            </table>
-        </div>
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-            <div class="jumbotron">
-                <h3 class="border-bottom mb-3">Tasks</h3>
-                {% if student.in_ballot %}
-                    <button class="btn btn-primary mb-3" id="remove">Remove from Ballot</button><br>
-                    {% if student.syndicate is None %}
-                        <button class="btn btn-primary mb-3" id="add-to-syndicate">Add to Syndicate</button><br>
-                        <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
-                             id="add-to-syndicate-widget">
-                            <p>Start typing the syndicate ID below:</p>
-                            <input id="syndicate"><br>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <button class="btn btn-primary mb-3" id="add-to-ballot">Add to Ballot</button><br>
-                {% endif %}
-                {% if student.has_allocated %}
-                    <button class="btn btn-primary mb-3" id="deallocate-room">Deallocate Room</button><br>
-                {% else %}
-                    <button class="btn btn-primary mb-3" id="allocate-room">Allocate Room</button><br>
-                    <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none" id="allocate-room-widget">
-                        <p>Start typing the room below:</p>
-                        <input id="room"><br>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                    <div class="jumbotron">
+                        <h3 class="border-bottom mb-3">Tasks</h3>
+                        {% if student.in_ballot %}
+                            <button class="btn btn-primary mb-3" id="remove">Remove from Ballot</button><br>
+                            {% if student.syndicate is None %}
+                                <button class="btn btn-primary mb-3" id="add-to-syndicate">Add to Syndicate</button><br>
+                                <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
+                                     id="add-to-syndicate-widget">
+                                    <p>Start typing the syndicate ID below:</p>
+                                    <input id="syndicate"><br>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <button class="btn btn-primary mb-3" id="add-to-ballot">Add to Ballot</button><br>
+                        {% endif %}
+                        {% if student.has_allocated %}
+                            <button class="btn btn-primary mb-3" id="deallocate-room">Deallocate Room</button><br>
+                        {% else %}
+                            <button class="btn btn-primary mb-3" id="allocate-room">Allocate Room</button><br>
+                            <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
+                                 id="allocate-room-widget">
+                                <p>Start typing the room below:</p>
+                                <input id="room"><br>
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 </div>
 
