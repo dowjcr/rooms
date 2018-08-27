@@ -6,6 +6,7 @@ Author Cameron O'Connor
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
+from django.conf import settings as django_settings
 from .models import *
 from .methods import *
 from modeldict import ModelDict
@@ -26,7 +27,7 @@ def room_detail(request, room_id):
     weekly_price = room.price / 100
     image_urls = []     # TODO: implement image storage.
     for image in Image.objects.filter(room=room):
-        image_urls.append(settings.MEDIA_ROOT + image.file.url)
+        image_urls.append('https://ballot.downingjcr.co.uk/media/' + image.file.url)
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'total_price': total_price,
                                                                 'weekly_price': weekly_price,

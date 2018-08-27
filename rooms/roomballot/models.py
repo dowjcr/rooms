@@ -47,6 +47,7 @@ class Staircase(models.Model):
     name = models.CharField(max_length=30)
     price_category = models.ForeignKey(PriceCategory, on_delete=models.SET_DEFAULT, default=None)
     contract_length = models.IntegerField('Number of contract weeks?')
+    description = models.CharField(max_length=1000, default=None, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -153,7 +154,7 @@ class Image(models.Model):
     file = models.ImageField(upload_to='room_images')
 
     def __str__(self):
-        return self.room.__str__() + ", Image " + str(self.image_id)
+        return self.room.__str__() + " (Image " + str(self.image_id) + ")"
 
 
 # ================== SETTING =====================

@@ -59,6 +59,7 @@
         <div class="row">
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
                 <h2>{{ staircase }}</h2>
+                <p>{{ staircase.description }}</p>
             </div>
         </div>
     </div>
@@ -96,21 +97,21 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 mt-4 alert-warning">
-            <h4 class="mt-2">Important Information</h4>
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 mt-4">
+            <nav class="d-none d-md-block sidebar">
+            <div class="list-group">
+                <a href="#" class="list-group-item"><i class="fa fa-key"></i> <span>Floorplan</span></a>
+                <p class="list-group-item">
+                    Let: {{ staircase.contract_length }} Weeks
+                </p>
+                <p class="list-group-item">
+                    Price Category: {{ staircase.price_category }}
+                </p>
+            </div>
+        </nav>
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-        crossorigin="anonymous"></script>
 
 </body>
 </html>

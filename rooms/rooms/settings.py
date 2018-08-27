@@ -25,7 +25,7 @@ SECRET_KEY = '*-_)bn3-jpummsh^%+zyko7)0%1k-!0)$erg%#*p8j9-k!mu)m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ballot.downingjcr.co.uk', 'localhost']
 
 
 # Application definition
@@ -54,8 +54,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'rooms.urls'
-ENV_PATH = "/home/cam/rooms/rooms/media/"
-MEDIA_ROOT = os.path.join(ENV_PATH, '/media')
+MEDIA_ROOT = '/var/www/ballot.downingjcr.co.uk/static/media/'
 
 TEMPLATES = [
     {
@@ -87,8 +86,10 @@ LOGIN_URL = 'accounts/login'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+                'read_default_file': '/etc/mysql/my.cnf',
+        },
     }
 }
 
@@ -130,6 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/ballot.downingjcr.co.uk/static'
 
 
 # Raven (ucamwebauth) authentication
