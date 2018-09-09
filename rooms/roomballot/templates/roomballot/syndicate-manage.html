@@ -30,30 +30,16 @@
         // Handle response received after POST request.
         function HandleResponse(responseCode) {
             // Successfully created syndicate.
-            if (responseCode === 1) location.reload(true);
+            if (responseCode === 1) location.replace("/roomballot/admin/syndicates");
             else location.href('/roomballot/error/' + responseCode.toString());
         }
 
         // Called when the user clicks a button.
         function CreateButtonAjaxResponse(code) {
             $.ajax({
-                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
+                url: '/roomballot/admin/syndicate/{{ syndicate.syndicate_id }}',
                 type: 'POST',
                 data: {'response': code},
-                dataType: 'json',
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function (response) {
-                    HandleResponse(response.responseCode);
-                }
-            });
-        }
-
-        // Called when the user selects a room/syndicate to allocate.
-        function CreateSelectionAjaxResponse(code, id) {
-            $.ajax({
-                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
-                type: 'POST',
-                data: {'response': code, 'id': id},
                 dataType: 'json',
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 success: function (response) {
@@ -75,56 +61,11 @@
                 {% endfor %}
             ];
 
-            // Generate JSON of syndicates which can be allocated.
-            var availableSyndicates = [
-                {% for s in syndicates %}
-                    {
-                        value: "{{ s.syndicate_id }}",
-                        label: "{{ s.syndicate_id }}"
-                    }
-                    {% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Set parameters of autocomplete field.
-            $('#room').autocomplete({
-                source: availableRooms,
-                select: function (event, ui) {
-                    CreateSelectionAjaxResponse(3, ui.item.value);
-                    return false;
-                }
-            });
-
-            // Set parameters of autocomplete field.
-            $('#syndicate').autocomplete({
-                source: availableSyndicates,
-                select: function (event, ui) {
-                    CreateSelectionAjaxResponse(4, ui.item.value);
-                    return false;
-                }
-            });
-
             // When 'remove from syndicate' is clicked, send response.
-            $('#remove').click(function () {
+            $('#dissolve-syndicate').click(function () {
                 CreateButtonAjaxResponse(1);
             });
 
-            // When 'remove from syndicate' is clicked, send response.
-            $('#deallocate-room').click(function () {
-                CreateButtonAjaxResponse(2);
-            });
-
-            $('#allocate-room').click(function () {
-                $('#allocate-room-widget').toggle()
-            });
-
-            $('#add-to-syndicate').click(function () {
-                $('#add-to-syndicate-widget').toggle()
-            });
-
-            $('#add-to-ballot').click(function () {
-                CreateButtonAjaxResponse(5);
-            });
         });
 
     });
@@ -207,7 +148,7 @@
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                     <div class="jumbotron">
                         <h3 class="mb-3">Tasks</h3>
-                        <a class="btn btn-primary" href="../manage-student/{{ student.user_id }}">Dissolve Syndicate</a>
+                        <button class="btn btn-primary" id="dissolve-syndicate">Dissolve Syndicate</button>
                     </div>
                 </div>
             </div>

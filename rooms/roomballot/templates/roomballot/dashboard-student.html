@@ -93,10 +93,10 @@
                         <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate</a>
                         {% endif %}
                     {% else %}
-                        {% if student.syndicate == None %}
+                        {% if student.syndicate == None and student.year == 1%}
                         <p>You haven't created, or been invited to, a syndicate yet.</p>
                         <a href="dashboard/create-syndicate" class="btn btn-primary">Create Syndicate</a>
-                        {% else %}
+                        {% elif student.syndicate != None and student.year == 1 %}
                         <p>You've been invited to a syndicate. Accept the invite now!</p>
                         <a href="dashboard/syndicate" class="btn btn-primary">Accept Invite</a>
                         {% endif %}

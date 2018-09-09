@@ -121,6 +121,9 @@ def create_syndicate(request):
         # If student already part of a syndicate, redirects to error page.
         if student.syndicate is not None:
             return error(request, 902)
+        # If student in second year, redirects to error page.
+        if student.year == 2:
+            return error(request, 403)
         if request.method == 'POST':
             usernames = request.POST.getlist('crsids[]')
             try:
@@ -294,6 +297,14 @@ def manage_student(request, user_id):
                 except BallotInProgressException:
                     response_code = 907
 
+            # Clicked 'Accept Syndicate'
+            elif request.POST.get('response') == '6':
+                try:
+                    accept_syndicate(student)
+                    response_code = 1
+                except ConcurrencyException:
+                    response_code = 905
+
             return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
         else:
             room = None
@@ -345,9 +356,17 @@ def manage_syndicate(request, syndicate_id):
     try:
         AdminUser.objects.get(user_id=request.user.username)
         syndicate = Syndicate.objects.get(syndicate_id=syndicate_id)
-        students = Student.objects.filter(syndicate=syndicate).order_by('first_name')
-        return render(request, 'roomballot/syndicate-manage.html', {'syndicate': syndicate,
-                                                                    'students': students})
+        if request.method == 'POST':
+            response_code = 900
+            # Clicked 'Remove from Ballot'.
+            if request.POST.get('response') == '1':
+                dissolve_syndicate(syndicate)
+                response_code = 1
+            return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+        else:
+            students = Student.objects.filter(syndicate=syndicate).order_by('first_name')
+            return render(request, 'roomballot/syndicate-manage.html', {'syndicate': syndicate,
+                                                                        'students': students})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
