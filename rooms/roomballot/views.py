@@ -25,9 +25,9 @@ def room_detail(request, room_id):
     selectable = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
     total_price = room.price * room.staircase.contract_length / 100
     weekly_price = room.price / 100
-    image_urls = []     # TODO: implement image storage.
+    image_urls = []
     for image in Image.objects.filter(room=room):
-        image_urls.append('https://ballot.downingjcr.co.uk/media/' + image.file.url)
+        image_urls.append('https://ballot.downingjcr.co.uk/media/' + image.file.url)        # TODO - change this link.
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'total_price': total_price,
                                                                 'weekly_price': weekly_price,
@@ -82,7 +82,23 @@ def landing(request):
 
 def staircase_list(request):
     student = Student.objects.get(user_id=request.user.username)
-    return render(request, 'roomballot/staircase-list.html', {'staircases': Staircase.objects.order_by('name'),
+    staircases = Staircase.objects.order_by('name')
+    # Getting metadata
+    class ModifiedStaircase(object):
+        pass
+
+    modified_staircases = []
+    for staircase in staircases:
+        rooms = Room.objects.filter(staircase=staircase)
+        total_rooms = rooms.count()
+        available_rooms = rooms.filter(taken_by=None).count()
+        ms = ModifiedStaircase()
+        ms.name = staircase.name
+        ms.total_rooms = total_rooms
+        ms.available_rooms = available_rooms
+        ms.staircase_id = staircase.staircase_id
+        modified_staircases.append(ms)
+    return render(request, 'roomballot/staircase-list.html', {'staircases': modified_staircases,
                                                               'student': student})
 
 
@@ -93,9 +109,14 @@ def staircase_list(request):
 def staircase_detail(request, staircase_id):
     student = Student.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
+    try:
+        floorplan = Floorplan.objects.get(staircase=staircase)
+    except:
+        floorplan = None
     return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
                                                               'rooms': Room.objects.filter(staircase=staircase)
-                                                                                   .order_by('room_number'),
+                                                                                   .order_by('sort_number'),
+                                                              'floorplan': floorplan.file.url,
                                                               'student': student})
 
 

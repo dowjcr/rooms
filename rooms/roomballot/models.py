@@ -111,6 +111,7 @@ class Room(models.Model):
     band = models.IntegerField(choices=BAND_CHOICES)
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None)
     price = models.IntegerField(editable=False, default=0)
+    sort_number = models.IntegerField(default=0)
 
     def __str__(self):
         return self.staircase.__str__() + ", Room " + str(self.room_number)
@@ -155,6 +156,19 @@ class Image(models.Model):
 
     def __str__(self):
         return self.room.__str__() + " (Image " + str(self.image_id) + ")"
+
+
+# ================ FLOORPLAN =====================
+# Implements relationship allowing storage of floorplan
+# files for staircase.
+
+class Floorplan(models.Model):
+    floorplan_id = models.AutoField(primary_key=True)
+    staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
+    file = models.FileField(upload_to='floorplans')
+
+    def __str__(self):
+        return self.staircase.__str__() + " (Floorplan " + str(self.floorplan_id) + ")"
 
 
 # ================== SETTING =====================

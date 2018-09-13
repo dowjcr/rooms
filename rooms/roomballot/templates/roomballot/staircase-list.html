@@ -65,23 +65,25 @@
 
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-4">
-            <table class="table table-bordered table-striped table-hover">
+            <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col" class="d-none d-sm-table-cell">Total Rooms</th>
                     <th scope="col">Available Rooms</th>
-                    <th scope="col" class="d-none d-sm-table-cell">Average Price</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for staircase in staircases %}
+                {% if staircase.available_rooms == 0 %}
+                <tr class="alert-danger">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td><b>{{ staircase.name }}</b></td>
-                    <td class="d-none d-sm-table-cell">0</td>
-                    <td>0</td>
-                    <td class="d-none d-sm-table-cell">0</td>
+                    <td class="d-none d-sm-table-cell">{{ staircase.total_rooms }}</td>
+                    <td>{{ staircase.available_rooms }}</td>
                     <td class="text-center">
                         <a class="btn btn-primary" href="staircase/{{ staircase.staircase_id }}">View</a>
                     </td>
