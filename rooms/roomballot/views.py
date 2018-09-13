@@ -27,7 +27,7 @@ def room_detail(request, room_id):
     weekly_price = room.price / 100
     image_urls = []
     for image in Image.objects.filter(room=room):
-        image_urls.append('https://ballot.downingjcr.co.uk/media/' + image.file.url)        # TODO - change this link.
+        image_urls.append('/media/' + image.file.url)        # TODO - change this link.
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'total_price': total_price,
                                                                 'weekly_price': weekly_price,

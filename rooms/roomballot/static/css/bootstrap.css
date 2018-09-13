@@ -3144,6 +3144,13 @@ input[type="button"].btn-block {
   border-top: 1px solid #e9ecef;
 }
 
+.dropdown-divider-burgundy {
+  height: 0;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  border-top: 1px solid #bf78a8;
+}
+
 .dropdown-item {
   display: block;
   width: 100%;
@@ -3166,7 +3173,7 @@ input[type="button"].btn-block {
 .dropdown-item.active, .dropdown-item:active {
   color: #fff;
   text-decoration: none;
-  background-color: #007bff;
+  background-color: #960066;
 }
 
 .dropdown-item.disabled, .dropdown-item:disabled {
@@ -8981,4 +8988,7 @@ a.text-dark:hover, a.text-dark:focus {
     border-color: #dee2e6;
   }
 }
+
+button.navbar-toggler:focus
+{ outline: 1px none; }
 /*# sourceMappingURL=bootstrap.css.map */
