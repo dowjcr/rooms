@@ -116,7 +116,7 @@ def staircase_detail(request, staircase_id):
     return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
                                                               'rooms': Room.objects.filter(staircase=staircase)
                                                                                    .order_by('sort_number'),
-                                                              'floorplan': floorplan.file.url,
+                                                              'floorplan': floorplan,
                                                               'student': student})
 
 
