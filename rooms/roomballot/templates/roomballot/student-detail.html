@@ -63,7 +63,7 @@
     <div class="border-bottom">
         <div class="row">
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-                <h2>{{ student.first_name }} {{ student.surname }}</h2>
+                <h2>{{ student_to_view.first_name }} {{ student_to_view.surname }}</h2>
             </div>
         </div>
     </div>
@@ -80,21 +80,21 @@
                 <tbody>
                 <tr>
                     <td><b>CRSid</b></td>
-                    <td>{{ student.user_id }}</td>
+                    <td>{{ student_to_view.user_id }}</td>
                 </tr>
                 <tr>
                     <td><b>In Ballot</b></td>
                     <td>
-                        {% if student.in_ballot %} Yes
+                        {% if student_to_view.in_ballot %} Yes
                         {% else %} No
                         {% endif %}
                     </td>
                 </tr>
-                {% if student.in_ballot %}
+                {% if student_to_view.in_ballot %}
                 <tr>
                     <td><b>Accepted Syndicate</b></td>
                     <td>
-                        {% if student.accepted_syndicate %} Yes
+                        {% if student_to_view.accepted_syndicate %} Yes
                         {% else %} No
                         {% endif %}
                     </td>
@@ -109,7 +109,7 @@
                 <tr>
                     <td><b>Picks At</b></td>
                     <td>
-                        {{ student.picks_at }}
+                        {{ student_to_view.picks_at }}
                     </td>
                 </tr>
                 {% endif %}

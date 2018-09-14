@@ -123,7 +123,9 @@
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 mt-4 mb-4">
             <div class="d-md-block">
             <div class="list-group">
+                {% if floorplan is not None %}
                 <a href="/media/{{ floorplan.file.url }}" class="list-group-item"><i class="fa fa-key"></i> <span>Floorplan</span></a>
+                {% endif %}
                 <p class="list-group-item">
                     Let: {{ staircase.contract_length }} Weeks
                 </p>

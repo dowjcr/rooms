@@ -63,8 +63,8 @@
                 <li class="nav-item">
                     <a class="nav-link d-lg-none d-xl-none" href="/roomballot/dashboard">Dashboard</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link d-lg-none d-xl-none" href="/roomballot/staircases">Browse Rooms</a>
+                <li class="nav-item active">
+                    <a class="nav-link active d-lg-none d-xl-none" href="/roomballot/staircases">Browse Rooms</a>
                 </li>
                 <div class="dropdown-divider-burgundy"></div>
                 <li class="nav-item">
@@ -102,7 +102,7 @@
                 {% if staircase.available_rooms == 0 %}
                 <tr class="alert-danger">
                 {% else %}
-                <tr>
+                <tr class="alert-success">
                 {% endif %}
                     <td><b>{{ staircase.name }}</b></td>
                     <td class="d-none d-sm-table-cell">{{ staircase.total_rooms }}</td>

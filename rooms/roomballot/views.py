@@ -248,18 +248,21 @@ def admin_dashboard(request):
 # Displays students ranked by ballot order.
 
 def ballot_ranking(request):
-    Student.objects.get(user_id=request.user.username)
+    student = Student.objects.get(user_id=request.user.username)
     ranked_students = Student.objects.filter(in_ballot=True).order_by('rank')
-    return render(request, 'roomballot/ranking.html', {'students': ranked_students})
+    return render(request, 'roomballot/ranking.html', {'student': student,
+                                                       'students': ranked_students})
 
 
 # ============== STUDENT DETAIL ===============
 # Displays student metadata.
 
 def student_detail(request, user_id):
-    student = get_object_or_404(Student, user_id=user_id)
+    student = Student.objects.get(user_id=request.user.username)
+    student_to_view = get_object_or_404(Student, user_id=user_id)
     room = Room.objects.get(taken_by=student) if student.has_allocated else None
     return render(request, 'roomballot/student-detail.html', {'student': student,
+                                                              'student_to_view': student_to_view,
                                                               'room': room})
 
 
