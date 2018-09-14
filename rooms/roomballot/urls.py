@@ -25,5 +25,6 @@ urlpatterns = [
     path('room/<str:room_id>', views.room_detail, name='room-detail'),
     path('error/<int:code>', views.error, name='error'),
     path('student/<str:user_id>', views.student_detail, name='student-detail'),
-    path('info', views.ballot_info, name='info')
+    path('info', views.ballot_info, name='info'),
+    path('about', views.about, name='about'),
 ]

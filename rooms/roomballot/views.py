@@ -353,6 +353,14 @@ def ballot_info(request):
                                                     'date': settings['start_date']})
 
 
+# =================== ABOUT ===================
+# Display page with information about this system.
+
+def about(request):
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/about.html', {'student': student})
+
+
 # ================== STATUS ===================
 # Display page with ballot status - which students
 # haven't completed syndicate, which syndicates are

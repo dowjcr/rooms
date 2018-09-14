@@ -7,7 +7,7 @@ Author Cameron O'Connor
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from re import compile
-from .models import Student
+from .models import Student, AdminUser
 from .views import error
 
 
@@ -32,11 +32,16 @@ class AuthRequiredMiddleware(object):
             else:
                 return response
         # Check that user is registered as a student, excluding admin pages.
-        ADMIN_URLS = [compile('roomballot/admin/')]
+        ADMIN_URLS = [compile('roomballot/admin'), compile('admin')]
         try:
             path = request.path_info.lstrip('/')
             if not any(m.match(path) for m in ADMIN_URLS):
                 Student.objects.get(user_id=request.user.username)
         except Student.DoesNotExist:
-            return error(request, 906)
+            # Redirects to admin page if only admin user.
+            try:
+                AdminUser.objects.get(user_id=request.user.username)
+                return HttpResponseRedirect('/roomballot/admin')
+            except AdminUser.DoesNotExist:
+                return error(request, 906)
         return response
