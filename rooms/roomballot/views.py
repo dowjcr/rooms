@@ -27,7 +27,7 @@ def room_detail(request, room_id):
     weekly_price = room.price / 100
     image_urls = []
     for image in Image.objects.filter(room=room):
-        image_urls.append('/media/' + image.file.url)        # TODO - change this link.
+        image_urls.append('/media/' + image.file.url)
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'total_price': total_price,
                                                                 'weekly_price': weekly_price,
@@ -228,7 +228,7 @@ def error(request, code):
 def admin_dashboard(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        students = Student.objects.all()
+        students = Student.objects.order_by('surname')
         syndicates_complete = True
         for s in Student.objects.filter(year=1, in_ballot=True):
             if not s.accepted_syndicate:
@@ -239,8 +239,8 @@ def admin_dashboard(request):
                                                                    'syndicates_complete': syndicates_complete,
                                                                    'randomised': randomised,
                                                                    'in_progress': in_progress,
-                                                                   'syndicates': Syndicate.objects.all(),
-                                                                   'rooms': Room.objects.order_by('room_number')})
+                                                                   'syndicates': Syndicate.objects.order_by('syndicate_id'),
+                                                                   'rooms': Room.objects.order_by('sort_number')})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -335,8 +335,8 @@ def manage_student(request, user_id):
             room = None
             if student.has_allocated:
                 room = Room.objects.get(taken_by=student)
-            rooms = Room.objects.filter(taken_by=None)
-            syndicates = Syndicate.objects.filter(year=student.year)
+            rooms = Room.objects.filter(taken_by=None).order_by('sort_number')
+            syndicates = Syndicate.objects.filter(year=student.year).order_by('syndicate_id')
             return render(request, 'roomballot/student-manage.html', {'student': student,
                                                                       'room': room,
                                                                       'rooms': rooms,
@@ -434,7 +434,7 @@ def students_list(request):
 def rooms_list(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        rooms = Room.objects.order_by('staircase', 'room_number')
+        rooms = Room.objects.order_by('staircase', 'sort_number')
         return render(request, 'roomballot/rooms-list.html', {'rooms': rooms})
     except AdminUser.DoesNotExist:
         return error(request, 403)

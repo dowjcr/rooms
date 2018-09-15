@@ -31,7 +31,7 @@ class Syndicate(models.Model):
     owner_id = models.CharField(max_length=10)
     complete = models.BooleanField(default=False)
     year = models.IntegerField(choices=YEAR_CHOICES)
-    rank = models.IntegerField(null=True, blank=True)
+    rank = models.IntegerField(null=True, editable=False)
 
     def __str__(self):
         return str(self.syndicate_id)
@@ -68,12 +68,12 @@ class Student(models.Model):
     first_name = models.CharField('First Name', max_length=20)
     surname = models.CharField('Surname', max_length=20)
     year = models.IntegerField(choices=YEAR_CHOICES)
-    in_ballot = models.BooleanField(default=True)
-    has_allocated = models.BooleanField(default=False)
-    rank = models.IntegerField(null=True, blank=True)
-    syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
-    accepted_syndicate = models.BooleanField(default=False)
-    picks_at = models.DateTimeField(null=True, blank=True)
+    in_ballot = models.BooleanField(default=True, editable=False)
+    has_allocated = models.BooleanField(default=False, editable=False)
+    rank = models.IntegerField(null=True, blank=True, editable=False)
+    syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, editable=False)
+    accepted_syndicate = models.BooleanField(default=False, editable=False)
+    picks_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     def __str__(self):
         return self.first_name + " " + self.surname
@@ -109,7 +109,7 @@ class Room(models.Model):
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
     band = models.IntegerField(choices=BAND_CHOICES)
-    taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None)
+    taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
     price = models.IntegerField(editable=False, default=0)
     sort_number = models.IntegerField(default=0)
 
