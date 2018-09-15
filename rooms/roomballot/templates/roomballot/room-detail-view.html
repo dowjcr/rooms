@@ -89,7 +89,7 @@
                 {% endif %}
             </div>
             <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 text-center">
-                {% if not room.taken and not student.has_allocated and selectable %}
+                {% if room.taken_by is None and not student.has_allocated and selectable %}
                     <div align="right">
                         <a class="btn btn-primary mt-3 mb-2" href="{{ room.room_id }}/confirm-selection">Select this
                             room</a>

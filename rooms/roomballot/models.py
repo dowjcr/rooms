@@ -177,7 +177,7 @@ class Floorplan(models.Model):
 
 class Setting(models.Model):
     key = models.CharField(max_length=32)
-    value = models.CharField(max_length=200, null=True)
+    value = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return str(self.key)

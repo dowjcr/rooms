@@ -233,8 +233,8 @@ def admin_dashboard(request):
         for s in Student.objects.filter(year=1, in_ballot=True):
             if not s.accepted_syndicate:
                 syndicates_complete = False
-        randomised = True if settings['randomised'] == 'true' else False
-        in_progress = True if settings['ballot_in_progress'] == 'true' else False
+        randomised = settings['randomised'] == 'true'
+        in_progress = settings['ballot_in_progress'] == 'true'
         return render(request, 'roomballot/dashboard-admin.html', {'students': students,
                                                                    'syndicates_complete': syndicates_complete,
                                                                    'randomised': randomised,
@@ -370,11 +370,20 @@ def about(request):
 def status(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
+        randomised = settings['randomised'] == 'true'
+        in_progress = settings['ballot_in_progress'] == 'true'
+        syndicates_complete = True
+        for s in Student.objects.filter(year=1, in_ballot=True):
+            if not s.accepted_syndicate:
+                syndicates_complete = False
         incomplete_students = []
         for student in Student.objects.filter(in_ballot=True).order_by('first_name'):
             if not student.accepted_syndicate or not student.syndicate.complete:
                 incomplete_students.append(student)
         return render(request, 'roomballot/status.html', {'syndicates': Syndicate.objects.all(),
+                                                          'syndicates_complete': syndicates_complete,
+                                                          'randomised': randomised,
+                                                          'in_progress': in_progress,
                                                           'incomplete_students': incomplete_students,
                                                           'students_outside_ballot': Student.objects.filter(in_ballot=False),
                                                           'incomplete_syndicates': Syndicate.objects.filter(complete=False)})
