@@ -239,7 +239,8 @@ def admin_dashboard(request):
                                                                    'syndicates_complete': syndicates_complete,
                                                                    'randomised': randomised,
                                                                    'in_progress': in_progress,
-                                                                   'syndicates': Syndicate.objects.all()})
+                                                                   'syndicates': Syndicate.objects.all(),
+                                                                   'rooms': Room.objects.order_by('room_number')})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -411,5 +412,41 @@ def syndicates_list(request):
         AdminUser.objects.get(user_id=request.user.username)
         syndicates = Syndicate.objects.all().order_by('syndicate_id')
         return render(request, 'roomballot/syndicate-list.html', {'syndicates': syndicates})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+
+
+# ============== STUDENTS LIST ================
+# Admin page listing all students.
+
+def students_list(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        students = Student.objects.order_by('year','surname')
+        return render(request, 'roomballot/student-list.html', {'students': students})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+
+
+# ================ ROOMS LIST =================
+# Admin page listing all rooms.
+
+def rooms_list(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        rooms = Room.objects.order_by('staircase', 'room_number')
+        return render(request, 'roomballot/rooms-list.html', {'rooms': rooms})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+
+
+# =============== MANAGE ROOM =================
+# Admin page showing room detail.
+
+def manage_room(request, room_id):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        room = get_object_or_404(Room, room_id=room_id)
+        return render(request, 'roomballot/room-manage.html', {'room': room})
     except AdminUser.DoesNotExist:
         return error(request, 403)

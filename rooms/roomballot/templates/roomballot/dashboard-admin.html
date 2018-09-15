@@ -58,6 +58,17 @@
                 {% endfor %}
             ];
 
+            // Generate JSON of rooms.
+            var availableRooms = [
+                {% for r in rooms %}
+                    {
+                        value: "{{ r.room_id }}",
+                        label: "{{ r }}"
+                    }
+                    {% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+
             // Set parameters of autocomplete field.
             $('#student').autocomplete({
                 source: availableStudents,
@@ -71,6 +82,14 @@
                 source: availableSyndicates,
                 select: function (event, ui) {
                     location.assign('admin/syndicate/' + ui.item.value);
+                }
+            });
+
+            // Set parameters of autocomplete field.
+            $('#room').autocomplete({
+                source: availableRooms,
+                select: function (event, ui) {
+                    location.assign('admin/room/' + ui.item.value);
                 }
             });
         });
@@ -89,16 +108,15 @@
 <div class="container-fluid">
 
     <div class="row mt-2">
-        <nav class="col-md-2 d-none d-md-block sidebar">
+        <div class="col-md-2 col-sm-12 mb-5 d-md-block sidebar">
             <div class="list-group">
-                <a href="#" class="list-group-item active"><i class="fa fa-key"></i> <span>Dashboard</span></a>
-                <a href="admin/status" class="list-group-item"><i class="fa fa-credit-card"></i> <span>Status</span></a>
-                <a href="admin/syndicates" class="list-group-item"><i class="fa fa-question-circle"></i> <span>Syndicates</span></a>
-                <a href="#" class="list-group-item"><i class="fa fa-arrow-circle-o-left"></i>
-                    <span>Students</span></a>
+                <a href="/roomballot/admin" class="list-group-item active"><span>Dashboard</span></a>
+                <a href="/roomballot/admin/status" class="list-group-item"><span>Status</span></a>
+                <a href="/roomballot/admin/syndicates" class="list-group-item"><span>Syndicates</span></a>
+                <a href="/roomballot/admin/students" class="list-group-item"><span>Students</span></a>
+                <a href="/roomballot/admin/rooms" class="list-group-item"><span>Rooms</span></a>
             </div>
-        </nav>
-
+        </div>
 
         <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
             <div class="row">
@@ -138,7 +156,7 @@
                                 </tr>
                             </table>
                         </div>
-                        <a href="admin/status" class="btn btn-primary">More Info</a>
+                        <a href="/roomballot/admin/status" class="btn btn-primary">More Info</a>
                     </div>
                 </div>
 
@@ -149,6 +167,7 @@
                         <div class="ui-widget mb-3" id="student-search-widget">
                             <input id="student"><br>
                         </div>
+                        <a href="/roomballot/admin/students" class="btn btn-primary">View All</a>
                     </div>
                 </div>
 
@@ -159,7 +178,18 @@
                         <div class="ui-widget mb-3" id="student-search-widget">
                             <input id="syndicate"><br>
                         </div>
-                        <a href="admin/syndicates" class="btn btn-primary">View All</a>
+                        <a href="/roomballot/admin/syndicates" class="btn btn-primary">View All</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="jumbotron">
+                        <h3 class="mb-3">View Room</h3>
+                        <p>Start typing the room below:</p>
+                        <div class="ui-widget mb-3" id="student-search-widget">
+                            <input id="room"><br>
+                        </div>
+                        <a href="/roomballot/admin/rooms" class="btn btn-primary">View All</a>
                     </div>
                 </div>
             </div>

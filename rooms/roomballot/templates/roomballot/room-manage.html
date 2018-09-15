@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>{{ room }} | Downing JCR RBS</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
+          media="all"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
+            type="text/javascript"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-dark justify-content-between mb-4">
+    <a class="navbar-brand" href="/roomballot/admin">
+        Downing JCR RBS<br>
+        <p class="small">Administration Portal</p>
+    </a>
+</nav>
+
+<div class="container-fluid">
+
+
+    <div class="row mt-4">
+
+        <div class="col-md-2 col-sm-12 mb-5 d-md-block sidebar">
+            <div class="list-group">
+                <a href="/roomballot/admin" class="list-group-item"><span>Dashboard</span></a>
+                <a href="/roomballot/admin/status" class="list-group-item"><span>Status</span></a>
+                <a href="/roomballot/admin/syndicates" class="list-group-item"><span>Syndicates</span></a>
+                <a href="/roomballot/admin/students" class="list-group-item"><span>Students</span></a>
+                <a href="/roomballot/admin/rooms" class="list-group-item"><span>Rooms</span></a>
+            </div>
+        </div>
+        <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
+                    <h2>{{ room }}</h2>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead style="display:none">
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><b>Room ID</b></td>
+                            <td>{{ room.room_id }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Floor</b></td>
+                            <td>
+                                {% if room.floor == 1 %} Ground
+                                {% elif room.floor == 2 %} First
+                                {% elif room.floor == 3 %} Second
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Ensuite</b></td>
+                            <td>
+                                {% if room.is_ensuite %} Yes
+                                {% else %} No
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Bed Type</b></td>
+                            <td>
+                                {% if room.is_double_bed %} Double
+                                {% else %} Single
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Disabled Facilities</b></td>
+                            <td>
+                                {% if room.has_disabled_facilities %} Yes
+                                {% else %} No
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Size</b></td>
+                            <td>{{ room.size }} m&#178;</td>
+                        </tr>
+                        <tr>
+                            <td><b>Band</b></td>
+                            <td>{{ room.band }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Price</b></td>
+                            <td>£{{ weekly_price }} per week</td>
+                        </tr>
+                        <tr>
+                            <td><b>Contract Length</b></td>
+                            <td>{{ room.staircase.contract_length }} weeks</td>
+                        </tr>
+                        <tr>
+                            <td><b>Total Price</b></td>
+                            <td>£{{ total_price }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Occupied By</b></td>
+                            <td>{{ room.taken_by }}
+                                {% if room.taken_by is not None %}
+                                    <br><a href="/roomballot/admin/manage-student/{{ room.taken_by.user_id }}" class="btn btn-primary">Manage</a>
+                                {% endif %}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <h4>Something wrong?</h4>
+                        <p>If you think these details should be changed, please contact the JCR Internet Officer at
+                        <a href="mailto:internet@jcr.dow.cam.ac.uk">internet@jcr.dow.cam.ac.uk.</a></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+
+</body>
+</html>
