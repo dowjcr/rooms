@@ -362,6 +362,33 @@ def about(request):
     return render(request, 'roomballot/about.html', {'student': student})
 
 
+# =============== SYNDICATE INFO ==============
+# Display page with instructions on how to create
+# a syndicate.
+
+def syndicate_info(request):
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/info-create-syndicate.html', {'student': student})
+
+
+# =============== INDIVIDUAL INFO ==============
+# Display page with instructions on how to enter the
+# ballot as an individual.
+
+def individual_info(request):
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/info-individual.html', {'student': student})
+
+
+# ============== SELECT ROOM INFO ==============
+# Display page with instructions on how to select
+# a room come ballot day.
+
+def select_room_info(request):
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/info-select-room.html', {'student': student})
+
+
 # ================== STATUS ===================
 # Display page with ballot status - which students
 # haven't completed syndicate, which syndicates are
