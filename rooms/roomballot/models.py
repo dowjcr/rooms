@@ -152,7 +152,7 @@ class AdminUser(models.Model):
 class Image(models.Model):
     image_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(Room, on_delete=models.SET_DEFAULT, default=None)
-    thumbnail = models.ImageField(upload_to='room_images', default=None, null=True)
+    thumbnail = models.ImageField(upload_to='room_images')
     file = models.ImageField(upload_to='room_images')
 
     def __str__(self):

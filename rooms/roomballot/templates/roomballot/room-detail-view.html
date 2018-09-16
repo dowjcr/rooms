@@ -102,7 +102,7 @@
     <div class="row">
         <div class="col-md-6 mt-4">
             {% for i in images %}
-                <a href="{{ i.file.url }}" target="blank"><img class="img-thumbnail mb-3" src="{{ i.thumbnail.url }}"></a>
+                <a href="/media/{{ i.file.url }}" target="blank"><img class="img-thumbnail mb-3" src="/media/{{ i.thumbnail.url }}"></a>
             {% endfor %}
         </div>
         <div class="col-md-6">
