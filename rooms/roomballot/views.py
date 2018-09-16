@@ -275,6 +275,7 @@ def manage_student(request, user_id):
     try:
         AdminUser.objects.get(user_id=request.user.username)
         student = get_object_or_404(Student, user_id=user_id)
+        in_progress = settings['ballot_in_progress'] == 'true'
         if request.method == 'POST':
             response_code = 900
             # Clicked 'Remove from Ballot'.
@@ -340,7 +341,8 @@ def manage_student(request, user_id):
             return render(request, 'roomballot/student-manage.html', {'student': student,
                                                                       'room': room,
                                                                       'rooms': rooms,
-                                                                      'syndicates': syndicates})
+                                                                      'syndicates': syndicates,
+                                                                      'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -402,13 +404,18 @@ def manage_syndicate(request, syndicate_id):
             response_code = 900
             # Clicked 'Remove from Ballot'.
             if request.POST.get('response') == '1':
-                dissolve_syndicate(syndicate)
-                response_code = 1
+                try:
+                    dissolve_syndicate(syndicate)
+                    response_code = 1
+                except BallotInProgressException:
+                    response_code = 907
             return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
         else:
             students = Student.objects.filter(syndicate=syndicate).order_by('first_name')
+            in_progress = settings['ballot_in_progress'] == 'true'
             return render(request, 'roomballot/syndicate-manage.html', {'syndicate': syndicate,
-                                                                        'students': students})
+                                                                        'students': students,
+                                                                        'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 

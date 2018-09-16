@@ -41,7 +41,7 @@
                 {% for s in students %}
                     {
                         value: "{{ s.user_id }}",
-                        label: "{{ s }} ({{ s.user_id }})"
+                        label: "{{ s|escapejs }} ({{ s.user_id }})"
                     }
                     {% if not forloop.last %},{% endif %}
                 {% endfor %}

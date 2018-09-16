@@ -21,8 +21,8 @@
     <script type="text/javascript">
         var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
         Tawk_API.visitor = {
-            name: '{{ student.first_name }} ({{ request.user.username }})',
-            email: '{{ request.user.email }}'
+            name: '{{ student.first_name|escapejs }} {{ student.surname|escapejs }}',
+            email: '{{ request.user.username }}@cam.ac.uk'
         };
         (function () {
             var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];

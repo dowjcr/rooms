@@ -31,7 +31,7 @@
         function HandleResponse(responseCode) {
             // Successfully created syndicate.
             if (responseCode === 1) location.reload(true);
-            else location.href('/roomballot/error/' + responseCode.toString());
+            else location.assign('/roomballot/error/' + responseCode.toString());
         }
 
         // Called when the user clicks a button.
@@ -237,7 +237,7 @@
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                     <div class="jumbotron">
                         <h3 class="border-bottom mb-3">Tasks</h3>
-                        {% if student.in_ballot %}
+                        {% if student.in_ballot and not in_progress %}
                             <button class="btn btn-primary mb-3" id="remove">Remove from Ballot</button><br>
                             {% if student.syndicate is None %}
                                 <button class="btn btn-primary mb-3" id="add-to-syndicate">Add to Syndicate</button><br>
@@ -251,7 +251,7 @@
                                     <button class="btn btn-primary mb-3" id="accept-syndicate">Accept Syndicate</button><br>
                                 {% endif %}
                             {% endif %}
-                        {% else %}
+                        {% elif not student.in_ballot and not in_progress %}
                             <button class="btn btn-primary mb-3" id="add-to-ballot">Add to Ballot</button><br>
                         {% endif %}
                         {% if student.has_allocated %}

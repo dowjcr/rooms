@@ -185,7 +185,7 @@ def advance_year():
 # by removing them from rankings and their syndicate.
 
 def remove_from_ballot(student):
-    if settings['ballot_in_progress'] == 'false':
+    if settings['ballot_in_progress'] != 'true':
         student_rank = student.rank
         student_syndicate = student.syndicate
         student.rank = None
@@ -231,7 +231,7 @@ def remove_from_ballot(student):
 # then the student will be added last in the syndicate.
 
 def readd_to_ballot(student, syndicate):
-    if settings['ballot_in_progress'] == 'false':
+    if settings['ballot_in_progress'] != 'true':
         syndicate_rank = syndicate.rank
         # Increments the student rank of all students in subsequent syndicates.
         new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
@@ -293,11 +293,14 @@ def create_new_syndicate(student_ids, owner_id):
 # students' attributes.
 
 def dissolve_syndicate(syndicate):
-    for student in Student.objects.filter(syndicate=syndicate):
-        student.syndicate = None
-        student.accepted_syndicate = False
-        student.save()
-    syndicate.delete()
+    if settings['ballot_in_progress'] == 'true':
+        raise BallotInProgressException()
+    else:
+        for student in Student.objects.filter(syndicate=syndicate):
+            student.syndicate = None
+            student.accepted_syndicate = False
+            student.save()
+        syndicate.delete()
 
 
 # ============= ACCEPT SYNDICATE =================

@@ -31,7 +31,7 @@
         function HandleResponse(responseCode) {
             // Successfully created syndicate.
             if (responseCode === 1) location.replace("/roomballot/admin/syndicates");
-            else location.href('/roomballot/error/' + responseCode.toString());
+            else location.assign('/roomballot/error/' + responseCode.toString());
         }
 
         // Called when the user clicks a button.
@@ -147,7 +147,9 @@
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                     <div class="jumbotron">
                         <h3 class="mb-3">Tasks</h3>
+                        {% if not in_progress %}
                         <button class="btn btn-primary" id="dissolve-syndicate">Dissolve Syndicate</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
