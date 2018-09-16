@@ -11,6 +11,7 @@ from .models import *
 from .methods import *
 from modeldict import ModelDict
 import json
+import csv
 
 settings = ModelDict(Setting, key='key', value='value', instances=False)
 
@@ -25,13 +26,10 @@ def room_detail(request, room_id):
     selectable = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
     total_price = room.price * room.staircase.contract_length / 100
     weekly_price = room.price / 100
-    image_urls = []
-    for image in Image.objects.filter(room=room):
-        image_urls.append('/media/' + image.file.url)
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'total_price': total_price,
                                                                 'weekly_price': weekly_price,
-                                                                'images': image_urls,
+                                                                'images': Image.objects.filter(room=room),
                                                                 'student': student,
                                                                 'reviews': reviews,
                                                                 'selectable': selectable})
@@ -466,3 +464,34 @@ def manage_room(request, room_id):
         return render(request, 'roomballot/room-manage.html', {'room': room})
     except AdminUser.DoesNotExist:
         return error(request, 403)
+
+
+# =============== EXPORT DATA =================
+# Admin views to export data in CSV format.
+
+def export_student_data(request):
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['First Name', 'Surname', 'CRSid', 'Room'])
+    for s in Student.objects.order_by('surname'):
+        try:
+            room = Room.objects.get(taken_by=s)
+        except Room.DoesNotExist:
+            room = None
+        writer.writerow([s.first_name, s.surname, s.user_id, room])
+    return response
+
+
+def export_room_data(request):
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Room ID', 'Staircase', 'Number', 'Weekly Price', 'Occupant'])
+    for r in Room.objects.order_by('staircase', 'sort_number'):
+        writer.writerow([r.room_id, r.staircase, r.room_number, r.price, r.taken_by])
+    return response

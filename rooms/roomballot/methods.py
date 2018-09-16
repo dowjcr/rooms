@@ -258,7 +258,7 @@ def readd_to_ballot(student, syndicate):
 # to the concerned students.
 
 def create_new_syndicate(student_ids, owner_id):
-    if settings['ballot_in_progress'] == 'false':
+    if settings['ballot_in_progress'] != 'true':
         owner = Student.objects.get(user_id=owner_id)
         size = len(student_ids)
         if owner.syndicate is not None or owner.accepted_syndicate or size > 6 or size < 1:
