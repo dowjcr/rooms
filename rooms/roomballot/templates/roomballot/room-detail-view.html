@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-md-6 mt-4">
             {% for i in images %}
                 <a href="/media/{{ i.file.url }}" target="blank"><img class="img-thumbnail mb-3" src="/media/{{ i.thumbnail.url }}"></a>
@@ -160,20 +160,13 @@
                     <td>{{ room.band }}</td>
                 </tr>
                 <tr>
-                    <td><b>Price</b></td>
-                    <td>£{{ weekly_price }} per week</td>
-                </tr>
-                <tr>
                     <td><b>Contract Length</b></td>
                     <td>{{ room.staircase.contract_length }} weeks</td>
-                </tr>
-                <tr>
-                    <td><b>Total Price</b></td>
-                    <td>£{{ total_price }}</td>
                 </tr>
                 </tbody>
             </table>
         </div>
+        {% if reviews %}
         <div class="col-md-12">
             <h3 class="border-bottom mb-3">Reviews</h3>
             {% for review in reviews %}
@@ -184,6 +177,7 @@
                 </div>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
 

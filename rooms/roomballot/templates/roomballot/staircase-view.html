@@ -82,7 +82,7 @@
         <div class="row">
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
                 <h2>{{ staircase }}</h2>
-                <p>{{ staircase.description }}</p>
+                <p>{% if staircase.description is not None %}{{ staircase.description }}{% endif %}</p>
             </div>
         </div>
     </div>
@@ -108,7 +108,7 @@
                     <tr class="alert-success">
                     {% endif %}
                     <td><b>{{ room.room_number }}</b></td>
-                    <td class="d-none d-sm-table-cell">{{ room.size }}</td>
+                    <td class="d-none d-sm-table-cell">{{ room.size }} m&#178;</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_ensuite %}Yes{% else %}No{% endif %}</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_double_bed %}Double{% else %}Single{% endif %}</td>
                     <td>{{ room.taken_by }}</td>

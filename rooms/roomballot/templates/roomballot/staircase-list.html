@@ -87,8 +87,8 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-4">
-            <table class="table table-bordered">
+        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-4 mb-4">
+            <table class="table table-bordered table-striped table-hover">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -99,11 +99,7 @@
                 </thead>
                 <tbody>
                 {% for staircase in staircases %}
-                {% if staircase.available_rooms == 0 %}
-                <tr class="alert-danger">
-                {% else %}
-                <tr class="alert-success">
-                {% endif %}
+                <tr>
                     <td><b>{{ staircase.name }}</b></td>
                     <td class="d-none d-sm-table-cell">{{ staircase.total_rooms }}</td>
                     <td>{{ staircase.available_rooms }}</td>
