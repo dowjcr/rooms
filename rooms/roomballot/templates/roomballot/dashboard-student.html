@@ -142,8 +142,8 @@
                     {% else %}
                         <p>You are ranked <b>{{ student.rank }} out of all students.</b><br>
                             {% if student.picks_at is not None %}
-                                You'll pick your room on {{ student.picks_at }}</p>
-                            {% endif %}
+                                You'll pick your room on {{ student.picks_at }}
+                            {% endif %}</p>
                         <a href="ranking" class="btn btn-primary">View Ranking</a>
                     {% endif %}
                 {% else %}

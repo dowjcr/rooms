@@ -225,26 +225,25 @@ def remove_from_ballot(student):
         raise BallotInProgressException()
 
 
-# ============= RE-ADD TO BALLOT =================
-# Re-adds a student who has been removed from the
-# ballot. A pre-existing syndicate must be specified,
-# then the student will be added last in the syndicate.
+# ============= ADD TO SYNDICATE =================
+# Adds a student to the given syndicate. A pre-existing
+# syndicate must be specified, then the student will
+# be added last in the syndicate.
 
-def readd_to_ballot(student, syndicate):
+def add_to_syndicate(student, syndicate):
     if settings['ballot_in_progress'] != 'true':
         syndicate_rank = syndicate.rank
         # Increments the student rank of all students in subsequent syndicates.
-        new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-        if syndicate_rank is not None:
-            new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-            for rank in range(syndicate_rank+1, get_num_syndicates()+1):
-                sy = Syndicate.objects.get(rank=rank)
-                for st in Student.objects.filter(syndicate=sy):
-                    new_rank = min(new_rank, st.rank)
-                    st.rank += 1
-                    st.save()
-            student.rank = new_rank
-        student.in_ballot = True
+        #new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+        #if syndicate_rank is not None:
+        #    new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+        #    for rank in range(syndicate_rank+1, get_num_syndicates()+1):
+        #        sy = Syndicate.objects.get(rank=rank)
+        #        for st in Student.objects.filter(syndicate=sy):
+        #            new_rank = min(new_rank, st.rank)
+        #            st.rank += 1
+        #            st.save()
+        #    student.rank = new_rank
         student.syndicate = syndicate
         student.save()
         syndicate.complete = False
