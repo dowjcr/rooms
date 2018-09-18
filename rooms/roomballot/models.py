@@ -23,15 +23,15 @@ class PriceCategory(models.Model):
 
 class Syndicate(models.Model):
     YEAR_CHOICES = (
-        (1, 'Currently First Year'),
-        (2, 'Currently Second Year')
+        (1, 'First Ballot Year'),
+        (2, 'Second Ballot Year')
     )
 
     syndicate_id = models.AutoField(primary_key=True)
     owner_id = models.CharField(max_length=10)
     complete = models.BooleanField(default=False)
     year = models.IntegerField(choices=YEAR_CHOICES)
-    rank = models.IntegerField(null=True, editable=False)
+    rank = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.syndicate_id)
@@ -65,8 +65,8 @@ class Student(models.Model):
     )
 
     user_id = models.CharField('CRSid', primary_key=True, max_length=10)
-    first_name = models.CharField('First Name', max_length=20)
-    surname = models.CharField('Surname', max_length=20)
+    first_name = models.CharField('First Name', max_length=50)
+    surname = models.CharField('Surname', max_length=50)
     year = models.IntegerField(choices=YEAR_CHOICES)
     in_ballot = models.BooleanField(default=True, editable=False)
     has_allocated = models.BooleanField(default=False, editable=False)
