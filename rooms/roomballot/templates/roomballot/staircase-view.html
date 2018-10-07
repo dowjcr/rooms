@@ -33,6 +33,15 @@
     </script>
     <!--End of Tawk.to Script-->
 </head>
+
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
@@ -97,24 +106,20 @@
                     <th scope="col" class="d-none d-sm-table-cell">Ensuite</th>
                     <th scope="col" class="d-none d-sm-table-cell">Bed Type</th>
                     <th scope="col">Occupant</th>
-                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for room in rooms %}
                     {% if room.taken_by is not None %}
-                    <tr class="alert-danger">
+                    <tr class="alert-danger clickable-row" data-href="../room/{{ room.room_id }}" style="cursor: pointer;">
                     {% else %}
-                    <tr class="alert-success">
+                    <tr class="alert-success clickable-row" data-href="../room/{{ room.room_id }}" style="cursor: pointer;">
                     {% endif %}
                     <td><b>{{ room.room_number }}</b></td>
                     <td class="d-none d-sm-table-cell">{{ room.size }} m&#178;</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_ensuite %}Yes{% else %}No{% endif %}</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_double_bed %}Double{% else %}Single{% endif %}</td>
                     <td>{{ room.taken_by }}</td>
-                    <td class="text-center">
-                        <a class="btn btn-primary" href="../room/{{ room.room_id }}">View</a>
-                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>

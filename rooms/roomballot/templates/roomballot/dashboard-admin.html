@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
     <title>Admin Dashboard | Downing JCR RBS</title>
-    <link rel="stylesheet" href={% static 'css/bootstrap.css' %}>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
           media="all"/>
@@ -14,6 +13,7 @@
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
             type="text/javascript"></script>
+    <link rel="stylesheet" href={% static 'css/bootstrap.css' %}>
 </head>
 <body>
 
@@ -123,7 +123,7 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="jumbotron">
                         <h3 class="mb-3">Status</h3>
-                        <div class="ui-widget mb-3" id="student-search-widget">
+                        <div class="mb-3">
                             <table>
                                 <tr>
                                     <td>
@@ -164,8 +164,8 @@
                     <div class="jumbotron">
                         <h3 class="mb-3">View Room</h3>
                         <p>Start typing the room below:</p>
-                        <div class="ui-widget mb-3" id="student-search-widget">
-                            <input id="room"><br>
+                        <div class="ui-widget mb-3" id="student-search-widget" style="font-family: 'Lato', sans-serif;">
+                            <input id="room" style="width:100%;"><br>
                         </div>
                         <a href="/roomballot/admin/rooms" class="btn btn-primary">View All</a>
                     </div>
@@ -176,7 +176,7 @@
                         <h3 class="mb-3">Manage Student</h3>
                         <p>Start typing the student's name below:</p>
                         <div class="ui-widget mb-3" id="student-search-widget">
-                            <input id="student"><br>
+                            <input id="student" style="width:100%;"><br>
                         </div>
                         <a href="/roomballot/admin/students" class="btn btn-primary">View All</a>
                     </div>
@@ -187,7 +187,7 @@
                         <h3 class="mb-3">Manage Syndicate</h3>
                         <p>Start typing the syndicate ID below:</p>
                         <div class="ui-widget mb-3" id="student-search-widget">
-                            <input id="syndicate"><br>
+                            <input id="syndicate" style="width:100%;"><br>
                         </div>
                         <a href="/roomballot/admin/syndicates" class="btn btn-primary">View All</a>
                     </div>

@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width = device-width, initial-scale = 1">
     <title>{{ student.first_name }} {{ student.surname }} | Downing JCR RBS</title>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
           media="all"/>
@@ -14,6 +13,7 @@
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
             type="text/javascript"></script>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 </head>
 <body>
 
@@ -190,11 +190,11 @@
                         </tr>
                         {% if student.in_ballot %}
                             <tr>
-                                <td><b>Syndicate ID</b></td>
+                                <td><b>Syndicate</b></td>
                                 <td>
                                     {{ student.syndicate_id }}
                                     {% if student.syndicate is not None %}
-                                        <br><a href="../syndicate/{{ student.syndicate_id }}" class="btn btn-primary">Manage</a>
+                                        <br><a href="../syndicate/{{ student.syndicate_id }}" class="btn btn-primary mt-2">Manage</a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -226,7 +226,7 @@
                             <td>
                                 {{ room }} <br>
                                 {% if student.has_allocated %}
-                                    <a href="/roomballot/admin/room/{{ room.room_id }}" class="btn btn-primary">View</a>
+                                    <a href="/roomballot/admin/room/{{ room.room_id }}" class="btn btn-primary mt-2">View</a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -244,7 +244,7 @@
                                 <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
                                      id="add-to-syndicate-widget">
                                     <p>Start typing the syndicate ID below:</p>
-                                    <input id="syndicate"><br>
+                                    <input id="syndicate" style="width: 100%;"><br>
                                 </div>
                             {% else %}
                                 {% if not student.accepted_syndicate %}
@@ -261,7 +261,7 @@
                             <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
                                  id="allocate-room-widget">
                                 <p>Start typing the room below:</p>
-                                <input id="room"><br>
+                                <input id="room" style="width: 100%;"><br>
                             </div>
                         {% endif %}
                     </div>

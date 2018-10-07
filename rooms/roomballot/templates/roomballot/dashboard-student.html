@@ -92,15 +92,15 @@
                 <h3>Your Room</h3>
                 {% if student.has_allocated %}
                     <p>You have chosen {{ room }}.</p>
-                    <a href="room/{{ room.room_id }}" class="btn btn-primary">View Room</a>
+                    <a href="room/{{ room.room_id }}" class="btn btn-primary mr-1">View Room</a>
                 {% else %}
                     {% if can_pick %}
                         <p>It's time to pick your room.</p>
                     {% else %}
                         <p>You can't pick your room quite yet.</p>
                     {% endif %}
-                    <a href="staircases" class="btn btn-primary">Browse Rooms</a>
                 {% endif %}
+                <a href="staircases" class="btn btn-primary">Browse Rooms</a>
             </div>
         </div>
 

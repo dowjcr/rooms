@@ -33,6 +33,15 @@
     </script>
     <!--End of Tawk.to Script-->
 </head>
+
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
@@ -88,26 +97,22 @@
 
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-4">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-hover table-striped">
                 <thead>
                 <tr>
                     <th scope="col">Rank</th>
                     <th scope="col">Name</th>
                     <th scope="col" class="d-none d-sm-table-cell">CRSid</th>
                     <th scope="col" class="d-none d-sm-table-cell">Picks at</th>
-                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for student in students %}
-                <tr>
+                <tr class="clickable-row" data-href="student/{{ student.user_id }}" style="cursor: pointer;">
                     <td>{{ student.rank }}</td>
                     <td>{{ student.first_name }} {{ student.surname }}</td>
                     <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
                     <td class="d-none d-sm-table-cell">{{ student.picks_at }}</td>
-                    <td class="text-center">
-                        <a class="btn btn-primary" href="student/{{ student.user_id }}">View</a>
-                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>

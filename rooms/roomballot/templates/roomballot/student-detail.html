@@ -135,7 +135,8 @@
                 <tr>
                     <td><b>Room Allocated</b></td>
                     <td>
-                        {{ room }}
+                        {{ room }}<br>
+                        {% if room %}<a href="/roomballot/room/{{ room.room_id }}" class="btn btn-primary mt-2">View</a>{% endif %}
                     </td>
                 </tr>
 
