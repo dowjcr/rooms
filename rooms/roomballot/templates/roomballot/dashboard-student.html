@@ -93,6 +93,9 @@
                 {% if student.has_allocated %}
                     <p>You have chosen {{ room }}.</p>
                     <a href="room/{{ room.room_id }}" class="btn btn-primary mr-1">View Room</a>
+                    {% if can_leave_review %}
+                    <a href="/roomballot/dashboard/review" class="btn btn-primary mr-1">Leave Review</a>
+                    {% endif %}
                 {% else %}
                     {% if can_pick %}
                         <p>It's time to pick your room.</p>

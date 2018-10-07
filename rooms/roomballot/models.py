@@ -125,8 +125,12 @@ class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(Room, on_delete=models.SET_DEFAULT, default=None)
     author_name = models.CharField(max_length=40)
+    author_id = models.CharField(max_length=10)
+    title = models.CharField(max_length=255)
+    layout_rating = models.IntegerField()
+    facilities_rating = models.IntegerField()
+    overall_rating = models.IntegerField()
     text = models.CharField(max_length=1000)
-    # TODO: add review attributes as required.
 
     def __str__(self):
         return self.room.__str__() + ", Review " + str(self.review_id)

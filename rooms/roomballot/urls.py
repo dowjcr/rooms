@@ -34,5 +34,6 @@ urlpatterns = [
     path('info/create-syndicate', views.syndicate_info, name='syndicate-info'),
     path('info/individual', views.individual_info, name='individual-info'),
     path('info/select-room', views.select_room_info, name='select-room-info'),
+    path('dashboard/review', views.leave_review, name='leave-review'),
     path('about', views.about, name='about'),
 ]

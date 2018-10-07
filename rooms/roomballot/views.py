@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings as django_settings
 from .models import *
 from .methods import *
+from .forms import *
 from modeldict import ModelDict
 import json
 import csv
@@ -125,10 +126,13 @@ def staircase_detail(request, staircase_id):
 def student_dashboard(request):
     student = Student.objects.get(user_id=request.user.username)
     room = Room.objects.get(taken_by=student) if student.has_allocated else None
+    reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
+    can_leave_review = reviews_left.count() == 0
     can_pick = settings['current_student'] == request.user.username and settings['ballot_in_progress'] == 'true'
     return render(request, 'roomballot/dashboard-student.html', {'student': student,
                                                                  'room': room,
-                                                                 'can_pick': can_pick})
+                                                                 'can_pick': can_pick,
+                                                                 'can_leave_review': can_leave_review})
 
 
 # ============ CREATE SYNDICATE ================
@@ -522,3 +526,41 @@ def export_room_data(request):
     for r in Room.objects.order_by('staircase', 'sort_number'):
         writer.writerow([r.room_id, r.staircase, r.room_number, r.price, r.taken_by])
     return response
+
+
+# ============== LEAVE REVIEW =================
+# Allows user to leave a review of their room.
+
+def leave_review(request):
+    student = Student.objects.get(user_id=request.user.username)
+    if student.has_allocated:
+        if request.method == 'POST':
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                room = Room.objects.get(taken_by=student)
+                review = Review()
+                review.room = room
+                review.author_name = str(student)
+                review.author_id = student.user_id
+                review.title = form.cleaned_data['title']
+                review.layout_rating = form.cleaned_data['layout_rating']
+                review.facilities_rating = form.cleaned_data['facilities_rating']
+                review.overall_rating = form.cleaned_data['overall_rating']
+                review.text = form.cleaned_data['text']
+                review.save()
+                return render(request, 'roomballot/create_review_success.html', {'student': student})
+        else:
+            room = Room.objects.get(taken_by=student)
+            reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
+            if reviews_left.count() != 0:
+                return error(request, 404)
+            images = Image.objects.filter(room=room)
+            if images.count() != 0:
+                image = images[0]
+            else:
+                image = None
+            return render(request, 'roomballot/create-review.html', {'student': student,
+                                                                     'room': room,
+                                                                     'image': image})
+    else:
+        return error(request, 404)
