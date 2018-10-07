@@ -95,15 +95,8 @@
                 the room below:
             </p>
             <div class="alert alert-info">
-                <div class="row">
-                    <div style="max-width: 20%">
-                        {% if image %}
-                        <img class="img-thumbnail mb-3" src="/media/{{ image.thumbnail.url }}">
-                        {% endif %}
-                    </div>
-                    <div class="ml-3">
-                        <h4>{{ room }}</h4>
-                    </div>
+                <div class="ml-3">
+                    <h4>{{ room }}</h4>
                 </div>
             </div>
             <p>
@@ -121,7 +114,7 @@
                 <div class="form-group">
                     <label for="layout_rating">How well laid out is your room?</label>
                     <select class="form-control" id="layout_rating" name="layout_rating" required>
-                        <option disabled selected value> -- select an option -- </option>
+                        <option disabled selected value> -- select an option --</option>
                         <option>1</option>
                         <option>2</option>
                         <option>3</option>
@@ -135,7 +128,7 @@
                 <div class="form-group">
                     <label for="facilities_rating">How would you rate your room's facilities?</label>
                     <select class="form-control" id="facilities_rating" name="facilities_rating" required>
-                        <option disabled selected value> -- select an option -- </option>
+                        <option disabled selected value> -- select an option --</option>
                         <option>1</option>
                         <option>2</option>
                         <option>3</option>
@@ -146,7 +139,7 @@
                 <div class="form-group">
                     <label for="overall_rating">How would you rate your room overall?</label>
                     <select class="form-control" id="overall_rating" name="overall_rating" required>
-                        <option disabled selected value> -- select an option -- </option>
+                        <option disabled selected value> -- select an option --</option>
                         <option>1</option>
                         <option>2</option>
                         <option>3</option>
