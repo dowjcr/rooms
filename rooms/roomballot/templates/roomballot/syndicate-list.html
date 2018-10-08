@@ -24,6 +24,14 @@
     </a>
 </nav>
 
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
 <div class="container-fluid">
 
     <div class="row mb-5">
@@ -50,20 +58,16 @@
                             <th scope="col" class="d-none d-sm-table-cell">Owner</th>
                             <th scope="col" class="d-none d-sm-table-cell">Year</th>
                             <th scope="col">Complete?</th>
-                            <th scope="col"></th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for syndicate in syndicates %}
-                            <tr>
+                            <tr class="clickable-row" data-href="syndicate/{{ syndicate.syndicate_id }}" style="cursor: pointer;">
                                 <td>{{ syndicate.syndicate_id }}</td>
                                 <td class="d-none d-sm-table-cell">{{ syndicate.owner_id }}</td>
                                 <td class="d-none d-sm-table-cell">{% if syndicate.year == 1 %}First{% else %}
                                     Second{% endif %}</td>
                                 <td>{% if syndicate.complete %}Yes{% else %}No{% endif %}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-primary" href="syndicate/{{ syndicate.syndicate_id }}">Manage</a>
-                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
