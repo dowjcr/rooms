@@ -42,6 +42,7 @@ $ mv settings_example.py settings.py
 Migrate the database, then you're ready to run the test server:
 
 ```bash
+$ cd ..
 $ python manage.py makemigrations
 $ python manage.py migrate
 $ python manage.py runserver
