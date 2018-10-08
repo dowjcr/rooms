@@ -1,4 +1,4 @@
-from roomballot.methods import randomise_order, NotReadyToRandomiseException
+from roomballot.methods import randomise_order, NotReadyToRandomiseException, BallotInProgressException
 from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
@@ -10,3 +10,5 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('Successfully randomised order.'))
         except NotReadyToRandomiseException:
             raise CommandError("Not ready to perform randomisation - perhaps a syndicate is incomplete?")
+        except BallotInProgressException:
+            raise CommandError("Can't perform randomisation because the ballot is in progress.")

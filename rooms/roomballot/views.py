@@ -7,6 +7,7 @@ Author Cameron O'Connor
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings as django_settings
+from django.db import transaction
 from .models import *
 from .methods import *
 from .forms import *
@@ -319,8 +320,10 @@ def manage_student(request, user_id):
             # Clicked 'Add to Ballot'.
             elif request.POST.get('response') == '5':
                 try:
-                    student.in_ballot = True
-                    student.save()
+                    with transaction.atomic():
+                        student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
+                        student_to_update.in_ballot = True
+                        student_to_update.save()
                     response_code = 1
                 except BallotInProgressException:
                     response_code = 907
@@ -538,16 +541,17 @@ def leave_review(request):
             form = ReviewForm(request.POST)
             if form.is_valid():
                 room = Room.objects.get(taken_by=student)
-                review = Review()
-                review.room = room
-                review.author_name = str(student)
-                review.author_id = student.user_id
-                review.title = form.cleaned_data['title']
-                review.layout_rating = form.cleaned_data['layout_rating']
-                review.facilities_rating = form.cleaned_data['facilities_rating']
-                review.overall_rating = form.cleaned_data['overall_rating']
-                review.text = form.cleaned_data['text']
-                review.save()
+                with transaction.atomic():
+                    review = Review()
+                    review.room = room
+                    review.author_name = str(student)
+                    review.author_id = student.user_id
+                    review.title = form.cleaned_data['title']
+                    review.layout_rating = form.cleaned_data['layout_rating']
+                    review.facilities_rating = form.cleaned_data['facilities_rating']
+                    review.overall_rating = form.cleaned_data['overall_rating']
+                    review.text = form.cleaned_data['text']
+                    review.save()
                 return render(request, 'roomballot/create_review_success.html', {'student': student})
         else:
             room = Room.objects.get(taken_by=student)

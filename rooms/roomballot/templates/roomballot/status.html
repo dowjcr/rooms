@@ -17,6 +17,14 @@
 </head>
 <body>
 
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
 <nav class="navbar navbar-dark justify-content-between mb-4">
     <a class="navbar-brand" href="/roomballot/admin">
         Downing JCR RBS<br>
@@ -90,22 +98,17 @@
                                 <th scope="col">Name</th>
                                 <th scope="col" class="d-none d-sm-table-cell">CRSid</th>
                                 <th scope="col">Issue</th>
-                                <th scope="col"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for student in incomplete_students %}
-                                <tr class="alert-danger">
+                                <tr class="alert-danger clickable-row" data-href="manage-student/{{ student.user_id }}" style="cursor: pointer;">
                                     <td>{{ student.first_name }} {{ student.surname }}</td>
                                     <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
                                     <td>{% if student.syndicate == None %}Not part of a syndicate
                                     {% elif not student.accepted_syndicate %}Not accepted syndicate
                                     {% elif not student.syndicate.complete %}Syndicate Incomplete
                                     {% endif %}</td>
-                                    <td class="text-center">
-                                        <a class="btn btn-primary"
-                                           href="manage-student/{{ student.user_id }}">Manage</a>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -126,19 +129,14 @@
                                 <th scope="col">Name</th>
                                 <th scope="col" class="d-none d-sm-table-cell">CRSid</th>
                                 <th scope="col">Room Allocated?</th>
-                                <th scope="col"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for student in students_outside_ballot %}
-                                <tr>
+                                <tr class="clickable-row" data-href="manage-student/{{ student.user_id }}" style="cursor: pointer;">
                                     <td>{{ student.first_name }} {{ student.surname }}</td>
                                     <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
                                     <td>{% if student.has_allocated %}Yes{% else %}No{% endif %}</td>
-                                    <td class="text-center">
-                                        <a class="btn btn-primary"
-                                           href="manage-student/{{ student.user_id }}">Manage</a>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -158,18 +156,13 @@
                             <tr>
                                 <th scope="col">Syndicate ID</th>
                                 <th scope="col">Owner</th>
-                                <th scope="col"></th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for syndicate in incomplete_syndicates %}
-                                <tr>
+                                <tr class="clickable-row" data-href="syndicate/{{ syndicate.syndicate_id }}" style="cursor: pointer;">
                                     <td>{{ syndicate.syndicate_id }}</td>
                                     <td>{{ syndicate.owner_id }}</td>
-                                    <td class="text-center">
-                                        <a class="btn btn-primary"
-                                           href="syndicate/{{ syndicate.syndicate_id }}">Manage</a>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

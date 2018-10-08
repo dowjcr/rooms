@@ -17,6 +17,14 @@
 </head>
 <body>
 
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
 <nav class="navbar navbar-dark justify-content-between mb-4">
     <a class="navbar-brand" href="/roomballot/admin">
         Downing JCR RBS<br>
@@ -49,18 +57,14 @@
                             <th scope="col">Staircase</th>
                             <th scope="col">Room</th>
                             <th scope="col" class="d-none d-sm-table-cell">Occupant</th>
-                            <th scope="col"></th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for r in rooms %}
-                            <tr>
+                            <tr class="clickable-row" data-href="/roomballot/admin/room/{{ r.room_id }}" style="cursor: pointer;">
                                 <td>{{ r.staircase }}</td>
                                 <td>{{ r.room_number }}</td>
                                 <td class="d-none d-sm-table-cell">{{ r.taken_by }}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-primary" href="/roomballot/admin/room/{{ r.room_id }}">View</a>
-                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

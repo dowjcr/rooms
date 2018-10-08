@@ -17,6 +17,14 @@
 </head>
 <body>
 
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
 <nav class="navbar navbar-dark justify-content-between mb-4">
     <a class="navbar-brand" href="/roomballot/admin">
         Downing JCR RBS<br>
@@ -49,19 +57,15 @@
                             <th scope="col">CRSid</th>
                             <th scope="col">Name</th>
                             <th scope="col" class="d-none d-sm-table-cell">Year</th>
-                            <th scope="col"></th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for s in students %}
-                            <tr>
+                            <tr class="clickable-row" data-href="/roomballot/admin/manage-student/{{ s.user_id }}" style="cursor: pointer;">
                                 <td>{{ s.user_id }}</td>
                                 <td>{{ s.first_name }} {{ s.surname }}</td>
                                 <td class="d-none d-sm-table-cell">{% if s.year == 1 %}First{% else %}
                                     Second{% endif %}</td>
-                                <td class="text-center">
-                                    <a class="btn btn-primary" href="/roomballot/admin/manage-student/{{ s.user_id }}">Manage</a>
-                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
