@@ -1,0 +1,4 @@
+Django==2.0.6
+django-ucamwebauth
+django-modeldict-yplan
+Pillow
