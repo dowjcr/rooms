@@ -255,15 +255,15 @@ def add_to_syndicate(student, syndicate):
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             syndicate_rank = syndicate_to_update.rank
             # Increments the student rank of all students in subsequent syndicates.
-            if syndicate_rank is not None:
-                new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-                for rank in range(syndicate_rank+1, get_num_syndicates()+1):
-                    sy = Syndicate.objects.get(rank=rank)
-                    for st in Student.objects.select_for_update().filter(syndicate=sy):
-                        new_rank = min(new_rank, st.rank)
-                        st.rank += 1
-                        st.save()
-                student_to_update.rank = new_rank
+            #if syndicate_rank is not None:
+            #    new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+            #    for rank in range(syndicate_rank+1, get_num_syndicates()+1):
+            #        sy = Syndicate.objects.get(rank=rank)
+            #        for st in Student.objects.select_for_update().filter(syndicate=sy):
+            #            new_rank = min(new_rank, st.rank)
+            #            st.rank += 1
+            #            st.save()
+            #    student_to_update.rank = new_rank
             student_to_update.syndicate = syndicate_to_update
             student_to_update.save()
             syndicate_to_update.complete = False
