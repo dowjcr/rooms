@@ -134,7 +134,7 @@ class Review(models.Model):
     text = models.CharField(max_length=1000)
 
     def __str__(self):
-        return self.room.__str__() + ", Review " + str(self.review_id)
+        return self.room.__str__() + " (Review " + str(self.review_id) + ")"
 
 
 # =================== ADMIN ======================

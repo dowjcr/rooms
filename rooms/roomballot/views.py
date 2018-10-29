@@ -553,6 +553,7 @@ def leave_review(request):
                     review.overall_rating = form.cleaned_data['overall_rating']
                     review.text = form.cleaned_data['text']
                     review.save()
+                confirm_review(student)
                 return render(request, 'roomballot/create_review_success.html', {'student': student})
         else:
             room = Room.objects.get(taken_by=student)

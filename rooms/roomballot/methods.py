@@ -40,7 +40,7 @@ def allocate_room(room, student):
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             student_to_update.has_allocated = True
             student_to_update.save()
-        #selected_room(student, room)
+        selected_room(student, room)
 
 
 # ============= DEALLOCATE ROOM ==================
@@ -289,6 +289,7 @@ def create_new_syndicate(student_ids, owner_id):
                 syndicate.owner_id = owner_id
                 if len(student_ids) == 1:
                     syndicate.complete = True
+                    completed_syndicate(syndicate)
                 syndicate.save()
                 for student_id in student_ids:
                     student = Student.objects.select_for_update().get(user_id=student_id)
@@ -304,7 +305,7 @@ def create_new_syndicate(student_ids, owner_id):
                 owner = Student.objects.select_for_update().get(user_id=owner_id)
                 owner.accepted_syndicate = True
                 owner.save()
-            #invite_syndicate(syndicate)
+            invite_syndicate(syndicate)
     else:
         raise BallotInProgressException()
 
@@ -317,6 +318,7 @@ def dissolve_syndicate(syndicate):
     if settings['ballot_in_progress'] == 'true':
         raise BallotInProgressException()
     else:
+        failed_syndicate(syndicate)
         with transaction.atomic():
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
             for student in Student.objects.select_for_update().filter(syndicate=syndicate_to_update):
@@ -347,10 +349,10 @@ def accept_syndicate(student):
             if accepted:
                 syndicate.complete = True
                 syndicate.save()
+                completed_syndicate(syndicate)
             else:
                 syndicate.complete = False
                 syndicate.save()
-            #completed_syndicate(syndicate)
 
 
 # ============= DECLINE SYNDICATE =================
@@ -361,13 +363,14 @@ def decline_syndicate(student):
     if student.accepted_syndicate:
         raise ConcurrencyException()
     else:
-        syndicate = Syndicate.objects.select_for_update().get(syndicate_id=student.syndicate.syndicate_id)
-        for student in Student.objects.filter(syndicate=syndicate):
-            student.syndicate = None
-            student.accepted_syndicate = False
-            student.save()
-        # failed_syndicate(syndicate)
-        syndicate.delete()
+        with transaction.atomic():
+            syndicate = Syndicate.objects.select_for_update().get(syndicate_id=student.syndicate.syndicate_id)
+            for student in Student.objects.filter(syndicate=syndicate):
+                student.syndicate = None
+                student.accepted_syndicate = False
+                student.save()
+            failed_syndicate(syndicate)
+            syndicate.delete()
 
 
 # ======== RE-ALLOCATE SYNDICATE OWNER ============
