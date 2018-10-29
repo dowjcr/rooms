@@ -131,7 +131,7 @@ class Review(models.Model):
     facilities_rating = models.IntegerField()
     noise_rating = models.IntegerField()
     overall_rating = models.IntegerField()
-    text = models.CharField(max_length=1000)
+    text = models.CharField(max_length=5000)
 
     def __str__(self):
         return self.room.__str__() + " (Review " + str(self.review_id) + ")"
