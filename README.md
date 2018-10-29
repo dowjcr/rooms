@@ -4,6 +4,8 @@
 
 This system manages the allocation of college rooms during ballot weekend. It comprises a web application, which allows a student to view and select their room, and calculates room pricing automatically according to the Room Pricing Policy 2018.
 
+<img src="https://github.com/cjoc/cjoc.github.io/raw/master/jcr-rbs.png">
+
 ## Installation
 
 These instructions are for installation on an Ubuntu machine. The same method will work on any Linux distribution,
