@@ -4,7 +4,7 @@ Defines views to be used in this application.
 Author Cameron O'Connor
 """
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings as django_settings
 from django.db import transaction
