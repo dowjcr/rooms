@@ -13,16 +13,18 @@
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
             type="text/javascript"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"
+          integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 </head>
 <body>
 
 <script>
-    jQuery(document).ready(function($) {
-    $(".clickable-row").click(function() {
-        window.location = $(this).data("href");
+    jQuery(document).ready(function ($) {
+        $(".clickable-row").click(function () {
+            window.location = $(this).data("href");
+        });
     });
-});
 </script>
 
 <nav class="navbar navbar-dark justify-content-between mb-4">
@@ -53,33 +55,32 @@
                     <div class="mb-3">
                         <table>
                             <tr>
-                                <td>
-                                    {% if syndicates_complete %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                                </td>
-                                <td>First Year Syndicates Complete</td>
+                                {% if syndicates_complete %}
+                                    <td style="min-width: 25px"><i class="fas fa-check"></i></td>
+                                    <td>First Year Syndicates Complete</td>
+                                {% else %}
+                                    <td style="min-width: 25px"><i class="fas fa-times"></i></td>
+                                    <td>First Year Syndicates Incomplete</td>
+                                {% endif %}
                             </tr>
                             <tr>
-                                <td>
-                                    {% if randomised %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                                </td>
-                                <td>Randomised</td>
+                                {% if randomised %}
+                                    <td><i class="fas fa-check"></i></td>
+                                    <td>Randomised</td>
+                                {% else %}
+                                    <td><i class="fas fa-times"></i></td>
+                                    <td>Not Randomised</td>
+                                {% endif %}
+
                             </tr>
                             <tr>
-                                <td>
-                                    {% if in_progress %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}</td>
-                                <td>Ballot In Progress</td>
+                                {% if in_progress %}
+                                    <td><i class="fas fa-check"></i></td>
+                                    <td>Ballot In Progress</td>
+                                {% else %}
+                                    <td><i class="fas fa-times"></i></td>
+                                    <td>Ballot Not In Progress</td>
+                                {% endif %}
                             </tr>
                         </table>
                     </div>
@@ -102,7 +103,8 @@
                             </thead>
                             <tbody>
                             {% for student in incomplete_students %}
-                                <tr class="alert-danger clickable-row" data-href="manage-student/{{ student.user_id }}" style="cursor: pointer;">
+                                <tr class="alert-danger clickable-row" data-href="manage-student/{{ student.user_id }}"
+                                    style="cursor: pointer;">
                                     <td>{{ student.first_name }} {{ student.surname }}</td>
                                     <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
                                     <td>{% if student.syndicate == None %}Not part of a syndicate
@@ -133,7 +135,8 @@
                             </thead>
                             <tbody>
                             {% for student in students_outside_ballot %}
-                                <tr class="clickable-row" data-href="manage-student/{{ student.user_id }}" style="cursor: pointer;">
+                                <tr class="clickable-row" data-href="manage-student/{{ student.user_id }}"
+                                    style="cursor: pointer;">
                                     <td>{{ student.first_name }} {{ student.surname }}</td>
                                     <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
                                     <td>{% if student.has_allocated %}Yes{% else %}No{% endif %}</td>
@@ -160,7 +163,8 @@
                             </thead>
                             <tbody>
                             {% for syndicate in incomplete_syndicates %}
-                                <tr class="clickable-row" data-href="syndicate/{{ syndicate.syndicate_id }}" style="cursor: pointer;">
+                                <tr class="clickable-row" data-href="syndicate/{{ syndicate.syndicate_id }}"
+                                    style="cursor: pointer;">
                                     <td>{{ syndicate.syndicate_id }}</td>
                                     <td>{{ syndicate.owner_id }}</td>
                                 </tr>
