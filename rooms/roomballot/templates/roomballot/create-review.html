@@ -135,6 +135,19 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="noise_rating">How quiet is your room?</label>
+                    <select class="form-control" id="noise_rating" name="noise_rating" required>
+                        <option disabled selected value> -- select an option --</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                    <small id="layoutHelp" class="form-text text-muted">1 is 'very noisy', 5 is 'I can hear a pin drop'.
+                    </small>
+                </div>
+                <div class="form-group">
                     <label for="overall_rating">How would you rate your room overall?</label>
                     <select class="form-control" id="overall_rating" name="overall_rating" required>
                         <option disabled selected value> -- select an option --</option>

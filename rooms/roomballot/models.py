@@ -129,6 +129,7 @@ class Review(models.Model):
     title = models.CharField(max_length=255)
     layout_rating = models.IntegerField()
     facilities_rating = models.IntegerField()
+    noise_rating = models.IntegerField()
     overall_rating = models.IntegerField()
     text = models.CharField(max_length=1000)
 

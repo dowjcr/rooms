@@ -40,7 +40,7 @@ def allocate_room(room, student):
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             student_to_update.has_allocated = True
             student_to_update.save()
-        #selected_room(student)
+        #selected_room(student, room)
 
 
 # ============= DEALLOCATE ROOM ==================

@@ -6,8 +6,9 @@ Author Cameron O'Connor.
 
 
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from .models import Student
-FROM_EMAIL = "no-reply@jcr.dow.cam.ac.uk"
+FROM_EMAIL = "no-reply@downingjcr.co.uk"
 
 
 # ============ INVITE SELECTION ==================
@@ -57,16 +58,41 @@ def failed_syndicate(syndicate):
     for student in students:
         subject = student.first_name + ", your syndicate has failed."
         recipient_list = [student.user_id + "@cam.ac.uk"]
-        message = "Syndicate failed."
-        send_mail(subject, message, FROM_EMAIL, recipient_list)
+        html_message = render_to_string('roomballot/emails/syndicate-failed.html', {'student': student})
+        plain_message = """
+        Hey! Unfortunately, someone rejected their invite to your syndicate, so it has been dissolved. To create
+        a new syndicate, visit https://ballot.downingjcr.co.uk.
+        """
+        send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
 
 
 # ============= ROOM SELECTED =================
 # Sends confirmation email to user that they have
 # selected their room.
 
-def selected_room(student):
+def selected_room(student, room):
     subject = student.first_name + ", you've selected your room."
     recipient_list = [student.user_id + "@cam.ac.uk"]
-    message = "Room has been selected. Details below:"
-    send_mail(subject, message, FROM_EMAIL, recipient_list)
+    html_message = render_to_string('roomballot/emails/room-selected.html', {'student': student,
+                                                                             'room': room})
+    plain_message = """
+    Hey, thanks for selecting your room! You can view your selection on the Room Balloting System
+    by visiting https://ballot.downingjcr.co.uk.
+    """
+    send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+
+
+# ============= INVITE REVIEW =================
+# Sends an email inviting the user to review their
+# room.
+
+def invite_review():
+    for student in Student.objects.all():
+        subject = student.first_name + ", review your room!"
+        recipient_list = [student.user_id + "@cam.ac.uk"]
+        html_message = render_to_string('roomballot/emails/review-room.html', {'student': student})
+        plain_message = """
+        Hey, Downing JCR here. Perhaps you'd like to review the room you're living in this year? Please
+        visit https://ballot.downingjcr.co.uk.
+        """
+        send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)

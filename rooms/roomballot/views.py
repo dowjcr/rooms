@@ -549,6 +549,7 @@ def leave_review(request):
                     review.title = form.cleaned_data['title']
                     review.layout_rating = form.cleaned_data['layout_rating']
                     review.facilities_rating = form.cleaned_data['facilities_rating']
+                    review.noise_rating = form.cleaned_data['noise_rating']
                     review.overall_rating = form.cleaned_data['overall_rating']
                     review.text = form.cleaned_data['text']
                     review.save()
