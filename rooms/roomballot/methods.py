@@ -124,9 +124,9 @@ def get_num_syndicates():
 def randomise_order():
     if settings['ballot_in_progress'] == 'false':
         syndicates = []
-        settings['randomised'] = False
+        settings['randomised'] = 'false'
         # First check all students either in syndicate or removed from ballot.
-        for s in Student.objects.filter(year=1):
+        for s in Student.objects.all():
             if s.in_ballot and not s.accepted_syndicate:
                 raise NotReadyToRandomiseException()
         # Now get all first-year syndicates.
@@ -318,7 +318,7 @@ def dissolve_syndicate(syndicate):
     if settings['ballot_in_progress'] == 'true':
         raise BallotInProgressException()
     else:
-        failed_syndicate(syndicate)
+        #failed_syndicate(syndicate)
         with transaction.atomic():
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
             for student in Student.objects.select_for_update().filter(syndicate=syndicate_to_update):

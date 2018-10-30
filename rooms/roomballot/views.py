@@ -264,7 +264,7 @@ def ballot_ranking(request):
 def student_detail(request, user_id):
     student = Student.objects.get(user_id=request.user.username)
     student_to_view = get_object_or_404(Student, user_id=user_id)
-    room = Room.objects.get(taken_by=student_to_view) if student.has_allocated else None
+    room = Room.objects.get(taken_by=student_to_view) if student_to_view.has_allocated else None
     return render(request, 'roomballot/student-detail.html', {'student': student,
                                                               'student_to_view': student_to_view,
                                                               'room': room})

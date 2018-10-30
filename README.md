@@ -8,7 +8,7 @@ This system manages the allocation of college rooms during ballot weekend. It co
 
 ## Installation
 
-These instructions are for installation on an Ubuntu machine. The same method will work on any Linux distribution,
+These instructions are confirmed to work on Ubuntu 18.04 LTS. The same method will work on any Linux distribution,
 but you might have to change some of the paths below as appropriate. Change into the desired installation
 directory then clone this repository:
 
