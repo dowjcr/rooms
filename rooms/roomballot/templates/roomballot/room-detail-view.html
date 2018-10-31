@@ -15,7 +15,7 @@
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
                 <h2>{{ room }}</h2>
                 {% if room.taken_by is not None %}
-                    <p>This room has been taken by <b>{{ room.taken_by }}</b>.</p>
+                    <p>This room has been taken by <a style="color: #990066;" href="/roomballot/student/{{ room.taken_by.user_id }}"><b>{{ room.taken_by }}</b></a>.</p>
                 {% else %}
                     <p>This room is currently available for occupation.</p>
                 {% endif %}

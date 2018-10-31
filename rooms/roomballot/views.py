@@ -168,11 +168,11 @@ def create_syndicate(request):
         return error(request, 907)
 
 
-# ============ SYNDICATE DETAIL ================
+# ============= SYNDICATE VIEW =================
 # Shows syndicate information, including allowing
 # user to accept if required.
 
-def syndicate_detail(request):
+def syndicate_view(request):
     student = Student.objects.get(user_id=request.user.username)
     if request.method == 'POST':
         if request.POST.get('response') == '1':
@@ -202,6 +202,19 @@ def syndicate_detail(request):
         return render(request, 'roomballot/syndicate-view.html', {'student': student,
                                                                   'syndicate': student.syndicate,
                                                                   'students': students})
+
+
+# ============ SYNDICATE DETAIL ================
+# Shows detail of syndicate which student is part
+# of (from ranking page)
+
+def syndicate_detail(request, syndicate_id):
+    student = Student.objects.get(user_id=request.user.username)
+    syndicate = get_object_or_404(Syndicate, syndicate_id=syndicate_id)
+    students = Student.objects.filter(syndicate=syndicate).order_by('surname')
+    return render(request, 'roomballot/syndicate-detail.html', {'student': student,
+                                                                'syndicate': syndicate,
+                                                                'students': students})
 
 
 # ================= ERROR =====================

@@ -40,10 +40,12 @@
                 </tr>
                 {% if student_to_view.in_ballot %}
                 <tr>
-                    <td><b>Accepted Syndicate</b></td>
+                    <td><b>Syndicate</b></td>
                     <td>
-                        {% if student_to_view.accepted_syndicate %} Yes
-                        {% else %} No
+                        {% if student_to_view.syndicate %}
+                            #{{ student_to_view.syndicate.syndicate_id }}<br>
+                            <a href="/roomballot/syndicate/{{ student_to_view.syndicate.syndicate_id }}" class="btn btn-primary mt-2">View</a>
+                        {% else %} None
                         {% endif %}
                     </td>
                 </tr>
@@ -73,7 +75,6 @@
 
                 </tbody>
             </table>
-            <a class="btn btn-primary" href="../ranking">Back to Ranking</a>
         </div>
     </div>
 </div>
