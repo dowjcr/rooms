@@ -58,6 +58,7 @@ Instructions on how to serve Django in production are widely available; `mod_wsg
 - [**django-ucamwebauth**](https://pypi.org/project/django-ucamwebauth/)
 - [**jQuery**](https://jquery.com/)
 - [**Bootstrap 4.1.1**](https://getbootstrap.com)
+- [**Lookup API**](https://www.lookup.cam.ac.uk/doc/ws-doc/)
 
 ## Authors
 

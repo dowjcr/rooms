@@ -60,8 +60,8 @@ class Staircase(models.Model):
 
 class Student(models.Model):
     YEAR_CHOICES = (
-        (1, 'Currently First Year'),
-        (2, 'Currently Second Year')
+        (1, 'First Ballot Year'),
+        (2, 'Second Ballot Year')
     )
 
     user_id = models.CharField('CRSid', primary_key=True, max_length=10)
@@ -74,6 +74,7 @@ class Student(models.Model):
     syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, editable=False)
     accepted_syndicate = models.BooleanField(default=False, editable=False)
     picks_at = models.DateTimeField(null=True, blank=True, editable=False)
+    name_set = models.BooleanField(default=True, editable=False)
 
     def __str__(self):
         return self.first_name + " " + self.surname

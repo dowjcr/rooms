@@ -9,6 +9,7 @@ from .email import *
 import random, datetime
 from modeldict import ModelDict
 from django.db import transaction
+from ibisclient import *
 
 settings = ModelDict(Setting, key='key', value='value', instances=False)
 
@@ -20,6 +21,9 @@ class BallotInProgressException(Exception):
     pass
 
 class NotReadyToRandomiseException(Exception):
+    pass
+
+class StudentAlreadyExistsException(Exception):
     pass
 
 
@@ -433,3 +437,31 @@ def update_current_student():
             settings['current_student'] = student_picking.user_id
         except Student.DoesNotExist:
             settings['current_student'] = None
+
+
+# ============ POPULATE STUDENTS=================
+# Uses the UIS's Ibis API to get the given student,
+# and if they are not in the database, adds them.
+
+def populate_student(crsid):
+    conn = createConnection()
+    pm = PersonMethods(conn)
+    student = pm.getPerson('crsid', crsid)
+    if Student.objects.filter(user_id=student.identifier.value).count() == 0:
+        print("Imported", student.identifier.value, student.registeredName)
+        with transaction.atomic():
+            s = Student()
+            s.user_id = student.identifier.value
+            s.first_name = str(student.registeredName).replace(' ' + str(student.surname), '')
+            s.surname = student.surname
+            s.year = 1
+            s.in_ballot = True
+            s.has_allocated = False
+            s.rank = None
+            s.syndicate = None
+            s.accepted_syndicate = False
+            s.picks_at = None
+            s.name_set = False
+            s.save()
+    else:
+        raise StudentAlreadyExistsException()
