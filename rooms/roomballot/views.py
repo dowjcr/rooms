@@ -583,3 +583,21 @@ def leave_review(request):
                                                                      'image': image})
     else:
         return error(request, 404)
+
+
+# ============= SET FIRST NAME ================
+# Invites user to set their name.
+
+def set_first_name(request):
+    if request.method == 'POST':
+        form = FirstNameForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                s = Student.objects.select_for_update().get(user_id=request.user.username)
+                s.first_name = form.cleaned_data['first_name']
+                s.name_set = True
+                s.save()
+            return HttpResponseRedirect('/roomballot/dashboard')
+    else:
+        student = Student.objects.get(user_id=request.user.username)
+        return render(request, 'roomballot/enter-name.html', {'student': student})

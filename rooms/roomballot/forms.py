@@ -7,3 +7,6 @@ class ReviewForm(forms.Form):
     noise_rating = forms.IntegerField()
     overall_rating = forms.IntegerField()
     text = forms.CharField()
+
+class FirstNameForm(forms.Form):
+    first_name = forms.CharField()

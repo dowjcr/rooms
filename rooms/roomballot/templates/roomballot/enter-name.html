@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>Downing JCR RBS</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"
+          integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between mb-4">
+
+    <a class="navbar-brand" href="#">
+        <img src="https://www.jcr.dow.cam.ac.uk/storage/app/media/dowjcrwhite.png" width="60"
+             style="padding-right: 10px">
+        Room Balloting System
+    </a>
+</nav>
+
+<div id="modal-info" class="modal" role="dialog">
+    <h2>Why are you asking me this?</h2>
+    <p>This system automatically imports student information from the Cambridge Lookup
+        service. Unfortunately, the service doesn't tell us your first name - only your initials. We need your first name to
+    generate your room agreement (and to be more friendly when we send you emails)!</p>
+    <a href="#" rel="modal:close" class="btn btn-primary">Close</a>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <h1>Hey, stranger! </h1>
+            <p>Welcome to the Room Balloting System. We'd like to get to know you - please enter your <b>legal first name</b> below.
+            <br><a href="#modal-info" rel="modal:open" style="color: #990066;">Why are you asking me this?</a></p>
+
+            <form class="mb-5 mt-4" method="post">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="first_name" class="col-sm-2 col-form-label">First Name</label>
+                    <input type="text" class="form-control col-sm-10 ml-3" id="first_name" style="max-width: 300px;" name="first_name" required>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Surname</label>
+                    <input type="text" class="form-control col-sm-10 ml-3" style="max-width: 300px;" placeholder="{{ student.surname }}" disabled>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Submit <i class="fas fa-angle-right ml-2"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

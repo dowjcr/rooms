@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from re import compile
 from .models import Student, AdminUser
-from .views import error
+from .views import error, set_first_name
 
 
 # =============== AUTH REQUIRED ==================
@@ -36,7 +36,9 @@ class AuthRequiredMiddleware(object):
         try:
             path = request.path_info.lstrip('/')
             if not any(m.match(path) for m in ADMIN_URLS):
-                Student.objects.get(user_id=request.user.username)
+                student = Student.objects.get(user_id=request.user.username)
+                if not student.name_set:
+                    return set_first_name(request)
         except Student.DoesNotExist:
             # Redirects to admin page if only admin user.
             try:

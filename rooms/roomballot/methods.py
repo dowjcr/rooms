@@ -26,6 +26,9 @@ class NotReadyToRandomiseException(Exception):
 class StudentAlreadyExistsException(Exception):
     pass
 
+class InvalidIdentifierException(Exception):
+    pass
+
 
 # ============== ALLOCATE ROOM ===================
 # Takes a room and student, and tries to allocate that
@@ -447,21 +450,24 @@ def populate_student(crsid):
     conn = createConnection()
     pm = PersonMethods(conn)
     student = pm.getPerson('crsid', crsid)
-    if Student.objects.filter(user_id=student.identifier.value).count() == 0:
-        print("Imported", student.identifier.value, student.registeredName)
-        with transaction.atomic():
-            s = Student()
-            s.user_id = student.identifier.value
-            s.first_name = str(student.registeredName).replace(' ' + str(student.surname), '')
-            s.surname = student.surname
-            s.year = 1
-            s.in_ballot = True
-            s.has_allocated = False
-            s.rank = None
-            s.syndicate = None
-            s.accepted_syndicate = False
-            s.picks_at = None
-            s.name_set = False
-            s.save()
+    if student != None:
+        if Student.objects.filter(user_id=student.identifier.value).count() == 0:
+            print("Imported", student.identifier.value, student.registeredName)
+            with transaction.atomic():
+                s = Student()
+                s.user_id = student.identifier.value
+                s.first_name = str(student.registeredName).replace(' ' + str(student.surname), '')
+                s.surname = student.surname
+                s.year = 1
+                s.in_ballot = True
+                s.has_allocated = False
+                s.rank = None
+                s.syndicate = None
+                s.accepted_syndicate = False
+                s.picks_at = None
+                s.name_set = False
+                s.save()
+        else:
+            raise StudentAlreadyExistsException()
     else:
-        raise StudentAlreadyExistsException()
+        raise InvalidIdentifierException()

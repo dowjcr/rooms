@@ -74,7 +74,7 @@ class Student(models.Model):
     syndicate = models.ForeignKey(Syndicate, on_delete=models.SET_DEFAULT, default=None, null=True, editable=False)
     accepted_syndicate = models.BooleanField(default=False, editable=False)
     picks_at = models.DateTimeField(null=True, blank=True, editable=False)
-    name_set = models.BooleanField(default=True, editable=False)
+    name_set = models.BooleanField(default=True, editable=True)
 
     def __str__(self):
         return self.first_name + " " + self.surname
