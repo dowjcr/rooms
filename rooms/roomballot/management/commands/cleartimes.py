@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            for s in Student.objects.all():
+            for s in Student.objects.select_for_update().all():
                 s.picks_at = None
                 s.save()
             self.stdout.write(self.style.SUCCESS('Successfully cleared times.'))

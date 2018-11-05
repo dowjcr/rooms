@@ -400,25 +400,29 @@ def reallocate_syndicate_owner(syndicate):
 
 def generate_times():
     if settings['ballot_in_progress'] == 'false':
-        for s in Student.objects.select_for_update().filter(in_ballot=True):
-            s.picks_at = None
-            s.save()
+        with transaction.atomic():
+            students = Student.objects.select_for_update().filter(in_ballot=True)
+            for s in students:
+                s.picks_at = None
+                s.save()
         start_date = settings['start_date']
         # Generate times for second years.
-        second_years = Student.objects.select_for_update().filter(year=2, in_ballot=True).exclude(rank=None).order_by('rank')
         dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M")
-        for student in second_years:
-            student.picks_at = dt
-            student.save()
-            dt += datetime.timedelta(0,300)
+        with transaction.atomic():
+            second_years = Student.objects.select_for_update().filter(year=2, in_ballot=True).exclude(rank=None).order_by('rank')
+            for student in second_years:
+                student.picks_at = dt
+                student.save()
+                dt += datetime.timedelta(0,300)
 
         # Generate times for first years.
-        first_years = Student.objects.select_for_update().filter(year=1, in_ballot=True).exclude(rank=None).order_by('rank')
         dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M") + datetime.timedelta(1)
-        for student in first_years:
-            student.picks_at = dt
-            student.save()
-            dt += datetime.timedelta(0, 300)
+        with transaction.atomic():
+            first_years = Student.objects.select_for_update().filter(year=1, in_ballot=True).exclude(rank=None).order_by('rank')
+            for student in first_years:
+                student.picks_at = dt
+                student.save()
+                dt += datetime.timedelta(0, 300)
     else:
         raise BallotInProgressException()
 
