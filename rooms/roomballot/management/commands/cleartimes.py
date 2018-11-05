@@ -7,9 +7,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            for s in Student.objects.select_for_update().all():
-                s.picks_at = None
-                s.save()
+            with transaction.atomic():
+                for s in Student.objects.select_for_update().all():
+                    s.picks_at = None
+                    s.save()
             self.stdout.write(self.style.SUCCESS('Successfully cleared times.'))
         except BallotInProgressException:
             raise CommandError("The ballot is currently in progress, so you can't do that.")
