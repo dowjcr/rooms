@@ -442,7 +442,7 @@ def update_current_student():
             settings['current_student'] = None
 
 
-# ============ POPULATE STUDENTS=================
+# ============ POPULATE STUDENT ================
 # Uses the UIS's Ibis API to get the given student,
 # and if they are not in the database, adds them.
 
@@ -471,3 +471,21 @@ def populate_student(crsid):
             raise StudentAlreadyExistsException()
     else:
         raise InvalidIdentifierException()
+
+
+# ============== SEND TO BOTTOM =================
+# Changes the given student's picks-at time so
+# they are sent to the bottom of the ballot.
+
+def send_to_bottom(student):
+    if student.has_allocated:
+        raise ConcurrencyException()
+    else:
+        students_above = Student.objects.filter(year=student.year).exclude(user_id=student.user_id).order_by('picks_at')
+        last_student_time = students_above[students_above.count()-1].picks_at
+        new_time = last_student_time + datetime.timedelta(0,300)
+        with transaction.atomic():
+            s = Student.objects.select_for_update().get(user_id=student.user_id)
+            s.picks_at = new_time
+            s.save()
+

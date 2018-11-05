@@ -1,204 +1,161 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-edge">
-    <meta name="viewport" content="width = device-width, initial-scale = 1">
-    <title>Admin Dashboard | Downing JCR RBS</title>
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
-          media="all"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+{% extends 'roomballot/base-admin.html' %}
+
+{% block title %}Admin Dashboard | Downing JCR RBS{% endblock %}
+
+{% block content %}
+
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+
+        $(document).ready(function () {
+
+            // Defining CSRF token.
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            });
+
+            // Handle response received after POST request.
+            function HandleResponse(responseCode) {
+                // Successfully created syndicate.
+                if (responseCode === 1) location.reload(true);
+                else location.assign('/roomballot/error/' + responseCode.toString());
+            }
+
+            $(function () {
+
+                // Generate JSON of students.
+                var availableStudents = [
+                    {% for s in students %}
+                        {
+                            value: "{{ s.user_id }}",
+                            label: "{{ s|escapejs }} ({{ s.user_id }})"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+
+                // Generate JSON of syndicates.
+                var availableSyndicates = [
+                    {% for s in syndicates %}
+                        {
+                            value: "{{ s.syndicate_id }}",
+                            label: "{{ s.syndicate_id }}"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+
+                // Generate JSON of rooms.
+                var availableRooms = [
+                    {% for r in rooms %}
+                        {
+                            value: "{{ r.room_id }}",
+                            label: "{{ r }}"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+
+                // Set parameters of autocomplete field.
+                $('#student').autocomplete({
+                    source: availableStudents,
+                    select: function (event, ui) {
+                        location.assign('admin/manage-student/' + ui.item.value);
+                    }
+                });
+
+                // Set parameters of autocomplete field.
+                $('#syndicate').autocomplete({
+                    source: availableSyndicates,
+                    select: function (event, ui) {
+                        location.assign('admin/syndicate/' + ui.item.value);
+                    }
+                });
+
+                // Set parameters of autocomplete field.
+                $('#room').autocomplete({
+                    source: availableRooms,
+                    select: function (event, ui) {
+                        location.assign('admin/room/' + ui.item.value);
+                    }
+                });
+            });
+
+        });
     </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
-            type="text/javascript"></script>
-    <link rel="stylesheet" href={% static 'css/bootstrap.css' %}>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"
-          integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
-</head>
-<body>
-
-<script>
-    window.CSRF_TOKEN = "{{ csrf_token }}";
-
-    $(document).ready(function () {
-
-        // Defining CSRF token.
-        $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
-        });
-
-        // Handle response received after POST request.
-        function HandleResponse(responseCode) {
-            // Successfully created syndicate.
-            if (responseCode === 1) location.reload(true);
-            else location.assign('/roomballot/error/' + responseCode.toString());
-        }
-
-        $(function () {
-
-            // Generate JSON of students.
-            var availableStudents = [
-                {% for s in students %}
-                    {
-                        value: "{{ s.user_id }}",
-                        label: "{{ s|escapejs }} ({{ s.user_id }})"
-                    }
-                    {% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Generate JSON of syndicates.
-            var availableSyndicates = [
-                {% for s in syndicates %}
-                    {
-                        value: "{{ s.syndicate_id }}",
-                        label: "{{ s.syndicate_id }}"
-                    }
-                    {% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Generate JSON of rooms.
-            var availableRooms = [
-                {% for r in rooms %}
-                    {
-                        value: "{{ r.room_id }}",
-                        label: "{{ r }}"
-                    }
-                    {% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Set parameters of autocomplete field.
-            $('#student').autocomplete({
-                source: availableStudents,
-                select: function (event, ui) {
-                    location.assign('admin/manage-student/' + ui.item.value);
-                }
-            });
-
-            // Set parameters of autocomplete field.
-            $('#syndicate').autocomplete({
-                source: availableSyndicates,
-                select: function (event, ui) {
-                    location.assign('admin/syndicate/' + ui.item.value);
-                }
-            });
-
-            // Set parameters of autocomplete field.
-            $('#room').autocomplete({
-                source: availableRooms,
-                select: function (event, ui) {
-                    location.assign('admin/room/' + ui.item.value);
-                }
-            });
-        });
-
-    });
-</script>
-
-<nav class="navbar navbar-dark justify-content-between mb-4">
-    <a class="navbar-brand" href="/roomballot/admin">
-        Downing JCR RBS<br>
-        <p class="small">Administration Portal</p>
-    </a>
-</nav>
 
 
-<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Status</h3>
+                <div class="mb-3">
+                    <table>
+                        <tr>
+                            {% if syndicates_complete %}
+                                <td style="min-width: 25px"><i class="fas fa-check"></i></td>
+                                <td>First Year Syndicates Complete</td>
+                            {% else %}
+                                <td style="min-width: 25px"><i class="fas fa-times"></i></td>
+                                <td>First Year Syndicates Incomplete</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            {% if randomised %}
+                                <td><i class="fas fa-check"></i></td>
+                                <td>Randomised</td>
+                            {% else %}
+                                <td><i class="fas fa-times"></i></td>
+                                <td>Not Randomised</td>
+                            {% endif %}
 
-    <div class="row mt-2">
-        <div class="col-md-2 col-sm-12 mb-5 d-md-block sidebar">
-            <div class="list-group">
-                <a href="/roomballot/admin" class="list-group-item active"><span>Dashboard</span></a>
-                <a href="/roomballot/admin/status" class="list-group-item"><span>Status</span></a>
-                <a href="/roomballot/admin/syndicates" class="list-group-item"><span>Syndicates</span></a>
-                <a href="/roomballot/admin/students" class="list-group-item"><span>Students</span></a>
-                <a href="/roomballot/admin/rooms" class="list-group-item"><span>Rooms</span></a>
+                        </tr>
+                        <tr>
+                            {% if in_progress %}
+                                <td><i class="fas fa-check"></i></td>
+                                <td>Ballot In Progress</td>
+                            {% else %}
+                                <td><i class="fas fa-times"></i></td>
+                                <td>Ballot Not In Progress</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+                <a href="/roomballot/admin/status" class="btn btn-primary">More Info</a>
             </div>
         </div>
 
-        <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
-            <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <div class="jumbotron">
-                        <h3 class="mb-3">Status</h3>
-                        <div class="mb-3">
-                            <table>
-                            <tr>
-                                {% if syndicates_complete %}
-                                    <td style="min-width: 25px"><i class="fas fa-check"></i></td>
-                                    <td>First Year Syndicates Complete</td>
-                                {% else %}
-                                    <td style="min-width: 25px"><i class="fas fa-times"></i></td>
-                                    <td>First Year Syndicates Incomplete</td>
-                                {% endif %}
-                            </tr>
-                            <tr>
-                                {% if randomised %}
-                                    <td><i class="fas fa-check"></i></td>
-                                    <td>Randomised</td>
-                                {% else %}
-                                    <td><i class="fas fa-times"></i></td>
-                                    <td>Not Randomised</td>
-                                {% endif %}
-
-                            </tr>
-                            <tr>
-                                {% if in_progress %}
-                                    <td><i class="fas fa-check"></i></td>
-                                    <td>Ballot In Progress</td>
-                                {% else %}
-                                    <td><i class="fas fa-times"></i></td>
-                                    <td>Ballot Not In Progress</td>
-                                {% endif %}
-                            </tr>
-                        </table>
-                        </div>
-                        <a href="/roomballot/admin/status" class="btn btn-primary">More Info</a>
-                    </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">View Room</h3>
+                <p>Start typing the room below:</p>
+                <div class="ui-widget mb-3" id="student-search-widget" style="font-family: 'Lato', sans-serif;">
+                    <input id="room" style="width:100%;"><br>
                 </div>
-
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <div class="jumbotron">
-                        <h3 class="mb-3">View Room</h3>
-                        <p>Start typing the room below:</p>
-                        <div class="ui-widget mb-3" id="student-search-widget" style="font-family: 'Lato', sans-serif;">
-                            <input id="room" style="width:100%;"><br>
-                        </div>
-                        <a href="/roomballot/admin/rooms" class="btn btn-primary">View All</a>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <div class="jumbotron">
-                        <h3 class="mb-3">Manage Student</h3>
-                        <p>Start typing the student's name below:</p>
-                        <div class="ui-widget mb-3" id="student-search-widget">
-                            <input id="student" style="width:100%;"><br>
-                        </div>
-                        <a href="/roomballot/admin/students" class="btn btn-primary">View All</a>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <div class="jumbotron">
-                        <h3 class="mb-3">Manage Syndicate</h3>
-                        <p>Start typing the syndicate ID below:</p>
-                        <div class="ui-widget mb-3" id="student-search-widget">
-                            <input id="syndicate" style="width:100%;"><br>
-                        </div>
-                        <a href="/roomballot/admin/syndicates" class="btn btn-primary">View All</a>
-                    </div>
-                </div>
+                <a href="/roomballot/admin/rooms" class="btn btn-primary">View All</a>
             </div>
-        </main>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Manage Student</h3>
+                <p>Start typing the student's name below:</p>
+                <div class="ui-widget mb-3" id="student-search-widget">
+                    <input id="student" style="width:100%;"><br>
+                </div>
+                <a href="/roomballot/admin/students" class="btn btn-primary">View All</a>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Manage Syndicate</h3>
+                <p>Start typing the syndicate ID below:</p>
+                <div class="ui-widget mb-3" id="student-search-widget">
+                    <input id="syndicate" style="width:100%;"><br>
+                </div>
+                <a href="/roomballot/admin/syndicates" class="btn btn-primary">View All</a>
+            </div>
+        </div>
     </div>
-</div>
-
-</div>
-
-</body>
-</html>
+{% endblock %}

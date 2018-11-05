@@ -1,4 +1,3 @@
-from roomballot.methods import generate_times, BallotInProgressException
 from django.core.management.base import BaseCommand, CommandError
 from roomballot.models import Setting, Student
 from modeldict import ModelDict

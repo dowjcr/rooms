@@ -348,7 +348,12 @@ def manage_student(request, user_id):
                     response_code = 1
                 except ConcurrencyException:
                     response_code = 905
-
+            elif request.POST.get('response') == '7':
+                try:
+                    send_to_bottom(student)
+                    response_code = 1
+                except ConcurrencyException:
+                    response_code = 905
             return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
         else:
             room = None
@@ -419,6 +424,11 @@ def status(request):
         AdminUser.objects.get(user_id=request.user.username)
         randomised = settings['randomised'] == 'true'
         in_progress = settings['ballot_in_progress'] == 'true'
+        current_student_crsid = settings['current_student']
+        if current_student_crsid != None:
+            current_student = Student.objects.get(user_id=current_student_crsid)
+        else:
+            current_student = None
         syndicates_complete = True
         for s in Student.objects.filter(year=1, in_ballot=True):
             if not s.accepted_syndicate:
@@ -433,7 +443,8 @@ def status(request):
                                                           'in_progress': in_progress,
                                                           'incomplete_students': incomplete_students,
                                                           'students_outside_ballot': Student.objects.filter(in_ballot=False),
-                                                          'incomplete_syndicates': Syndicate.objects.filter(complete=False)})
+                                                          'incomplete_syndicates': Syndicate.objects.filter(complete=False),
+                                                          'current_student': current_student})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -567,7 +578,7 @@ def leave_review(request):
                     review.text = form.cleaned_data['text']
                     review.save()
                 confirm_review(student)
-                return render(request, 'roomballot/create_review_success.html', {'student': student})
+                return render(request, 'roomballot/create-review-success.html', {'student': student})
         else:
             room = Room.objects.get(taken_by=student)
             reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
@@ -601,3 +612,15 @@ def set_first_name(request):
     else:
         student = Student.objects.get(user_id=request.user.username)
         return render(request, 'roomballot/enter-name.html', {'student': student})
+
+
+# ============ RANKING (ADMIN) ================
+# Page for admin portal showing admin ranking.
+
+def ranking_admin(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        students = Student.objects.filter(in_ballot=True).order_by('rank')
+        return render(request, 'roomballot/ranking-admin.html', {'students': students})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)

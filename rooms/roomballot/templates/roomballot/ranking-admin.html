@@ -1,0 +1,54 @@
+{% extends 'roomballot/base-admin.html' %}
+
+{% block title %}Ranking | Downing JCR RBS{% endblock %}
+
+{% block content %}
+
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".clickable-row").click(function () {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+
+    <body>
+
+
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Name</th>
+                    <th scope="col" class="d-none d-sm-table-cell">CRSid</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Picks at</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Picked?</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                    <tr class="clickable-row" data-href="/roomballot/admin/manage-student/{{ student.user_id }}" style="cursor: pointer;">
+                        <td>{{ student.rank }}</td>
+                        <td>{{ student.first_name }} {{ student.surname }}</td>
+                        <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
+                        <td class="d-none d-sm-table-cell">{{ student.picks_at }}</td>
+                        <td class="d-none d-sm-table-cell">
+                            {% if student.has_allocated %}
+                                <i class="fas fa-check" style="color: #228B22"></i>
+                            {% else %}
+                                <i class="fas fa-times" style="color: #8B0000"></i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+{% endblock %}

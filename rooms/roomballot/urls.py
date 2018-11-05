@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/room/<str:room_id>', views.manage_room, name='manage-room'),
     path('admin/rooms/export', views.export_room_data, name='export-room-data'),
     path('admin/students/export', views.export_student_data, name='export-student-data'),
+    path('admin/students/ranking', views.ranking_admin, name='ranking-admin'),
     path('ranking', views.ballot_ranking, name='ranking'),
     path('staircases', views.staircase_list, name='staircases'),
     path('staircase/<int:staircase_id>', views.staircase_detail, name='staircase-view'),

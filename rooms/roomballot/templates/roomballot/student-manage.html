@@ -1,298 +1,272 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-edge">
-    <meta name="viewport" content="width = device-width, initial-scale = 1">
-    <title>{{ student.first_name }} {{ student.surname }} | Downing JCR RBS</title>
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"
-          media="all"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+{% extends 'roomballot/base-admin.html' %}
+
+{% block title %}{{ student }} | Downing JCR RBS{% endblock %}
+
+{% block content %}
+
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+
+        $(document).ready(function () {
+
+            // Defining CSRF token.
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            });
+
+            // Handle response received after POST request.
+            function HandleResponse(responseCode) {
+                // Successfully created syndicate.
+                if (responseCode === 1) location.reload(true);
+                else location.assign('/roomballot/error/' + responseCode.toString());
+            }
+
+            // Called when the user clicks a button.
+            function CreateButtonAjaxResponse(code) {
+                $.ajax({
+                    url: '/roomballot/admin/manage-student/{{ student.user_id }}',
+                    type: 'POST',
+                    data: {'response': code},
+                    dataType: 'json',
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    success: function (response) {
+                        HandleResponse(response.responseCode);
+                    }
+                });
+            }
+
+            // Called when the user selects a room/syndicate to allocate.
+            function CreateSelectionAjaxResponse(code, id) {
+                $.ajax({
+                    url: '/roomballot/admin/manage-student/{{ student.user_id }}',
+                    type: 'POST',
+                    data: {'response': code, 'id': id},
+                    dataType: 'json',
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    success: function (response) {
+                        HandleResponse(response.responseCode);
+                    }
+                });
+            }
+
+            $(function () {
+
+                // Generate JSON of rooms which can be allocated.
+                var availableRooms = [
+                    {% for r in rooms %}
+                        {
+                            value: "{{ r.room_id }}",
+                            label: "{{ r }}"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+
+                // Generate JSON of syndicates which can be allocated.
+                var availableSyndicates = [
+                    {% for s in syndicates %}
+                        {
+                            value: "{{ s.syndicate_id }}",
+                            label: "{{ s.syndicate_id }}"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+
+                // Set parameters of autocomplete field.
+                $('#room').autocomplete({
+                    source: availableRooms,
+                    select: function (event, ui) {
+                        CreateSelectionAjaxResponse(3, ui.item.value);
+                        return false;
+                    }
+                });
+
+                // Set parameters of autocomplete field.
+                $('#syndicate').autocomplete({
+                    source: availableSyndicates,
+                    select: function (event, ui) {
+                        CreateSelectionAjaxResponse(4, ui.item.value);
+                        return false;
+                    }
+                });
+
+                // When 'remove from syndicate' is clicked, send response.
+                $('#remove').click(function () {
+                    CreateButtonAjaxResponse(1);
+                });
+
+                // When 'remove from syndicate' is clicked, send response.
+                $('#deallocate-room').click(function () {
+                    CreateButtonAjaxResponse(2);
+                });
+
+                $('#allocate-room').click(function () {
+                    $('#allocate-room-widget').toggle()
+                });
+
+                $('#add-to-syndicate').click(function () {
+                    $('#add-to-syndicate-widget').toggle()
+                });
+
+                $('#add-to-ballot').click(function () {
+                    CreateButtonAjaxResponse(5);
+                });
+
+                $('#accept-syndicate').click(function () {
+                    CreateButtonAjaxResponse(6);
+                });
+
+                $('#send-to-bottom').click(function () {
+                    CreateButtonAjaxResponse(7);
+                });
+
+            });
+
+            $("modal-deallocate").modal({
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+
+        });
     </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"
-            type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css"/>
-</head>
-<body>
 
-<script>
-    window.CSRF_TOKEN = "{{ csrf_token }}";
 
-    $(document).ready(function () {
+    <div id="modal-deallocate" class="modal" role="dialog">
+        <p>Are you sure you want to deallocate {{ student.first_name }}'s room?</p>
+        <a href="#" rel="modal:close" class="btn btn-primary">Cancel</a>
+        <button class="btn btn-primary ml-2" id="deallocate-room">Confirm</button>
+    </div>
 
-        // Defining CSRF token.
-        $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
-        });
+    <div id="modal-remove-syndicate" class="modal" role="dialog">
+        <p>Are you sure you want to remove {{ student.first_name }} from the ballot?</p>
+        <a href="#" rel="modal:close" class="btn btn-primary">Cancel</a>
+        <button class="btn btn-primary ml-2" id="remove">Confirm</button>
+        <br>
+    </div>
 
-        // Handle response received after POST request.
-        function HandleResponse(responseCode) {
-            // Successfully created syndicate.
-            if (responseCode === 1) location.reload(true);
-            else location.assign('/roomballot/error/' + responseCode.toString());
-        }
+    <div id="modal-send-to-bottom" class="modal" role="dialog">
+        <p>Are you sure you want to send {{ student.first_name }} to the bottom of the ballot picking order?</p>
+        <a href="#" rel="modal:close" class="btn btn-primary">Cancel</a>
+        <button class="btn btn-primary ml-2" id="send-to-bottom">Confirm</button>
+    </div>
 
-        // Called when the user clicks a button.
-        function CreateButtonAjaxResponse(code) {
-            $.ajax({
-                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
-                type: 'POST',
-                data: {'response': code},
-                dataType: 'json',
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function (response) {
-                    HandleResponse(response.responseCode);
-                }
-            });
-        }
-
-        // Called when the user selects a room/syndicate to allocate.
-        function CreateSelectionAjaxResponse(code, id) {
-            $.ajax({
-                url: '/roomballot/admin/manage-student/{{ student.user_id }}',
-                type: 'POST',
-                data: {'response': code, 'id': id},
-                dataType: 'json',
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                success: function (response) {
-                    HandleResponse(response.responseCode);
-                }
-            });
-        }
-
-        $(function () {
-
-            // Generate JSON of rooms which can be allocated.
-            var availableRooms = [
-                {% for r in rooms %}
-                    {
-                        value: "{{ r.room_id }}",
-                        label: "{{ r }}"
-                    }
-                    {% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Generate JSON of syndicates which can be allocated.
-            var availableSyndicates = [
-                {% for s in syndicates %}
-                    {
-                        value: "{{ s.syndicate_id }}",
-                        label: "{{ s.syndicate_id }}"
-                    }
-                    {% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            // Set parameters of autocomplete field.
-            $('#room').autocomplete({
-                source: availableRooms,
-                select: function (event, ui) {
-                    CreateSelectionAjaxResponse(3, ui.item.value);
-                    return false;
-                }
-            });
-
-            // Set parameters of autocomplete field.
-            $('#syndicate').autocomplete({
-                source: availableSyndicates,
-                select: function (event, ui) {
-                    CreateSelectionAjaxResponse(4, ui.item.value);
-                    return false;
-                }
-            });
-
-            // When 'remove from syndicate' is clicked, send response.
-            $('#remove').click(function () {
-                CreateButtonAjaxResponse(1);
-            });
-
-            // When 'remove from syndicate' is clicked, send response.
-            $('#deallocate-room').click(function () {
-                CreateButtonAjaxResponse(2);
-            });
-
-            $('#allocate-room').click(function () {
-                $('#allocate-room-widget').toggle()
-            });
-
-            $('#add-to-syndicate').click(function () {
-                $('#add-to-syndicate-widget').toggle()
-            });
-
-            $('#add-to-ballot').click(function () {
-                CreateButtonAjaxResponse(5);
-            });
-
-            $('#accept-syndicate').click(function () {
-                CreateButtonAjaxResponse(6);
-            });
-
-        });
-
-        $("modal-deallocate").modal({
-            escapeClose: false,
-            clickClose: false,
-            showClose: false
-        });
-
-    });
-</script>
-
-<nav class="navbar navbar-dark justify-content-between mb-4">
-    <a class="navbar-brand" href="/roomballot/admin">
-        Downing JCR RBS<br>
-        <p class="small">Administration Portal</p>
-    </a>
-</nav>
-
-<div id="modal-deallocate" class="modal" role="dialog">
-    <p>Are you sure you want to deallocate {{ student.first_name }}'s room?</p>
-    <a href="#" rel="modal:close" class="btn btn-primary">Cancel</a>
-    <button class="btn btn-primary ml-2" id="deallocate-room">Confirm</button>
-</div>
-
-<div id="modal-remove-syndicate" class="modal" role="dialog">
-    <p>Are you sure you want to remove {{ student.first_name }} from the ballot?</p>
-    <a href="#" rel="modal:close" class="btn btn-primary">Cancel</a>
-    <button class="btn btn-primary ml-2" id="remove">Confirm</button><br>
-</div>
-
-<div class="container-fluid">
-
-    <div class="row mt-4">
-
-        <div class="col-md-2 col-sm-12 mb-5 d-md-block sidebar">
-            <div class="list-group">
-                <a href="/roomballot/admin" class="list-group-item"><span>Dashboard</span></a>
-                <a href="/roomballot/admin/status" class="list-group-item"><span>Status</span></a>
-                <a href="/roomballot/admin/syndicates" class="list-group-item"><span>Syndicates</span></a>
-                <a href="/roomballot/admin/students" class="list-group-item"><span>Students</span></a>
-                <a href="/roomballot/admin/rooms" class="list-group-item"><span>Rooms</span></a>
-            </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
+            <h2>{{ student.first_name }} {{ student.surname }}</h2>
         </div>
 
-        <main role="main" class="col md-9 ml-sm-auto col-lg-10 px-4">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
-                    <h2>{{ student.first_name }} {{ student.surname }}</h2>
-                </div>
-
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                    <table class="table table-bordered table-striped">
-                        <thead style="display:none">
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <table class="table table-bordered table-striped">
+                <thead style="display:none">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>CRSid</b></td>
+                    <td>{{ student.user_id }}</td>
+                </tr>
+                <tr>
+                    <td><b>Ballot Year</b></td>
+                    <td>{% if student.year == 1 %}First{% else %}Second{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><b>In Ballot</b></td>
+                    <td>
+                        {% if student.in_ballot %} Yes
+                        {% else %} No
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if student.in_ballot %}
+                    <tr>
+                        <td><b>Syndicate</b></td>
+                        <td>
+                            #{{ student.syndicate_id }}
+                            {% if student.syndicate is not None %}
+                                <br>
+                                <a href="../syndicate/{{ student.syndicate_id }}"
+                                   class="btn btn-primary mt-2">Manage</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Accepted Syndicate</b></td>
+                        <td>
+                            {% if student.accepted_syndicate %} Yes
+                            {% else %} No
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Rank</b></td>
+                        <td>
+                            {{ student.rank }}
+                        </td>
+                    </tr>
+                    {% if not student.has_allocated %}
                         <tr>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td><b>CRSid</b></td>
-                            <td>{{ student.user_id }}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Ballot Year</b></td>
-                            <td>{% if student.year == 1 %}First{% else %}Second{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td><b>In Ballot</b></td>
+                            <td><b>Picks At</b></td>
                             <td>
-                                {% if student.in_ballot %} Yes
-                                {% else %} No
-                                {% endif %}
+                                {{ student.picks_at }}
                             </td>
                         </tr>
-                        {% if student.in_ballot %}
-                            <tr>
-                                <td><b>Syndicate</b></td>
-                                <td>
-                                    {{ student.syndicate_id }}
-                                    {% if student.syndicate is not None %}
-                                        <br>
-                                        <a href="../syndicate/{{ student.syndicate_id }}" class="btn btn-primary mt-2">Manage</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><b>Accepted Syndicate</b></td>
-                                <td>
-                                    {% if student.accepted_syndicate %} Yes
-                                    {% else %} No
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><b>Rank</b></td>
-                                <td>
-                                    {{ student.rank }}
-                                </td>
-                            </tr>
-                            {% if not student.has_allocated %}
-                                <tr>
-                                    <td><b>Picks At</b></td>
-                                    <td>
-                                        {{ student.picks_at }}
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endif %}
-                        <tr>
-                            <td><b>Room Allocated</b></td>
-                            <td>
-                                {{ room }} <br>
-                                {% if student.has_allocated %}
-                                    <a href="/roomballot/admin/room/{{ room.room_id }}" class="btn btn-primary mt-2">View</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                    <div class="jumbotron">
-                        <h3 class="mb-3">Tasks</h3>
-                        {% if student.in_ballot and not in_progress %}
-                            <a href="#modal-remove-syndicate" rel="modal:open" class="btn btn-primary mb-3">Remove from Ballot</a><br>
-                            {% if student.syndicate is None %}
-                                <button class="btn btn-primary mb-3" id="add-to-syndicate">Add to Syndicate</button><br>
-                                <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
-                                     id="add-to-syndicate-widget">
-                                    <p>Start typing the syndicate ID below:</p>
-                                    <input id="syndicate" style="width: 100%;"><br>
-                                </div>
-                            {% else %}
-                                {% if not student.accepted_syndicate %}
-                                    <button class="btn btn-primary mb-3" id="accept-syndicate">Accept Syndicate</button>
-                                    <br>
-                                {% endif %}
-                            {% endif %}
-                        {% elif not student.in_ballot and not in_progress %}
-                            <button class="btn btn-primary mb-3" id="add-to-ballot">Add to Ballot</button><br>
-                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                <tr>
+                    <td><b>Room Allocated</b></td>
+                    <td>
+                        {{ room }} <br>
                         {% if student.has_allocated %}
-                            <a href="#modal-deallocate" rel="modal:open" class="btn btn-primary mb-3">Deallocate
-                                Room</a><br>
-                        {% else %}
-                            <button class="btn btn-primary mb-3" id="allocate-room">Allocate Room</button><br>
-                            <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
-                                 id="allocate-room-widget">
-                                <p>Start typing the room below:</p>
-                                <input id="room" style="width: 100%;"><br>
-                            </div>
+                            <a href="/roomballot/admin/room/{{ room.room_id }}" class="btn btn-primary mt-2">View</a>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-</div>
+                    </td>
+                </tr>
 
-</body>
-</html>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3 class="mb-3">Tasks</h3>
+                {% if student.in_ballot and not in_progress %}
+                    <a href="#modal-remove-syndicate" rel="modal:open" class="btn btn-primary mb-3">Remove from
+                        Ballot</a><br>
+                    {% if student.syndicate is None %}
+                        <button class="btn btn-primary mb-3" id="add-to-syndicate">Add to Syndicate</button><br>
+                        <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
+                             id="add-to-syndicate-widget">
+                            <p>Start typing the syndicate ID below:</p>
+                            <input id="syndicate" style="width: 100%;"><br>
+                        </div>
+                    {% else %}
+                        {% if not student.accepted_syndicate %}
+                            <button class="btn btn-primary mb-3" id="accept-syndicate">Accept Syndicate</button>
+                            <br>
+                        {% endif %}
+                    {% endif %}
+                {% elif not student.in_ballot and not in_progress %}
+                    <button class="btn btn-primary mb-3" id="add-to-ballot">Add to Ballot</button><br>
+                {% endif %}
+                {% if student.has_allocated %}
+                    <a href="#modal-deallocate" rel="modal:open" class="btn btn-primary mb-3">Deallocate
+                        Room</a><br>
+                {% else %}
+                    <button class="btn btn-primary mb-3" id="allocate-room">Allocate Room</button><br>
+                    <div class="ui-widget mb-2 alert alert-info mb-3" style="display: none"
+                         id="allocate-room-widget">
+                        <p>Start typing the room below:</p>
+                        <input id="room" style="width: 100%;"><br>
+                    </div>
+                {% endif %}
+                {% if student.in_ballot and not student.has_allocated %}
+                    <a href="#modal-send-to-bottom" rel="modal:open" class="btn btn-primary mb-3">Send to Bottom</a><br>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
