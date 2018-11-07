@@ -44,7 +44,8 @@ def room_detail(request, room_id):
 def room_selection_confirm(request, room_id):
     student = Student.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
-    can_allocate = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
+    can_allocate = settings['ballot_in_progress'] == 'true' and settings[
+        'current_student'] == request.user.username and room.type == 2
     if request.method == 'POST':
         try:
             if student.syndicate is None or not student.accepted_syndicate or not student.syndicate.complete:
@@ -83,15 +84,19 @@ def landing(request):
 def staircase_list(request):
     student = Student.objects.get(user_id=request.user.username)
     staircases = Staircase.objects.order_by('name')
+
     # Getting metadata
+
     class ModifiedStaircase(object):
         pass
 
     modified_staircases = []
     for staircase in staircases:
-        rooms = Room.objects.filter(staircase=staircase)
+        rooms = Room.objects.filter(staircase=staircase).exclude(type=4).exclude(type=1)
         total_rooms = rooms.count()
-        available_rooms = rooms.filter(taken_by=None).count()
+        if total_rooms == 0:
+            continue
+        available_rooms = rooms.filter(type=2, taken_by=None).count()
         ms = ModifiedStaircase()
         ms.name = staircase.name
         ms.total_rooms = total_rooms
@@ -109,13 +114,13 @@ def staircase_list(request):
 def staircase_detail(request, staircase_id):
     student = Student.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
+    rooms = Room.objects.exclude(type=4).exclude(type=1).filter(staircase=staircase).order_by('sort_number')
     try:
         floorplan = Floorplan.objects.get(staircase=staircase)
     except:
         floorplan = None
     return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
-                                                              'rooms': Room.objects.filter(staircase=staircase)
-                                                                                   .order_by('sort_number'),
+                                                              'rooms': rooms,
                                                               'floorplan': floorplan,
                                                               'student': student})
 
@@ -255,7 +260,8 @@ def admin_dashboard(request):
                                                                    'syndicates_complete': syndicates_complete,
                                                                    'randomised': randomised,
                                                                    'in_progress': in_progress,
-                                                                   'syndicates': Syndicate.objects.order_by('syndicate_id'),
+                                                                   'syndicates': Syndicate.objects.order_by(
+                                                                       'syndicate_id'),
                                                                    'rooms': Room.objects.order_by('sort_number')})
     except AdminUser.DoesNotExist:
         return error(request, 403)
@@ -442,8 +448,10 @@ def status(request):
                                                           'randomised': randomised,
                                                           'in_progress': in_progress,
                                                           'incomplete_students': incomplete_students,
-                                                          'students_outside_ballot': Student.objects.filter(in_ballot=False),
-                                                          'incomplete_syndicates': Syndicate.objects.filter(complete=False),
+                                                          'students_outside_ballot': Student.objects.filter(
+                                                              in_ballot=False),
+                                                          'incomplete_syndicates': Syndicate.objects.filter(
+                                                              complete=False),
                                                           'current_student': current_student})
     except AdminUser.DoesNotExist:
         return error(request, 403)
@@ -494,7 +502,7 @@ def syndicates_list(request):
 def students_list(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        students = Student.objects.order_by('year','surname')
+        students = Student.objects.order_by('year', 'surname')
         return render(request, 'roomballot/student-list.html', {'students': students})
     except AdminUser.DoesNotExist:
         return error(request, 403)
@@ -518,8 +526,42 @@ def rooms_list(request):
 def manage_room(request, room_id):
     try:
         AdminUser.objects.get(user_id=request.user.username)
+        if request.method == 'POST':
+            response_code = 900
+            # Clicked 'JCR Freshers'.
+            if request.POST.get('response') == '1':
+                if settings['ballot_in_progress'] != 'true':
+                    with transaction.atomic():
+                        room = Room.objects.select_for_update().get(room_id=room_id)
+                        room.type = 1
+                        response_code = 1
+                        room.save()
+            if request.POST.get('response') == '2':
+                if settings['ballot_in_progress'] != 'true':
+                    with transaction.atomic():
+                        room = Room.objects.select_for_update().get(room_id=room_id)
+                        room.type = 2
+                        response_code = 1
+                        room.save()
+            if request.POST.get('response') == '3':
+                if settings['ballot_in_progress'] != 'true':
+                    with transaction.atomic():
+                        room = Room.objects.select_for_update().get(room_id=room_id)
+                        room.type = 3
+                        response_code = 1
+                        room.save()
+            if request.POST.get('response') == '4':
+                if settings['ballot_in_progress'] != 'true':
+                    with transaction.atomic():
+                        room = Room.objects.select_for_update().get(room_id=room_id)
+                        room.type = 4
+                        response_code = 1
+                        room.save()
+            return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+        in_progress = settings['ballot_in_progress'] == 'true'
         room = get_object_or_404(Room, room_id=room_id)
-        return render(request, 'roomballot/room-manage.html', {'room': room})
+        return render(request, 'roomballot/room-manage.html', {'room': room,
+                                                               'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 
@@ -549,9 +591,9 @@ def export_room_data(request):
     response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Room ID', 'Staircase', 'Number', 'Weekly Price', 'Occupant'])
+    writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Weekly Price', 'Occupant', 'CRSid'])
     for r in Room.objects.order_by('staircase', 'sort_number'):
-        writer.writerow([r.room_id, r.staircase, r.room_number, r.price, r.taken_by])
+        writer.writerow([r.room_id, r.staircase, r.room_number, r.get_type_display(), r.price, r.taken_by, r.taken_by.user_id if r.taken_by else None])
     return response
 
 

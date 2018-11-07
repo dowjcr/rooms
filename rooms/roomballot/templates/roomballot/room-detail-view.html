@@ -16,15 +16,21 @@
                 <h2>{{ room }}</h2>
                 {% if room.taken_by is not None %}
                     <p>This room has been taken by <a style="color: #990066;" href="/roomballot/student/{{ room.taken_by.user_id }}"><b>{{ room.taken_by }}</b></a>.</p>
-                {% else %}
+                {% elif room.type == 2 %}
                     <p>This room is currently available for occupation.</p>
+                {% else %}
+                    <p>This room is reserved for students who are outside the JCR ballot.</p>
                 {% endif %}
             </div>
             <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 text-center">
-                {% if room.taken_by is None and not student.has_allocated and selectable %}
+                {% if room.taken_by is None and not student.has_allocated and selectable and room.type == 2 %}
                     <div align="right">
                         <a class="btn btn-primary mt-3 mb-2" href="{{ room.room_id }}/confirm-selection">Select this
                             room</a>
+                    </div>
+                {% elif room.type != 2 %}
+                    <div align="center">
+                        <p class="alert alert-danger">Outside Ballot</p>
                     </div>
                 {% endif %}
             </div>

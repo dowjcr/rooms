@@ -1,6 +1,5 @@
 from roomballot.methods import randomise_order, NotReadyToRandomiseException, BallotInProgressException
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
 
 class Command(BaseCommand):
     help = 'Randomises first-year order, and generates times.'

@@ -1,6 +1,7 @@
 from roomballot.methods import generate_times, BallotInProgressException
 from roomballot.models import Student
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 
 class Command(BaseCommand):
     help = 'Clears the fields containing picking times.'

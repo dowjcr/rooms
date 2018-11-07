@@ -39,7 +39,7 @@
                 </thead>
                 <tbody>
                 {% for room in rooms %}
-                    {% if room.taken_by is not None %}
+                    {% if room.taken_by is not None or room.type != 2 %}
                     <tr class="alert-danger clickable-row" data-href="../room/{{ room.room_id }}" style="cursor: pointer;">
                     {% else %}
                     <tr class="alert-success clickable-row" data-href="../room/{{ room.room_id }}" style="cursor: pointer;">
@@ -48,7 +48,7 @@
                     <td class="d-none d-sm-table-cell">{{ room.size }} m&#178;</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_ensuite %}Yes{% else %}No{% endif %}</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_double_bed %}Double{% else %}Single{% endif %}</td>
-                    <td>{{ room.taken_by }}</td>
+                    <td>{% if room.type == 2 %}{{ room.taken_by }}{% else %}Outside Ballot{% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

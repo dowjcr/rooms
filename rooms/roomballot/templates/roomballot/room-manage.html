@@ -4,6 +4,63 @@
 
 {% block content %}
 
+    <script>
+        $(document).ready(function () {
+                $.ajaxSetup({
+                    data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+                });
+
+                // Handle response received after POST request.
+                function HandleResponse(responseCode) {
+                    // Successfully created syndicate.
+                    if (responseCode === 1) location.reload(true);
+                    else location.assign('/roomballot/error/' + responseCode.toString());
+                }
+
+                // Called when the user clicks a button.
+                function CreateButtonAjaxResponse(code) {
+                    $.ajax({
+                        url: '/roomballot/admin/room/{{ room.room_id }}',
+                        type: 'POST',
+                        data: {'response': code},
+                        dataType: 'json',
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        success: function (response) {
+                            HandleResponse(response.responseCode);
+                        }
+                    });
+                }
+
+                $(function () {
+                    $('#change-type').click(function () {
+                        $('#change-type-widget').toggle()
+                    });
+
+                    // When 'JCR Freshers' is clicked, send response.
+                    $('#freshers').click(function () {
+                        CreateButtonAjaxResponse(1);
+                    });
+
+                    // When 'JCR Ballot' is clicked, send response.
+                    $('#in-ballot').click(function () {
+                        CreateButtonAjaxResponse(2);
+                    });
+
+                    // When 'JCR Outside Ballot' is clicked, send response.
+                    $('#outside-ballot').click(function () {
+                        CreateButtonAjaxResponse(3);
+                    });
+
+                    // When 'MCR' is clicked, send response.
+                    $('#mcr').click(function () {
+                        CreateButtonAjaxResponse(4);
+                    });
+
+                });
+            }
+        );
+    </script>
+
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
             <h2>{{ room }}</h2>
@@ -23,6 +80,10 @@
                 <tr>
                     <td><b>Room ID</b></td>
                     <td>{{ room.room_id }}</td>
+                </tr>
+                <tr>
+                    <td><b>Allocation Type</b></td>
+                    <td>{{ room.get_type_display }}</td>
                 </tr>
                 <tr>
                     <td><b>Floor</b></td>
@@ -89,6 +150,25 @@
             </table>
         </div>
         <div class="col-md-6">
+            <div class="jumbotron">
+                <h3 class="mb-3">Tasks</h3>
+                {% if not in_progress and not room.taken_by %}
+                <button class="btn btn-primary mb-3" id="change-type">Change Allocation Type</button>
+                <br>
+                <div class="ui-widget mb-2 alert alert-light mb-3" style="display: none" id="change-type-widget">
+                    <p>Select the new type below:</p>
+                    <div class="sidebar">
+                        <div class="list-group">
+                            <button class="list-group-item" id="freshers"><span>JCR Freshers</span></button>
+                            <button class="list-group-item" id="in-ballot"><span>JCR Ballot</span></button>
+                            <button class="list-group-item" id="outside-ballot"><span>JCR Outside Ballot</span></button>
+                            <button class="list-group-item" id="mcr"><span>MCR</span></button>
+                        </div>
+                    </div>
+
+                </div>
+                {% endif %}
+            </div>
             <div class="alert alert-info">
                 <h4>Something wrong?</h4>
                 <p>If you think these details should be changed, please contact the JCR Internet Officer at

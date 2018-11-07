@@ -101,6 +101,13 @@ class Room(models.Model):
         (4, 'Third')
     )
 
+    TYPE_CHOICES = (
+        (1, 'JCR Freshers'),
+        (2, 'JCR Ballot'),
+        (3, 'JCR Outside Ballot'),
+        (4, 'MCR')
+    )
+
     room_id = models.AutoField(primary_key=True)
     room_number = models.CharField(max_length=10)
     floor = models.IntegerField(choices=FLOOR_CHOICES)
@@ -110,6 +117,7 @@ class Room(models.Model):
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
     band = models.IntegerField(choices=BAND_CHOICES)
+    type = models.IntegerField(choices=TYPE_CHOICES)
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
     price = models.IntegerField(editable=False, default=0)
     sort_number = models.IntegerField(default=0)
