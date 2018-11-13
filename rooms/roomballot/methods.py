@@ -84,13 +84,11 @@ def generate_price(room):
 # in the ballot, and the number of first-year syndicates.
 
 def get_num_first_years_in_ballot():
-    qset = Student.objects.filter(year=1, in_ballot=True)
-    return qset.count()
+    return Student.objects.filter(year=1, in_ballot=True).count()
 
 
 def get_num_first_year_syndicates():
-    qset = Syndicate.objects.filter(year=1)
-    return qset.count()
+    return Syndicate.objects.filter(year=1).count()
 
 
 # ========== SECOND YEARS IN BALLOT ==============
@@ -99,13 +97,11 @@ def get_num_first_year_syndicates():
 # second-year syndicates.
 
 def get_num_second_years_in_ballot():
-    qset = Student.objects.filter(year=2, in_ballot=True)
-    return qset.count()
+    return Student.objects.filter(year=2, in_ballot=True).count()
 
 
 def get_num_second_year_syndicates():
-    qset = Syndicate.objects.filter(year=2)
-    return qset.count()
+    return Syndicate.objects.filter(year=2).count()
 
 
 # =============== SYNDICATE SIZE =================
@@ -113,12 +109,11 @@ def get_num_second_year_syndicates():
 # students who are part of that syndicate.
 
 def get_syndicate_size(syndicate):
-    qset = Student.objects.filter(syndicate=syndicate)
-    return qset.count()
+    return Student.objects.filter(syndicate=syndicate).count()
+
 
 def get_num_syndicates():
-    qset = Syndicate.objects.all()
-    return qset.count()
+    return Syndicate.objects.all().count()
 
 
 # ============= RANDOMISE ORDER ==================
@@ -386,10 +381,14 @@ def decline_syndicate(student):
 # Inductively, syndicate must be non-empty.
 
 def reallocate_syndicate_owner(syndicate):
-    students = Student.objects.filter(syndicate=syndicate)
-    syndicate.owner_id = students[0].user_id
-    syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
-    syndicate_to_update.save()
+    if settings['ballot_in_progress'] == 'false':
+        with transaction.atomic():
+            students = Student.objects.filter(syndicate=syndicate)
+            syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
+            syndicate_to_update.owner_id = students[0].user_id
+            syndicate_to_update.save()
+    else:
+        raise BallotInProgressException()
 
 
 # =============== GENERATE TIMES ==================
@@ -447,7 +446,7 @@ def update_current_student():
 
 
 # ============ POPULATE STUDENT ================
-# Uses the UIS's Ibis API to get the given student,
+# Uses the UIS Ibis API to get the given student,
 # and if they are not in the database, adds them.
 
 def populate_student(crsid):
@@ -492,4 +491,3 @@ def send_to_bottom(student):
             s = Student.objects.select_for_update().get(user_id=student.user_id)
             s.picks_at = new_time
             s.save()
-
