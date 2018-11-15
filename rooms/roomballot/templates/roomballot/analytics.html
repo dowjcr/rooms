@@ -66,14 +66,20 @@
                     name: 'JCR',
                     data: [{% for r in jcr_prices %}{{ r }}, {% endfor %}]
                 }, {
+                    name: 'JCR Best Fit',
+                    data: [{% for r in jcr_fitted %}{{ r }}, {% endfor %}]
+                }, {
                     name: 'MCR',
                     data: [{% for r in mcr_prices %}{{ r }}, {% endfor %}]
+                }, {
+                    name: 'MCR Best Fit',
+                    data: [{% for r in mcr_fitted %}{{ r }}, {% endfor %}]
                 }]
             });
         });
     </script>
 
-    <div class="row">
+    <div class="row mb-3">
         <div class="col-md-6">
             <table class="table table-bordered table-striped table-hover">
                 <thead>
@@ -107,30 +113,46 @@
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                 <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">Lowest</th>
-                    <th scope="col">Highest</th>
-                    <th scope="col">Mean</th>
-                    <th scope="col">Median</th>
+                    <th scope="col"></th>
+                    <th scope="col">JCR</th>
+                    <th scope="col">MCR</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td><b>JCR</b></td>
+                    <td><b>Total Rooms</b></td>
                     <td>{{ jcr_rooms_count }}</td>
-                    <td>£{{ jcr_prices|first }}</td>
-                    <td>£{{ jcr_prices|last }}</td>
-                    <td>£{{ average_weekly_price_jcr|stringformat:'0.2f' }}</td>
-                    <td>£{{ median_weekly_price_jcr }}</td>
+                    <td>{{ mcr_rooms_count }}</td>
                 </tr>
                 <tr>
-                    <td><b>MCR</b></td>
-                    <td>{{ mcr_rooms_count }}</td>
-                    <td>£{{ mcr_prices|first }}</td>
-                    <td>£{{ mcr_prices|last }}</td>
+                    <td><b>Lowest</b></td>
+                    <td>£{{ jcr_prices|first|stringformat:'0.2f' }}</td>
+                    <td>£{{ mcr_prices|first|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Highest</b></td>
+                    <td>£{{ jcr_prices|last|stringformat:'0.2f' }}</td>
+                    <td>£{{ mcr_prices|last|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Mean</b></td>
+                    <td>£{{ average_weekly_price_jcr|stringformat:'0.2f' }}</td>
                     <td>£{{ average_weekly_price_mcr|stringformat:'0.2f' }}</td>
-                    <td>£{{ median_weekly_price_mcr }}</td>
+                </tr>
+                <tr>
+                    <td><b>Median</b></td>
+                    <td>£{{ median_weekly_price_jcr|stringformat:'0.2f' }}</td>
+                    <td>£{{ median_weekly_price_mcr|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Range</b></td>
+                    <td>£{{ jcr_range|stringformat:'0.2f' }}</td>
+                    <td>£{{ mcr_range|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Standard Deviation</b></td>
+                    <td>£{{ jcr_std|stringformat:'0.2f' }}</td>
+                    <td>£{{ mcr_std|stringformat:'0.2f' }}</td>
                 </tr>
                 </tbody>
             </table>

@@ -14,6 +14,7 @@ from .forms import *
 from modeldict import ModelDict
 import json
 import csv
+import numpy as np
 
 settings = ModelDict(Setting, key='key', value='value', instances=False)
 
@@ -696,27 +697,38 @@ def analytics(request):
             bc.total_mcr = mcr_rooms.filter(band=b).count()
             band_counts.append(bc)
 
+        jcr_x_values = np.arange(jcr_rooms_count)
+        jcr_x_values += 1
         jcr_prices = []
         for r in jcr_rooms.order_by('price'):
             jcr_prices.append(r.price)
+        jcr_prices = np.array(jcr_prices)
 
+        mcr_x_values = np.arange(mcr_rooms_count)
+        mcr_x_values += 1
         mcr_prices = []
         for r in mcr_rooms.order_by('price'):
             mcr_prices.append(r.price)
+        mcr_prices = np.array(mcr_prices)
 
         # Calculating metrics on average price etc.
-        total_weekly_price_jcr = 0
-        for r in jcr_rooms:
-            total_weekly_price_jcr += r.price
+        total_weekly_price_jcr = np.sum(jcr_prices)
+        total_weekly_price_mcr = np.sum(mcr_prices)
 
-        total_weekly_price_mcr = 0
-        for r in mcr_rooms:
-            total_weekly_price_mcr += r.price
+        average_weekly_price_jcr = np.mean(jcr_prices)
+        average_weekly_price_mcr = np.mean(mcr_prices)
+        median_weekly_price_jcr = np.median(jcr_prices)
+        median_weekly_price_mcr = np.median(mcr_prices)
+        jcr_range = (np.max(jcr_prices) - np.min(jcr_prices)) if jcr_rooms_count > 0 else 0
+        mcr_range = (np.max(mcr_prices) - np.min(mcr_prices)) if mcr_rooms_count > 0 else 0
+        jcr_std = np.std(jcr_prices)
+        mcr_std = np.std(mcr_prices)
 
-        average_weekly_price_jcr = total_weekly_price_jcr / (jcr_rooms_count if jcr_rooms_count != 0 else 1)
-        average_weekly_price_mcr = total_weekly_price_mcr / (mcr_rooms_count if mcr_rooms_count != 0 else 1)
-        median_weekly_price_jcr = jcr_rooms.order_by('price')[int(jcr_rooms_count/2)].price if jcr_rooms_count > 0 else 0
-        median_weekly_price_mcr = mcr_rooms.order_by('price')[int(mcr_rooms_count/2)].price if mcr_rooms_count > 0 else 0
+        jcr_coeffs = np.polyfit(jcr_x_values, jcr_prices, 4) if jcr_rooms_count > 0 else np.array([0])
+        jcr_fitted = np.poly1d(jcr_coeffs)(jcr_x_values)
+
+        mcr_coeffs = np.polyfit(mcr_x_values, mcr_prices, 4) if mcr_rooms_count > 0 else np.array([0])
+        mcr_fitted = np.poly1d(mcr_coeffs)(mcr_x_values)
 
         return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
                                                              'average_weekly_price_jcr': average_weekly_price_jcr,
@@ -726,6 +738,12 @@ def analytics(request):
                                                              'jcr_rooms_count': jcr_rooms_count,
                                                              'mcr_rooms_count': mcr_rooms_count,
                                                              'median_weekly_price_jcr': median_weekly_price_jcr,
-                                                             'median_weekly_price_mcr': median_weekly_price_mcr})
+                                                             'median_weekly_price_mcr': median_weekly_price_mcr,
+                                                             'jcr_range': jcr_range,
+                                                             'mcr_range': mcr_range,
+                                                             'jcr_std': jcr_std,
+                                                             'mcr_std': mcr_std,
+                                                             'jcr_fitted': jcr_fitted,
+                                                             'mcr_fitted': mcr_fitted})
     except AdminUser.DoesNotExist:
         return error(request, 403)
