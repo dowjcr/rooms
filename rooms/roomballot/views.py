@@ -691,7 +691,7 @@ def analytics(request):
             bc = BandCount()
             bc.band_name = b.band_name
             bc.count = Room.objects.filter(band=b).count()
-            bc.percentage = int(bc.count / total_rooms_count * 100)
+            bc.percentage = round(bc.count / total_rooms_count * 100, 1)
             bc.total_jcr = jcr_rooms.filter(band=b).count()
             bc.total_mcr = mcr_rooms.filter(band=b).count()
             band_counts.append(bc)
@@ -713,8 +713,10 @@ def analytics(request):
         for r in mcr_rooms:
             total_weekly_price_mcr += r.price
 
-        average_weekly_price_jcr = int(total_weekly_price_jcr / (jcr_rooms_count if jcr_rooms_count != 0 else 1))
-        average_weekly_price_mcr = int(total_weekly_price_mcr / (mcr_rooms_count if mcr_rooms_count != 0 else 1))
+        average_weekly_price_jcr = total_weekly_price_jcr / (jcr_rooms_count if jcr_rooms_count != 0 else 1)
+        average_weekly_price_mcr = total_weekly_price_mcr / (mcr_rooms_count if mcr_rooms_count != 0 else 1)
+        median_weekly_price_jcr = jcr_rooms.order_by('price')[int(jcr_rooms_count/2)].price if jcr_rooms_count > 0 else 0
+        median_weekly_price_mcr = mcr_rooms.order_by('price')[int(mcr_rooms_count/2)].price if mcr_rooms_count > 0 else 0
 
         return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
                                                              'average_weekly_price_jcr': average_weekly_price_jcr,
@@ -722,6 +724,8 @@ def analytics(request):
                                                              'jcr_prices': jcr_prices,
                                                              'mcr_prices': mcr_prices,
                                                              'jcr_rooms_count': jcr_rooms_count,
-                                                             'mcr_rooms_count': mcr_rooms_count})
+                                                             'mcr_rooms_count': mcr_rooms_count,
+                                                             'median_weekly_price_jcr': median_weekly_price_jcr,
+                                                             'median_weekly_price_mcr': median_weekly_price_mcr})
     except AdminUser.DoesNotExist:
         return error(request, 403)

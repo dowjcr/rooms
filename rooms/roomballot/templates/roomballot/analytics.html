@@ -1,4 +1,5 @@
 {% extends 'roomballot/base-admin.html' %}
+{% load humanize %}
 
 {% block title %}Analytics | Downing JCR RBS{% endblock %}
 
@@ -27,13 +28,14 @@
                 },
                 series: [{
                     name: 'JCR',
-                    data: [{% for b in band_counts %}{{ b.total_jcr }},{% endfor %}]
+                    data: [{% for b in band_counts %}{{ b.total_jcr }}, {% endfor %}]
                 }, {
                     name: 'MCR',
-                    data: [{% for b in band_counts %}{{ b.total_mcr }},{% endfor %}]
+                    data: [{% for b in band_counts %}{{ b.total_mcr }}, {% endfor %}]
                 }]
             });
 
+            var midpointJCR = {{ jcr_rooms_count }} / 2;
 
             var priceChart1 = Highcharts.chart('priceChart1', {
                 chart: {
@@ -46,13 +48,14 @@
                     enabled: false
                 },
                 xAxis: {
-                     categories: [''],
-                        title: {
-                            text: null
-                        },
-                        labels: {
-                         enabled:false,//default is true
-                         y : 20, rotation: -45, align: 'right' }
+                    categories: [''],
+                    title: {
+                        text: null
+                    },
+                    labels: {
+                        enabled: false,//default is true
+                        y: 20, rotation: -45, align: 'right'
+                    }
                 },
                 yAxis: {
                     title: {
@@ -61,10 +64,10 @@
                 },
                 series: [{
                     name: 'JCR',
-                    data: [{% for r in jcr_prices %}{{ r }},{% endfor %}]
+                    data: [{% for r in jcr_prices %}{{ r }}, {% endfor %}]
                 }, {
                     name: 'MCR',
-                    data: [{% for r in mcr_prices %}{{ r }},{% endfor %}]
+                    data: [{% for r in mcr_prices %}{{ r }}, {% endfor %}]
                 }]
             });
         });
@@ -105,10 +108,11 @@
                 <thead>
                 <tr>
                     <th scope="col">Type</th>
-                    <th scope="col">Number of Rooms</th>
+                    <th scope="col">Total</th>
                     <th scope="col">Lowest</th>
                     <th scope="col">Highest</th>
-                    <th scope="col">Average</th>
+                    <th scope="col">Mean</th>
+                    <th scope="col">Median</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -117,14 +121,16 @@
                     <td>{{ jcr_rooms_count }}</td>
                     <td>£{{ jcr_prices|first }}</td>
                     <td>£{{ jcr_prices|last }}</td>
-                    <td>£{{ average_weekly_price_jcr }}</td>
+                    <td>£{{ average_weekly_price_jcr|stringformat:'0.2f' }}</td>
+                    <td>£{{ median_weekly_price_jcr }}</td>
                 </tr>
                 <tr>
                     <td><b>MCR</b></td>
                     <td>{{ mcr_rooms_count }}</td>
                     <td>£{{ mcr_prices|first }}</td>
                     <td>£{{ mcr_prices|last }}</td>
-                    <td>£{{ average_weekly_price_mcr }}</td>
+                    <td>£{{ average_weekly_price_mcr|stringformat:'0.2f' }}</td>
+                    <td>£{{ median_weekly_price_mcr }}</td>
                 </tr>
                 </tbody>
             </table>
