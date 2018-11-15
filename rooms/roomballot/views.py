@@ -666,3 +666,62 @@ def ranking_admin(request):
         return render(request, 'roomballot/ranking-admin.html', {'students': students})
     except AdminUser.DoesNotExist:
         return error(request, 403)
+
+
+# =============== ANALYTICS ===================
+# Admin page with some useful analytics information.
+
+def analytics(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+
+        class BandCount(object):
+            pass
+
+        all_rooms = Room.objects.all()
+        jcr_rooms = Room.objects.exclude(type=4)
+        jcr_rooms_count = jcr_rooms.count()
+        mcr_rooms = Room.objects.filter(type=4)
+        mcr_rooms_count = mcr_rooms.count()
+        total_rooms_count = Room.objects.all().count()
+
+        # Calculating the number of rooms in each band.
+        band_counts = []
+        for b in Band.objects.all():
+            bc = BandCount()
+            bc.band_name = b.band_name
+            bc.count = Room.objects.filter(band=b).count()
+            bc.percentage = int(bc.count / total_rooms_count * 100)
+            bc.total_jcr = jcr_rooms.filter(band=b).count()
+            bc.total_mcr = mcr_rooms.filter(band=b).count()
+            band_counts.append(bc)
+
+        jcr_prices = []
+        for r in jcr_rooms:
+            jcr_prices.append(r.price)
+
+        mcr_prices = []
+        for r in mcr_rooms:
+            mcr_prices.append(r.price)
+
+        # Calculating metrics on average price etc.
+        total_weekly_price_jcr = 0
+        for r in jcr_rooms:
+            total_weekly_price_jcr += r.price
+
+        total_weekly_price_mcr = 0
+        for r in mcr_rooms:
+            total_weekly_price_mcr += r.price
+
+        average_weekly_price_jcr = total_weekly_price_jcr / (jcr_rooms_count if jcr_rooms_count != 0 else 1)
+        average_weekly_price_mcr = total_weekly_price_mcr / (mcr_rooms_count if mcr_rooms_count != 0 else 1)
+
+        return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
+                                                             'average_weekly_price_jcr': average_weekly_price_jcr,
+                                                             'average_weekly_price_mcr': average_weekly_price_mcr,
+                                                             'jcr_prices': jcr_prices,
+                                                             'mcr_prices': mcr_prices,
+                                                             'jcr_rooms_count': jcr_rooms_count,
+                                                             'mcr_rooms_count': mcr_rooms_count})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)

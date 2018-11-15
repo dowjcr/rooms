@@ -1,0 +1,136 @@
+{% extends 'roomballot/base-admin.html' %}
+
+{% block title %}Analytics | Downing JCR RBS{% endblock %}
+
+{% block content %}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        $(function () {
+
+            var bandChart1 = Highcharts.chart('bandChart1', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Number of Rooms by Band'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [{% for b in band_counts %}'{{ b.band_name }}',{% endfor %}]
+                },
+                yAxis: {
+                    title: {
+                        text: 'Number of Rooms'
+                    }
+                },
+                series: [{
+                    name: 'JCR',
+                    data: [{% for b in band_counts %}{{ b.total_jcr }},{% endfor %}]
+                }, {
+                    name: 'MCR',
+                    data: [{% for b in band_counts %}{{ b.total_mcr }},{% endfor %}]
+                }]
+            });
+
+
+            var priceChart1 = Highcharts.chart('priceChart1', {
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: 'Room Prices'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                     categories: [''],
+                        title: {
+                            text: null
+                        },
+                        labels: {
+                         enabled:false,//default is true
+                         y : 20, rotation: -45, align: 'right' }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Price per Week (£)'
+                    }
+                },
+                series: [{
+                    name: 'JCR',
+                    data: [{% for r in jcr_prices %}{{ r }},{% endfor %}]
+                }, {
+                    name: 'MCR',
+                    data: [{% for r in mcr_prices %}{{ r }},{% endfor %}]
+                }]
+            });
+        });
+    </script>
+
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Band</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Percentage</th>
+                    <th scope="col">Total JCR</th>
+                    <th scope="col">Total MCR</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for b in band_counts %}
+                    <tr>
+                        <td><b>{{ b.band_name }}</b></td>
+                        <td>{{ b.count }}</td>
+                        <td>{{ b.percentage }}%</td>
+                        <td>{{ b.total_jcr }}</td>
+                        <td>{{ b.total_mcr }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <div id="bandChart1"></div>
+        </div>
+        <div class="col-md-12 mb-4">
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Number of Rooms</th>
+                    <th scope="col">Lowest</th>
+                    <th scope="col">Highest</th>
+                    <th scope="col">Average</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>JCR</b></td>
+                    <td>{{ jcr_rooms_count }}</td>
+                    <td>£{{ jcr_prices|first }}</td>
+                    <td>£{{ jcr_prices|last }}</td>
+                    <td>£{{ average_weekly_price_jcr }}</td>
+                </tr>
+                <tr>
+                    <td><b>MCR</b></td>
+                    <td>{{ mcr_rooms_count }}</td>
+                    <td>£{{ mcr_prices|first }}</td>
+                    <td>£{{ mcr_prices|last }}</td>
+                    <td>£{{ average_weekly_price_mcr }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <div id="priceChart1"></div>
+        </div>
+    </div>
+{% endblock %}

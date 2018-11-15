@@ -107,7 +107,7 @@ class Room(models.Model):
     has_disabled_facilities = models.BooleanField('Has disabled facilities?')
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
-    band_object = models.ForeignKey(Band, on_delete=models.SET_DEFAULT, default=None, null=True)
+    band = models.ForeignKey(Band, on_delete=models.SET_DEFAULT, default=None, null=True)
     type = models.IntegerField(choices=TYPE_CHOICES)
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
     price = models.IntegerField(editable=False, default=0)
