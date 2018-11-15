@@ -18,6 +18,18 @@ class PriceCategory(models.Model):
         return str(self.category_id)
 
 
+# =================== BAND =======================
+# Represents a discrete pricing band.
+
+class Band(models.Model):
+    band_id = models.AutoField(primary_key=True)
+    band_name = models.CharField(max_length=10)
+    weekly_price = models.IntegerField()
+
+    def __str__(self):
+        return "Band " + self.band_name
+
+
 # ================ SYNDICATE =====================
 # Represents a syndicate between Students.
 
@@ -86,6 +98,7 @@ class Student(models.Model):
 
 class Room(models.Model):
     BAND_CHOICES = (
+        (0, 'Band 1*'),
         (1, 'Band 1'),
         (2, 'Band 2'),
         (3, 'Band 3'),
@@ -117,9 +130,12 @@ class Room(models.Model):
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
     band = models.IntegerField(choices=BAND_CHOICES)
+    band_object = models.ForeignKey(Band, on_delete=models.SET_DEFAULT, default=None, null=True)
     type = models.IntegerField(choices=TYPE_CHOICES)
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
     price = models.IntegerField(editable=False, default=0)
+    prev_price = models.IntegerField(editable=False, default=0)
+    price_explanation = models.CharField(max_length=1000, editable=False, null=True, default=None)
     sort_number = models.IntegerField(default=0)
 
     def __str__(self):
