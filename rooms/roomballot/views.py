@@ -697,11 +697,11 @@ def analytics(request):
             band_counts.append(bc)
 
         jcr_prices = []
-        for r in jcr_rooms:
+        for r in jcr_rooms.order_by('price'):
             jcr_prices.append(r.price)
 
         mcr_prices = []
-        for r in mcr_rooms:
+        for r in mcr_rooms.order_by('price'):
             mcr_prices.append(r.price)
 
         # Calculating metrics on average price etc.
@@ -713,8 +713,8 @@ def analytics(request):
         for r in mcr_rooms:
             total_weekly_price_mcr += r.price
 
-        average_weekly_price_jcr = total_weekly_price_jcr / (jcr_rooms_count if jcr_rooms_count != 0 else 1)
-        average_weekly_price_mcr = total_weekly_price_mcr / (mcr_rooms_count if mcr_rooms_count != 0 else 1)
+        average_weekly_price_jcr = int(total_weekly_price_jcr / (jcr_rooms_count if jcr_rooms_count != 0 else 1))
+        average_weekly_price_mcr = int(total_weekly_price_mcr / (mcr_rooms_count if mcr_rooms_count != 0 else 1))
 
         return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
                                                              'average_weekly_price_jcr': average_weekly_price_jcr,
