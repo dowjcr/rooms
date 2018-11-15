@@ -7,17 +7,6 @@ Author Cameron O'Connor
 from django.db import models
 
 
-# ============== PRICE CATEGORY ==================
-# Represents a price category.
-# TODO: finalise pricing standard, and store required information here.
-
-class PriceCategory(models.Model):
-    category_id = models.AutoField(primary_key=True)
-
-    def __str__(self):
-        return str(self.category_id)
-
-
 # =================== BAND =======================
 # Represents a discrete pricing band.
 
@@ -57,7 +46,6 @@ class Syndicate(models.Model):
 class Staircase(models.Model):
     staircase_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
-    price_category = models.ForeignKey(PriceCategory, on_delete=models.SET_DEFAULT, default=None)
     contract_length = models.IntegerField('Number of contract weeks?')
     description = models.CharField(max_length=1000, default=None, null=True, blank=True)
 
@@ -97,16 +85,6 @@ class Student(models.Model):
 # relationship to Student.
 
 class Room(models.Model):
-    BAND_CHOICES = (
-        (0, 'Band 1*'),
-        (1, 'Band 1'),
-        (2, 'Band 2'),
-        (3, 'Band 3'),
-        (4, 'Band 4'),
-        (5, 'Band 5'),
-        (6, 'Band 6')
-    )
-
     FLOOR_CHOICES = (
         (1, 'Ground'),
         (2, 'First'),
@@ -129,12 +107,10 @@ class Room(models.Model):
     has_disabled_facilities = models.BooleanField('Has disabled facilities?')
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
-    band = models.IntegerField(choices=BAND_CHOICES)
     band_object = models.ForeignKey(Band, on_delete=models.SET_DEFAULT, default=None, null=True)
     type = models.IntegerField(choices=TYPE_CHOICES)
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
     price = models.IntegerField(editable=False, default=0)
-    prev_price = models.IntegerField(editable=False, default=0)
     price_explanation = models.CharField(max_length=1000, editable=False, null=True, default=None)
     sort_number = models.IntegerField(default=0)
 

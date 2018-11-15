@@ -76,18 +76,9 @@ def deallocate_room(student):
 
 def generate_price(room):
     with transaction.atomic():
-        room_to_update = Room.objects.select_for_update.get(room_id=room.room_id)
-
-
-    # TODO: implement this.
-    return 0
-
-
-def link_band(room):
-    with transaction.atomic():
         room_to_update = Room.objects.select_for_update().get(room_id=room.room_id)
-        band = Band.objects.get(band_name=room_to_update.band)
-        room_to_update.band_object = band
+        room_to_update.price = room_to_update.band_object.weekly_price
+        room_to_update.price_explanation = "The pricing for 2019/20 has not yet been calculated."
         room_to_update.save()
 
 
