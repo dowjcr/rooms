@@ -78,6 +78,16 @@
                     <td>{% if room.faces_lensfield %}Yes{% else %}No{% endif %}</td>
                     <td>{{ room.score_facing_lensfield|stringformat:'0.2f' }}</td>
                 </tr>
+                <tr>
+                    <td><b>Facing Court?</b></td>
+                    <td>{% if room.faces_court %}Yes{% else %}No{% endif %}</td>
+                    <td>{{ room.score_facing_court|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Ground Floor?</b></td>
+                    <td>{% if room.floor == 1 %}Yes{% else %}No{% endif %}</td>
+                    <td>{{ room.score_ground_floor|stringformat:'0.2f' }}</td>
+                </tr>
                 {% if room.is_flat %}
                     <tr>
                         <td><b>Self-Contained</b></td>

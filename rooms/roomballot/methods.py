@@ -85,17 +85,19 @@ def generate_price():
     count_renovated_facilities = 0
     count_flat = 0
     count_facing_lensfield = 0
+    count_facing_court = 0
+    count_ground_floor = 0
 
     # Useful constants.
     min_size = Room.objects.order_by('size')[0].size if Room.objects.all().count() > 0 else 0
     max_size = Room.objects.order_by('-size')[0].size if Room.objects.all().count() > 0 else 0
-    denom = max(min(max_size, 18) - min_size, 1)
     accommodation_weeks = 0
 
     # Iterating through rooms and populating counts.
     for r in Room.objects.all():
         contract_length = r.staircase.contract_length
-        count_size += ((min(r.size, 18) - min_size) / denom) * contract_length
+        normalised_size = (r.size - min_size) / (max_size - min_size)
+        count_size += (2 * normalised_size - (normalised_size * normalised_size)) * contract_length
         if r.is_ensuite:
             count_ensuite += contract_length
         else:
@@ -106,6 +108,10 @@ def generate_price():
             count_flat += contract_length
         if not r.faces_lensfield:
             count_facing_lensfield += contract_length
+        if r.faces_court:
+            count_facing_court += contract_length
+        if int(r.floor) != 1:
+            count_ground_floor += contract_length
         accommodation_weeks += contract_length
         count_renovated_room += ((r.renovated - 1) / 2) * contract_length
         count_renovated_facilities += ((r.staircase.renovated - 1) / 2) * contract_length
@@ -120,13 +126,16 @@ def generate_price():
     weight_renovated_facilities = float(settings['weight_renovated_facilities'])
     weight_flat = float(settings['weight_flat'])
     weight_facing_lensfield = float(settings['weight_facing_lensfield'])
+    weight_facing_court = float(settings['weight_facing_court'])
+    weight_ground_floor = float(settings['weight_ground_floor'])
     total = float(settings['total'])
 
     # x = Weighted feature weeks.
     x = (weight_ensuite * count_ensuite) + (weight_double_bed * count_double_bed) + (weight_size * count_size) + \
             (weight_bathroom * count_bathroom) + (weight_renovated_room * count_renovated_room) + \
             (weight_renovated_facilities * count_renovated_facilities) + (weight_flat * count_flat) + \
-            (weight_facing_lensfield * count_facing_lensfield)
+            (weight_facing_lensfield * count_facing_lensfield) + (weight_facing_court * count_facing_court) + \
+            (weight_ground_floor * count_ground_floor)
 
     # y = Feature cost per week.
     y = (total - base_price * accommodation_weeks) / x
@@ -139,6 +148,8 @@ def generate_price():
 
             # Calculating sum of weights for this room, and saving in database.
             this_weight = 0
+
+            # Adding weight if ensuite.
             if room_to_update.is_ensuite:
                 this_weight += weight_ensuite
                 room_to_update.score_ensuite = weight_ensuite
@@ -146,18 +157,49 @@ def generate_price():
                 score = weight_bathroom * (5 - room_to_update.bathroom_sharing) / 4
                 this_weight += score
                 room_to_update.score_bathroom = score
+
+            # Adding weight if double bed.
             if room_to_update.is_double_bed:
                 this_weight += weight_double_bed
                 room_to_update.score_double_bed = weight_double_bed
+            else:
+                room_to_update.score_double_bed = 0
+
+            # Adding weight if self-contained flat.
             if room_to_update.is_flat:
                 this_weight += weight_flat
                 room_to_update.score_flat = weight_flat
+            else:
+                room_to_update.score_flat = 0
+
+            # Adding weight if facing Lensfield Road.
             if not room_to_update.faces_lensfield:
                 this_weight += weight_facing_lensfield
                 room_to_update.score_facing_lensfield = weight_facing_lensfield
-            score_size = weight_size * (min(room_to_update.size, 18) - min_size) / denom
+            else:
+                room_to_update.score_facing_lensfield = 0
+
+            # Adding weight if facing main court or Domus garden.
+            if room_to_update.faces_court:
+                this_weight += weight_facing_court
+                room_to_update.score_facing_court = weight_facing_court
+            else:
+                room_to_update.score_facing_court = 0
+
+            # Adding weight if not ground floor room.
+            if int(room_to_update.floor) != 1:
+                this_weight += weight_ground_floor
+                room_to_update.score_ground_floor = weight_ground_floor
+            else:
+                room_to_update.score_ground_floor = 0
+
+            # Adding weight for size.
+            normalised_size = (room_to_update.size - min_size) / (max_size - min_size)
+            score_size = weight_size * (2 * normalised_size - (normalised_size * normalised_size))
             this_weight += score_size
             room_to_update.score_size = score_size
+
+            # Adding weight for renovation (room & facilities).
             score_renovated = weight_renovated_room * (room_to_update.renovated - 1) / 2
             this_weight += score_renovated
             room_to_update.score_renovated = score_renovated
