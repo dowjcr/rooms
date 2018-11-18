@@ -41,12 +41,13 @@ $ cd rooms
 $ mv settings_example.py settings.py
 ```
 
-Migrate the database, then you're ready to run the test server:
+Migrate and seed the database, then you're ready to run the test server:
 
 ```bash
 $ cd ..
 $ python manage.py makemigrations
 $ python manage.py migrate
+$ python manage.py seed
 $ python manage.py runserver
 ```
 
@@ -62,7 +63,7 @@ Instructions on how to serve Django in production are widely available; `mod_wsg
 
 ## Authors
 
-- **Cameron O'Connor**, JCR Internet Officer 2018-19
+- [**Cameron O'Connor**](https://github.com/cjoc), JCR Internet Officer 2018-19
 
 ## Licence
 

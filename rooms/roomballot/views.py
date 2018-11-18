@@ -812,7 +812,7 @@ def change_weights(request):
                 generate_price()
                 return HttpResponse(json.dumps({'responseCode': 1}), content_type="application/json")
         else:
-
+            in_progress = settings['ballot_in_progress'] == 'true'
             return render(request, 'roomballot/change-weights.html', {'base_price': settings['base_price'],
                                                                       'weight_ensuite': settings['weight_ensuite'],
                                                                       'weight_bathroom': settings['weight_bathroom'],
@@ -830,6 +830,7 @@ def change_weights(request):
                                                                           'weight_facing_court'],
                                                                       'weight_ground_floor': settings[
                                                                           'weight_ground_floor'],
-                                                                      'total': settings['total']})
+                                                                      'total': settings['total'],
+                                                                      'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
