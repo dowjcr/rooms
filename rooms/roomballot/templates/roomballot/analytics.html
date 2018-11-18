@@ -42,7 +42,7 @@
                     type: 'line'
                 },
                 title: {
-                    text: 'Room Prices'
+                    text: 'Room Prices (JCR)'
                 },
                 credits: {
                     enabled: false
@@ -68,12 +68,6 @@
                 }, {
                     name: 'JCR Best Fit',
                     data: [{% for r in jcr_fitted %}{{ r }}, {% endfor %}]
-                }, {
-                    name: 'MCR',
-                    data: [{% for r in mcr_prices %}{{ r }}, {% endfor %}]
-                }, {
-                    name: 'MCR Best Fit',
-                    data: [{% for r in mcr_fitted %}{{ r }}, {% endfor %}]
                 }]
             });
         });
@@ -156,6 +150,8 @@
                 </tr>
                 </tbody>
             </table>
+            {{ total }}<br>
+            {{ new_total }}
         </div>
         <div class="col-md-6">
             <div id="priceChart1"></div>

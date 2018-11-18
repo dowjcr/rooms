@@ -44,9 +44,16 @@ class Syndicate(models.Model):
 # relationship to PriceCategory.
 
 class Staircase(models.Model):
+    RENOVATED_CHOICES = (
+        (1, 'Least Recently'),
+        (2, 'Quite Recently'),
+        (3, 'Most Recently')
+    )
+
     staircase_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
     contract_length = models.IntegerField('Number of contract weeks?')
+    renovated = models.IntegerField(choices=RENOVATED_CHOICES)
     description = models.CharField(max_length=1000, default=None, null=True, blank=True)
 
     def __str__(self):
@@ -92,6 +99,20 @@ class Room(models.Model):
         (4, 'Third')
     )
 
+    RENOVATED_CHOICES = (
+        (1, 'Least Recently'),
+        (2, 'Quite Recently'),
+        (3, 'Most Recently')
+    )
+
+    BATHROOM_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5+')
+    )
+
     TYPE_CHOICES = (
         (1, 'JCR Freshers'),
         (2, 'JCR Ballot'),
@@ -105,13 +126,27 @@ class Room(models.Model):
     is_ensuite = models.BooleanField('Has ensuite?')
     is_double_bed = models.BooleanField('Has double bed?')
     has_disabled_facilities = models.BooleanField('Has disabled facilities?')
+    renovated = models.IntegerField(choices=RENOVATED_CHOICES)
+    faces_lensfield = models.BooleanField('Faces Lensfield Road?')
+    bathroom_sharing = models.IntegerField(choices=BATHROOM_CHOICES, null=True)
+    is_flat = models.BooleanField(default=False)
     size = models.FloatField()
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
     band = models.ForeignKey(Band, on_delete=models.SET_DEFAULT, default=None, null=True)
     type = models.IntegerField(choices=TYPE_CHOICES)
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
     price = models.IntegerField(editable=False, default=0)
-    price_explanation = models.CharField(max_length=1000, editable=False, null=True, default=None)
+    new_price = models.FloatField(default=0)
+    score_ensuite = models.FloatField(editable=False)
+    score_double_bed = models.FloatField(editable=False)
+    score_renovated = models.FloatField(editable=False)
+    score_renovated_facilities = models.FloatField(editable=False)
+    score_bathroom = models.FloatField(editable=False)
+    score_flat = models.FloatField(editable=False)
+    score_facing_lensfield = models.FloatField(editable=False)
+    score_size = models.FloatField(editable=False)
+    score_total = models.FloatField(editable=False)
+    feature_price = models.FloatField(editable=False)
     sort_number = models.IntegerField(default=0)
 
     def __str__(self):

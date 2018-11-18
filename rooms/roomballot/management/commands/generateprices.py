@@ -7,7 +7,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            for r in Room.objects.all():
-                generate_price(r)
+            generate_price()
         except BallotInProgressException:
             raise CommandError("The ballot is currently in progress, so you can't do that.")

@@ -38,6 +38,20 @@ def room_detail(request, room_id):
                                                                 'selectable': selectable})
 
 
+# =============== ROOM PRICING ===================
+# Displays room pricing methodology.
+
+def room_pricing(request, room_id):
+    student = Student.objects.get(user_id=request.user.username)
+    room = get_object_or_404(Room, pk=room_id)
+    y = round(float(settings['feature_price']), 5)
+    base_price = round(float(settings['base_price']), 2)
+    return render(request, 'roomballot/room-detail-pricing.html', {'room': room,
+                                                                   'student': student,
+                                                                   'y': y,
+                                                                   'base_price': base_price})
+
+
 # =========== ROOM SELECTION CONFIRM ==============
 # Prompts user to confirm that they have selected the
 # correct room.
@@ -515,7 +529,7 @@ def students_list(request):
 def rooms_list(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        rooms = Room.objects.order_by('staircase', 'sort_number')
+        rooms = Room.objects.order_by('new_price') #'staircase', 'sort_number') # TODO: change this back
         return render(request, 'roomballot/rooms-list.html', {'rooms': rooms})
     except AdminUser.DoesNotExist:
         return error(request, 403)
@@ -700,20 +714,38 @@ def analytics(request):
         jcr_x_values = np.arange(jcr_rooms_count)
         jcr_x_values += 1
         jcr_prices = []
-        for r in jcr_rooms.order_by('price'):
+        jcr_new_prices = []
+        jcr_total_prices = []
+        jcr_total_new_prices = []
+        for r in jcr_rooms.order_by('new_price'):
             jcr_prices.append(r.price)
+            jcr_new_prices.append(r.new_price)
+            jcr_total_prices.append(r.price * r.staircase.contract_length)
+            jcr_total_new_prices.append(r.new_price * r.staircase.contract_length)
         jcr_prices = np.array(jcr_prices)
+        jcr_total_prices = np.array(jcr_total_prices)
+        jcr_new_prices = np.array(jcr_new_prices)
+        jcr_total_new_prices = np.array(jcr_total_new_prices)
 
         mcr_x_values = np.arange(mcr_rooms_count)
         mcr_x_values += 1
         mcr_prices = []
-        for r in mcr_rooms.order_by('price'):
+        mcr_new_prices = []
+        mcr_total_prices = []
+        for r in mcr_rooms.order_by('new_price'):
             mcr_prices.append(r.price)
+            mcr_new_prices.append(r.new_price)
+            mcr_total_prices.append(r.price * r.staircase.contract_length)
         mcr_prices = np.array(mcr_prices)
+        mcr_total_prices = np.array(mcr_total_prices)
+        mcr_new_prices = np.array(mcr_new_prices)
 
         # Calculating metrics on average price etc.
         total_weekly_price_jcr = np.sum(jcr_prices)
         total_weekly_price_mcr = np.sum(mcr_prices)
+
+        total = np.sum(jcr_total_prices) + np.sum(mcr_total_prices)
+        new_total = np.sum(jcr_total_new_prices)
 
         average_weekly_price_jcr = np.mean(jcr_prices)
         average_weekly_price_mcr = np.mean(mcr_prices)
@@ -724,17 +756,17 @@ def analytics(request):
         jcr_std = np.std(jcr_prices)
         mcr_std = np.std(mcr_prices)
 
-        jcr_coeffs = np.polyfit(jcr_x_values, jcr_prices, 4) if jcr_rooms_count > 0 else np.array([0])
+        jcr_coeffs = np.polyfit(jcr_x_values, jcr_new_prices, 5) if jcr_rooms_count > 0 else np.array([0])
         jcr_fitted = np.poly1d(jcr_coeffs)(jcr_x_values)
 
-        mcr_coeffs = np.polyfit(mcr_x_values, mcr_prices, 4) if mcr_rooms_count > 0 else np.array([0])
+        mcr_coeffs = np.polyfit(mcr_x_values, mcr_new_prices, 5) if mcr_rooms_count > 0 else np.array([0])
         mcr_fitted = np.poly1d(mcr_coeffs)(mcr_x_values)
 
         return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
                                                              'average_weekly_price_jcr': average_weekly_price_jcr,
                                                              'average_weekly_price_mcr': average_weekly_price_mcr,
-                                                             'jcr_prices': jcr_prices,
-                                                             'mcr_prices': mcr_prices,
+                                                             'jcr_prices': jcr_new_prices,
+                                                             'mcr_prices': mcr_new_prices,
                                                              'jcr_rooms_count': jcr_rooms_count,
                                                              'mcr_rooms_count': mcr_rooms_count,
                                                              'median_weekly_price_jcr': median_weekly_price_jcr,
@@ -744,6 +776,8 @@ def analytics(request):
                                                              'jcr_std': jcr_std,
                                                              'mcr_std': mcr_std,
                                                              'jcr_fitted': jcr_fitted,
-                                                             'mcr_fitted': mcr_fitted})
+                                                             'mcr_fitted': mcr_fitted,
+                                                             'total': total,
+                                                             'new_total': new_total})
     except AdminUser.DoesNotExist:
         return error(request, 403)

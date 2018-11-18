@@ -30,6 +30,7 @@ urlpatterns = [
     path('staircase/<int:staircase_id>', views.staircase_detail, name='staircase-view'),
     path('room/<str:room_id>/confirm-selection', views.room_selection_confirm, name='confirm-room-selection'),
     path('room/<str:room_id>', views.room_detail, name='room-detail'),
+    path('room-pricing/<str:room_id>', views.room_pricing, name='room-pricing'),
     path('error/<int:code>', views.error, name='error'),
     path('student/<str:user_id>', views.student_detail, name='student-detail'),
     path('syndicate/<int:syndicate_id>', views.syndicate_detail, name='syndicate-detail'),

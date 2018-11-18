@@ -72,14 +72,104 @@ def deallocate_room(student):
 
 
 # ============= GENERATE PRICE ===================
-# Takes a room and generates its price.
+# Takes all rooms and generates their price.
 
-def generate_price(room):
-    with transaction.atomic():
-        room_to_update = Room.objects.select_for_update().get(room_id=room.room_id)
-        room_to_update.price = room_to_update.band_object.weekly_price
-        room_to_update.price_explanation = "The pricing for 2019/20 has not yet been calculated."
-        room_to_update.save()
+def generate_price():
+
+    # Counts - contain number of accommodation weeks with that feature.
+    count_ensuite = 0
+    count_double_bed = 0
+    count_size = 0
+    count_bathroom = 0
+    count_renovated_room = 0
+    count_renovated_facilities = 0
+    count_flat = 0
+    count_facing_lensfield = 0
+
+    # Useful constants.
+    min_size = Room.objects.order_by('size')[0].size if Room.objects.all().count() > 0 else 0
+    max_size = Room.objects.order_by('-size')[0].size if Room.objects.all().count() > 0 else 0
+    denom = max(min(max_size, 18) - min_size, 1)
+    accommodation_weeks = 0
+
+    # Iterating through rooms and populating counts.
+    for r in Room.objects.all():
+        contract_length = r.staircase.contract_length
+        count_size += ((min(r.size, 18) - min_size) / denom) * contract_length
+        if r.is_ensuite:
+            count_ensuite += contract_length
+        else:
+            count_bathroom += ((5 - r.bathroom_sharing) / 4) * contract_length
+        if r.is_double_bed:
+            count_double_bed += contract_length
+        if r.is_flat:
+            count_flat += contract_length
+        if not r.faces_lensfield:
+            count_facing_lensfield += contract_length
+        accommodation_weeks += contract_length
+        count_renovated_room += ((r.renovated - 1) / 2) * contract_length
+        count_renovated_facilities += ((r.staircase.renovated - 1) / 2) * contract_length
+
+    # Getting weights from settings.
+    base_price = float(settings['base_price'])
+    weight_ensuite = float(settings['weight_ensuite'])
+    weight_bathroom = float(settings['weight_bathroom'])
+    weight_double_bed = float(settings['weight_double_bed'])
+    weight_size = float(settings['weight_size'])
+    weight_renovated_room = float(settings['weight_renovated_room'])
+    weight_renovated_facilities = float(settings['weight_renovated_facilities'])
+    weight_flat = float(settings['weight_flat'])
+    weight_facing_lensfield = float(settings['weight_facing_lensfield'])
+    total = float(settings['total'])
+
+    # x = Weighted feature weeks.
+    x = (weight_ensuite * count_ensuite) + (weight_double_bed * count_double_bed) + (weight_size * count_size) + \
+            (weight_bathroom * count_bathroom) + (weight_renovated_room * count_renovated_room) + \
+            (weight_renovated_facilities * count_renovated_facilities) + (weight_flat * count_flat) + \
+            (weight_facing_lensfield * count_facing_lensfield)
+
+    # y = Feature cost per week.
+    y = (total - base_price * accommodation_weeks) / x
+    settings['feature_price'] = y
+
+    # Iterating through rooms and calculating price.
+    for room in Room.objects.all():
+        with transaction.atomic():
+            room_to_update = Room.objects.select_for_update().get(room_id=room.room_id)
+
+            # Calculating sum of weights for this room, and saving in database.
+            this_weight = 0
+            if room_to_update.is_ensuite:
+                this_weight += weight_ensuite
+                room_to_update.score_ensuite = weight_ensuite
+            else:
+                score = weight_bathroom * (5 - room_to_update.bathroom_sharing) / 4
+                this_weight += score
+                room_to_update.score_bathroom = score
+            if room_to_update.is_double_bed:
+                this_weight += weight_double_bed
+                room_to_update.score_double_bed = weight_double_bed
+            if room_to_update.is_flat:
+                this_weight += weight_flat
+                room_to_update.score_flat = weight_flat
+            if not room_to_update.faces_lensfield:
+                this_weight += weight_facing_lensfield
+                room_to_update.score_facing_lensfield = weight_facing_lensfield
+            score_size = weight_size * (min(room_to_update.size, 18) - min_size) / denom
+            this_weight += score_size
+            room_to_update.score_size = score_size
+            score_renovated = weight_renovated_room * (room_to_update.renovated - 1) / 2
+            this_weight += score_renovated
+            room_to_update.score_renovated = score_renovated
+            score_renovated_facilities = weight_renovated_facilities * (room_to_update.staircase.renovated - 1) / 2
+            this_weight += score_renovated_facilities
+            room_to_update.score_renovated_facilities = score_renovated_facilities
+
+            # Calculating price based on weight, and saving.
+            room_to_update.new_price = this_weight * y + base_price
+            room_to_update.score_total = this_weight
+            room_to_update.feature_price = this_weight * y
+            room_to_update.save()
 
 
 # ========== FIRST YEARS IN BALLOT ===============

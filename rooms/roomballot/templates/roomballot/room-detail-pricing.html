@@ -1,0 +1,126 @@
+{% extends 'roomballot/base-student.html' %}
+
+{% block content %}
+
+<head>
+    <title>{{ room }} | Downing JCR RBS</title>
+</head>
+
+<div class="container">
+
+    <div class="border-bottom">
+        <div class="row">
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                <h2>{{ room }}</h2>
+                {% if room.taken_by is not None %}
+                    <p>This room has been taken by <a style="color: #990066;"
+                                                      href="/roomballot/student/{{ room.taken_by.user_id }}"><b>{{ room.taken_by }}</b></a>.
+                    </p>
+                {% elif room.type == 2 %}
+                    <p>This room is currently available for occupation.</p>
+                {% else %}
+                    <p>This room is reserved for students who are outside the JCR ballot.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col-md-6">
+            <table class="table table-bordered mt-4">
+                <thead>
+                <tr>
+                    <th scope="col">Feature</th>
+                    <th scope="col">Detail</th>
+                    <th scope="col">Weighted Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>Size</b></td>
+                    <td>{{ room.size }} m&#178;</td>
+                    <td>{{ room.score_size|stringformat:'0.2f' }}</td>
+                </tr>
+                {% if room.is_ensuite %}
+                    <tr>
+                        <td><b>Ensuite</b></td>
+                        <td>Yes</td>
+                        <td>{{ room.score_ensuite|stringformat:'0.2f' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td><b>Bathroom Ratio</b></td>
+                        <td>{{ room.bathroom_sharing }}:1</td>
+                        <td>{{ room.score_bathroom|stringformat:'0.2f' }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td><b>Double Bed</b></td>
+                    <td>
+                        {% if room.is_double_bed %}Yes
+                        {% else %}No{% endif %}
+                    </td>
+                    <td>{{ room.score_double_bed|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Renovated Room</b></td>
+                    <td>{{ room.get_renovated_display }}</td>
+                    <td>{{ room.score_renovated|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Renovated Facilities</b></td>
+                    <td>{{ room.staircase.get_renovated_display }}</td>
+                    <td>{{ room.score_renovated_facilities|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Facing Lensfield Road?</b></td>
+                    <td>{% if room.faces_lensfield %}Yes{% else %}No{% endif %}</td>
+                    <td>{{ room.score_facing_lensfield|stringformat:'0.2f' }}</td>
+                </tr>
+                {% if room.is_flat %}
+                    <tr>
+                        <td><b>Self-Contained</b></td>
+                        <td>{{ room.score_flat|stringformat:'0.2f' }}</td>
+                    </tr>
+                {% endif %}
+                <tr class="table-active">
+                    <td><b>TOTAL</b></td>
+                    <td></td>
+                    <td>{{ room.score_total|stringformat:'0.2f' }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered mt-4">
+                <thead style="display:none">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>Base Price</b></td>
+                    <td></td>
+                    <td>£{{ base_price|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>Feature Price</b></td>
+                    <td>{{ room.score_total|stringformat:'0.2f' }} x {{ y }}</td>
+                    <td>£{{ room.feature_price|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr class="table-active">
+                    <td><b>TOTAL</b></td>
+                    <td></td>
+                    <td><b>£{{ room.new_price|stringformat:'0.2f' }}</b></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
