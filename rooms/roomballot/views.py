@@ -529,7 +529,7 @@ def students_list(request):
 def rooms_list(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        rooms = Room.objects.order_by('new_price') #'staircase', 'sort_number') # TODO: change this back
+        rooms = Room.objects.order_by('new_price')  # 'staircase', 'sort_number') # TODO: change this back
         return render(request, 'roomballot/rooms-list.html', {'rooms': rooms})
     except AdminUser.DoesNotExist:
         return error(request, 403)
@@ -608,7 +608,8 @@ def export_room_data(request):
     writer = csv.writer(response)
     writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Weekly Price', 'Occupant', 'CRSid'])
     for r in Room.objects.order_by('staircase', 'sort_number'):
-        writer.writerow([r.room_id, r.staircase, r.room_number, r.get_type_display(), r.price, r.taken_by, r.taken_by.user_id if r.taken_by else None])
+        writer.writerow([r.room_id, r.staircase, r.room_number, r.get_type_display(), r.price, r.taken_by,
+                         r.taken_by.user_id if r.taken_by else None])
     return response
 
 
@@ -779,5 +780,56 @@ def analytics(request):
                                                              'mcr_fitted': mcr_fitted,
                                                              'total': total,
                                                              'new_total': new_total})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+
+
+# ============= CHANGE WEIGHTS ================
+# Admin page allowing easy changing of accommodation
+# pricing weight changes.
+
+def change_weights(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        if request.method == 'POST':
+            form = WeightsForm(request.POST)
+            if form.is_valid():
+                with transaction.atomic():
+                    settings['base_price'] = form.cleaned_data['base_price']
+                    settings['weight_ensuite'] = form.cleaned_data['weight_ensuite']
+                    settings['weight_bathroom'] = form.cleaned_data['weight_bathroom']
+                    settings['weight_double_bed'] = form.cleaned_data['weight_double_bed']
+                    settings['weight_size'] = form.cleaned_data['weight_size']
+                    settings['weight_renovated_room'] = form.cleaned_data['weight_renovated_room']
+                    settings['weight_renovated_facilities'] = form.cleaned_data['weight_renovated_facilities']
+                    settings['weight_flat'] = form.cleaned_data['weight_flat']
+                    settings['weight_facing_lensfield'] = form.cleaned_data['weight_facing_lensfield']
+                    settings['weight_facing_court'] = form.cleaned_data['weight_facing_court']
+                    settings['weight_ground_floor'] = form.cleaned_data['weight_ground_floor']
+                    settings['total'] = form.cleaned_data['total']
+                return HttpResponseRedirect('/roomballot/admin/change-weights')
+            elif request.POST.get('response') == '1':
+                generate_price()
+                return HttpResponse(json.dumps({'responseCode': 1}), content_type="application/json")
+        else:
+
+            return render(request, 'roomballot/change-weights.html', {'base_price': settings['base_price'],
+                                                                      'weight_ensuite': settings['weight_ensuite'],
+                                                                      'weight_bathroom': settings['weight_bathroom'],
+                                                                      'weight_double_bed': settings[
+                                                                          'weight_double_bed'],
+                                                                      'weight_size': settings['weight_size'],
+                                                                      'weight_renovated_room': settings[
+                                                                          'weight_renovated_room'],
+                                                                      'weight_renovated_facilities': settings[
+                                                                          'weight_renovated_facilities'],
+                                                                      'weight_flat': settings['weight_flat'],
+                                                                      'weight_facing_lensfield': settings[
+                                                                          'weight_facing_lensfield'],
+                                                                      'weight_facing_court': settings[
+                                                                          'weight_facing_court'],
+                                                                      'weight_ground_floor': settings[
+                                                                          'weight_ground_floor'],
+                                                                      'total': settings['total']})
     except AdminUser.DoesNotExist:
         return error(request, 403)

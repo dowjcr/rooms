@@ -1,0 +1,153 @@
+{% extends 'roomballot/base-admin.html' %}
+
+{% block title %}Change Weights | Downing JCR RBS{% endblock %}
+
+{% block content %}
+
+    <body>
+
+    <script>
+        $(document).ready(function () {
+                $.ajaxSetup({
+                    data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+                });
+
+                // Handle response received after POST request.
+                function HandleResponse(responseCode) {
+                    // Successfully created syndicate.
+                    if (responseCode === 1) {
+                        $('#modal-loading').modal('toggle');
+                        $('#modal-success').modal('toggle');
+                    }
+                    else location.assign('/roomballot/error/' + responseCode.toString());
+                }
+
+                // Called when the user clicks a button.
+                function CreateButtonAjaxResponse(code) {
+                    $.ajax({
+                        url: '/roomballot/admin/change-weights',
+                        type: 'POST',
+                        data: {'response': code},
+                        dataType: 'json',
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        success: function (response) {
+                            HandleResponse(response.responseCode);
+                        }
+                    });
+                }
+
+                $(function () {
+                    // When 'JCR Freshers' is clicked, send response.
+                    $('#generate-prices').click(function () {
+                        $('#modal-loading').modal('toggle');
+                        CreateButtonAjaxResponse(1);
+                    });
+                });
+            }
+        );
+    </script>
+
+    <div id="modal-loading" class="modal" role="dialog">
+        <h2>Generating prices...</h2>
+        <p>Hang on tight, this will only take a few seconds.</p>
+    </div>
+
+    <div id="modal-success" class="modal" role="dialog">
+        <h2>Success</h2>
+        <p>Successfully generated prices.</p>
+        <a href="#" rel="modal:close" class="btn btn-primary">Close</a>
+    </div>
+
+    <div id="modal-success-weights" class="modal" role="dialog">
+        <h2>Success</h2>
+        <p>Successfully updated feature weights.</p>
+        <a href="#" rel="modal:close" class="btn btn-primary">Close</a>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <form class="mb-5" method="post">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="base_price" class="col-sm-5 col-form-label">Base Price</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="base_price" style="max-width: 300px;"
+                           name="base_price" value="{{ base_price }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_ensuite" class="col-sm-5 col-form-label">Weight Ensuite</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_ensuite"
+                           style="max-width: 300px;" name="weight_ensuite" value="{{ weight_ensuite }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_bathroom" class="col-sm-5 col-form-label">Weight Bathroom Sharing</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_bathroom"
+                           style="max-width: 300px;" name="weight_bathroom" value="{{ weight_bathroom }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_double_bed" class="col-sm-5 col-form-label">Weight Double Bed</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_double_bed"
+                           style="max-width: 300px;" name="weight_double_bed" value="{{ weight_double_bed }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_size" class="col-sm-5 col-form-label">Weight Size</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_size" style="max-width: 300px;"
+                           name="weight_size" value="{{ weight_size }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_renovated_room" class="col-sm-5 col-form-label">Weight Renovated Room</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_renovated_room"
+                           style="max-width: 300px;" name="weight_renovated_room" value="{{ weight_renovated_room }}"
+                           required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_renovated_facilities" class="col-sm-5 col-form-label">Weight Renovated
+                        Facilities</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_renovated_facilities"
+                           style="max-width: 300px;" name="weight_renovated_facilities"
+                           value="{{ weight_renovated_facilities }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_flat" class="col-sm-5 col-form-label">Weight Self-Contained</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_flat"
+                           style="max-width: 300px;" name="weight_flat" value="{{ weight_flat }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_facing_lensfield" class="col-sm-5 col-form-label">Weight Facing Lensfield</label>
+                    <input type="number" class="form-control col-sm-10 ml-3" id="weight_facing_lensfield"
+                           style="max-width: 300px;" name="weight_facing_lensfield"
+                           value="{{ weight_facing_lensfield }}" required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_facing_court" class="col-sm-5 col-form-label">Weight Facing Court</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_facing_court"
+                           style="max-width: 300px;" name="weight_facing_court" value="{{ weight_facing_court }}"
+                           required>
+                </div>
+                <div class="form-group row">
+                    <label for="weight_ground_floor" class="col-sm-5 col-form-label">Weight Ground Floor</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="weight_ground_floor"
+                           style="max-width: 300px;" name="weight_ground_floor" value="{{ weight_ground_floor }}"
+                           required>
+                </div>
+                <div class="form-group row">
+                    <label for="total" class="col-sm-5 col-form-label">Total Income Required</label>
+                    <input type="number" class="form-control col-sm-6 ml-3" id="total"
+                           style="max-width: 300px;" name="total" value="{{ total }}" required>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="jumbotron">
+                <h3 class="mb-3">Tasks</h3>
+                {% if not in_progress %}
+                    <button class="btn btn-primary mb-3" id="generate-prices">Generate Prices</button>
+                {% endif %}
+            </div>
+
+        </div>
+
+{% endblock %}
