@@ -142,7 +142,7 @@ class Room(models.Model):
     score_double_bed = models.FloatField(editable=False, default=0)
     score_renovated = models.FloatField(editable=False, default=0)
     score_renovated_facilities = models.FloatField(editable=False, default=0)
-    score_bathroom = models.FloatField(editable=False, default=0)
+    score_bathroom = models.FloatField(editable=False, default=2)
     score_flat = models.FloatField(editable=False, default=0)
     score_facing_lensfield = models.FloatField(editable=False, default=0)
     score_size = models.FloatField(editable=False, default=0)

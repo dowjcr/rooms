@@ -795,18 +795,53 @@ def change_weights(request):
             form = WeightsForm(request.POST)
             if form.is_valid():
                 with transaction.atomic():
-                    settings['base_price'] = form.cleaned_data['base_price']
-                    settings['weight_ensuite'] = form.cleaned_data['weight_ensuite']
-                    settings['weight_bathroom'] = form.cleaned_data['weight_bathroom']
-                    settings['weight_double_bed'] = form.cleaned_data['weight_double_bed']
-                    settings['weight_size'] = form.cleaned_data['weight_size']
-                    settings['weight_renovated_room'] = form.cleaned_data['weight_renovated_room']
-                    settings['weight_renovated_facilities'] = form.cleaned_data['weight_renovated_facilities']
-                    settings['weight_flat'] = form.cleaned_data['weight_flat']
-                    settings['weight_facing_lensfield'] = form.cleaned_data['weight_facing_lensfield']
-                    settings['weight_facing_court'] = form.cleaned_data['weight_facing_court']
-                    settings['weight_ground_floor'] = form.cleaned_data['weight_ground_floor']
-                    settings['total'] = form.cleaned_data['total']
+                    base_price = Setting.objects.get(key='base_price')
+                    base_price.value = form.cleaned_data['base_price']
+                    base_price.save()
+
+                    weight_ensuite = Setting.objects.get(key='weight_ensuite')
+                    weight_ensuite.value = form.cleaned_data['weight_ensuite']
+                    weight_ensuite.save()
+
+                    weight_bathroom = Setting.objects.get(key='weight_bathroom')
+                    weight_bathroom.value = form.cleaned_data['weight_bathroom']
+                    weight_bathroom.save()
+
+                    weight_double_bed = Setting.objects.get(key='weight_double_bed')
+                    weight_double_bed.value = form.cleaned_data['weight_double_bed']
+                    weight_double_bed.save()
+
+                    weight_size = Setting.objects.get(key='weight_size')
+                    weight_size.value = form.cleaned_data['weight_size']
+                    weight_size.save()
+
+                    weight_renovated_room = Setting.objects.get(key='weight_renovated_room')
+                    weight_renovated_room.value = form.cleaned_data['weight_renovated_room']
+                    weight_renovated_room.save()
+
+                    weight_renovated_facilities = Setting.objects.get(key='weight_renovated_facilities')
+                    weight_renovated_facilities.value = form.cleaned_data['weight_renovated_facilities']
+                    weight_renovated_facilities.save()
+
+                    weight_flat = Setting.objects.get(key='weight_flat')
+                    weight_flat.value = form.cleaned_data['weight_flat']
+                    weight_flat.save()
+
+                    weight_facing_lensfield = Setting.objects.get(key='weight_facing_lensfield')
+                    weight_facing_lensfield.value = form.cleaned_data['weight_facing_lensfield']
+                    weight_facing_lensfield.save()
+
+                    weight_facing_court = Setting.objects.get(key='weight_facing_court')
+                    weight_facing_court.value = form.cleaned_data['weight_facing_court']
+                    weight_facing_court.save()
+
+                    weight_ground_floor = Setting.objects.get(key='weight_ground_floor')
+                    weight_ground_floor.value = form.cleaned_data['weight_ground_floor']
+                    weight_ground_floor.save()
+
+                    total = Setting.objects.get(key='total')
+                    total.value = form.cleaned_data['total']
+                    total.save()
                 return HttpResponseRedirect('/roomballot/admin/change-weights')
             elif request.POST.get('response') == '1':
                 generate_price()

@@ -118,6 +118,7 @@
             <div class="col-md-12">
                 <div class="border-bottom mb-4 mt-3"><h3>Reviews</h3></div>
                 {% for review in reviews %}
+                    <div class="d-none d-md-block">
                     <div class="row mb-5">
                         <div class="col-md-4">
                             <div class="row mb-2">
@@ -195,6 +196,83 @@
                         </div>
                         <div class="col-md-8">
                             <h4>{{ review.title }}</h4>
+                            <p>{{ review.text }}</p>
+                            <p><i>{{ review.author_name }}</i></p>
+
+                        </div>
+                    </div>
+                    </div>
+                    <div class="row mb-5 d-md-none">
+                        <div class="col-md-12">
+                            <h4>{{ review.title }}</h4>
+                            <table class="table mt-4 table-borderless table-sm">
+                                <tr>
+                                    <td><h5>Overall Rating</h5></td>
+                                    <td>
+                                        {% if review.overall_rating == 1 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.overall_rating == 2 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.overall_rating == 3 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.overall_rating == 4 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.overall_rating == 5 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h6>Layout</h6></td>
+                                    <td>
+                                        {% if review.layout_rating == 1 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.layout_rating == 2 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.layout_rating == 3 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.layout_rating == 4 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.layout_rating == 5 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h6>Facilities</h6></td>
+                                    <td>
+                                        {% if review.facilities_rating == 1 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.facilities_rating == 2 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.facilities_rating == 3 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.facilities_rating == 4 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.facilities_rating == 5 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h6>Noise</h6></td>
+                                    <td>
+                                        {% if review.noise_rating == 1 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.noise_rating == 2 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.noise_rating == 3 %}
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.noise_rating == 4 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-o"></i>
+                                    {% elif review.noise_rating == 5 %}
+                                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
                             <p>{{ review.text }}</p>
                             <p><i>{{ review.author_name }}</i></p>
 
