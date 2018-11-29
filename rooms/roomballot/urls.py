@@ -18,6 +18,7 @@ urlpatterns = [
     path('admin/status', views.status, name='status'),
     path('admin/syndicate/<int:syndicate_id>', views.manage_syndicate, name='manage-syndicate'),
     path('admin/syndicates', views.syndicates_list, name='syndicates-list'),
+    path('admin/create-syndicate', views.create_syndicate_admin, name='create-syndicate-admin'),
     path('admin/students', views.students_list, name='students-list'),
     path('admin/rooms', views.rooms_list, name='rooms-list'),
     path('admin/room/<str:room_id>', views.manage_room, name='manage-room'),

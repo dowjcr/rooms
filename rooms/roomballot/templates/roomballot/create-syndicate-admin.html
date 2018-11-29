@@ -1,0 +1,135 @@
+{% extends 'roomballot/base-admin.html' %}
+
+{% block content %}
+
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+
+        $(document).ready(function () {
+
+            // Defining CSRF token.
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            });
+
+            // Students' CRSids who have been added to syndicate.
+            var members = [];
+            var membersCount = 0;
+
+            // Handle response received after POST request.
+            function HandleResponse(responseCode, newSyndicateId) {
+                // Successfully created syndicate.
+                if (responseCode === 1) location.replace('/roomballot/admin/syndicate/' + newSyndicateId.toString());
+                else location.assign('/roomballot/error/' + responseCode.toString());
+            }
+
+            // Called when the user confirms they have inputted all members.
+            // Sends POST to create_syndicate view, which executes method.
+            function CreateSyndicateAjaxResponse() {
+                $.ajax({
+                    url: '/roomballot/admin/create-syndicate',
+                    type: 'POST',
+                    data: {'crsids': members},
+                    dataType: 'json',
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    success: function (response) {
+                        HandleResponse(response.responseCode, response.newSyndicateId);
+                    }
+                });
+            }
+
+            $(function () {
+
+                // Generate JSON of students who can be added to this syndicate.
+                var availableStudents = [
+                    {% for st in students %}
+                        {% if student != st %}
+                            {
+                                value: "{{ st.user_id }}",
+                                label: "{{ st.first_name }} {{ st.surname }} ({{ st.user_id }})"
+                            }
+                            {% if not forloop.last %},{% endif %}
+                        {% endif %}
+                    {% endfor %}
+                ];
+
+                // Set parameters of autocomplete field.
+                $('#student').autocomplete({
+                    source: availableStudents,
+                    select: function (event, ui) {
+                        let box = $('#student');
+                        $('#members').append('<br>' + ui.item.label);
+                        members.push(ui.item.value);
+                        membersCount++;
+                        // If syndicate is now full.
+                        if (membersCount === 6) {
+                            box.val("Maximum Size Reached");
+                            box.attr('disabled', true);
+                            box.autocomplete({source: null});
+                            return false;
+                        } else {
+                            box.val("");
+                            // Remove this student from those available to be added.
+                            availableStudents = availableStudents.filter(function (jsonObject) {
+                                return jsonObject.value !== ui.item.value;
+                            });
+                            box.autocomplete({source: availableStudents});
+                            return false;
+                        }
+                    }
+                });
+            });
+
+            // When 'continue' button is clicked, send response.
+            $('#continue').click(function () {
+                CreateSyndicateAjaxResponse();
+            });
+
+            $('#restart').click(function () {
+                location.reload();
+            })
+        });
+    </script>
+
+    <head>
+        <title>Create Syndicate | Downing JCR RBS</title>
+    </head>
+
+
+        <div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xl-12">
+                    <h2>Create Syndicate</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <p>
+                A syndicate can comprise a maximum of <b>6</b> people.<br>
+                To add a student to the syndicate, search for them in the box below.<br>
+                When you're done, click Create.
+            </p>
+            <div class="ui-widget mb-2">
+                <input id="student" style="width: 80%"><br>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <div class="jumbotron">
+                <h3>Syndicate Members</h3>
+                <p id="members">
+            </div>
+
+            <div align="right">
+                <button class="btn btn-primary" id="restart">Start Again</button>
+                <button class="btn btn-primary" id="continue">Create</button>
+            </div>
+        </div>
+
+        </div>
+
+
+{% endblock %}

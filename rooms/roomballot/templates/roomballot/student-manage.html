@@ -67,7 +67,7 @@
                     {% for s in syndicates %}
                         {
                             value: "{{ s.syndicate_id }}",
-                            label: "{{ s.syndicate_id }}"
+                            label: "{{ s.syndicate_id }} (Owner {{ s.owner_id }})"
                         }
                         {% if not forloop.last %},{% endif %}
                     {% endfor %}

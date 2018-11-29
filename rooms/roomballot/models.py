@@ -135,7 +135,7 @@ class Room(models.Model):
     staircase = models.ForeignKey(Staircase, on_delete=models.SET_DEFAULT, default=None)
     band = models.ForeignKey(Band, on_delete=models.SET_DEFAULT, default=None, null=True)
     type = models.IntegerField(choices=TYPE_CHOICES)
-    taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, null=True, editable=False, default=None)
+    taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, editable=False, null=True, default=None)
     price = models.IntegerField(editable=False, default=0)
     new_price = models.FloatField(default=0)
     score_ensuite = models.FloatField(editable=False, default=0)

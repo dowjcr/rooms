@@ -499,6 +499,33 @@ def manage_syndicate(request, syndicate_id):
         return error(request, 403)
 
 
+# ========= CREATE SYNDICATE ADMIN ============
+# Allows admin user to create a new syndicate.
+
+def create_syndicate_admin(request):
+    try:
+        AdminUser.objects.get(user_id=request.user.username)
+        if request.method == 'POST':
+            usernames = request.POST.getlist('crsids[]')
+            syndicate_id = 0
+            try:
+                syndicate_id = create_new_syndicate(usernames, usernames[0])
+                response_code = 1
+            except ConcurrencyException:
+                response_code = 901
+            except BallotInProgressException:
+                response_code = 907
+            return HttpResponse(json.dumps({'responseCode': response_code, 'newSyndicateId': syndicate_id}),
+                                content_type="application/json")
+        else:
+            return render(request, 'roomballot/create-syndicate-admin.html', {'students': Student.objects.filter(syndicate=None,
+                                                                                                                 in_ballot=True)})
+    except AdminUser.DoesNotExist:
+        return error(request, 403)
+    except BallotInProgressException:
+        return error(request, 907)
+
+
 # ============= SYNDICATES LIST ===============
 # Admin page listing all syndicates.
 

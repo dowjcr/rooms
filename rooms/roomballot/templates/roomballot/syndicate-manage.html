@@ -87,6 +87,10 @@
                     <td>{{ syndicate.owner_id }}</td>
                 </tr>
                 <tr>
+                    <td><b>Year</b></td>
+                    <td>{{ syndicate.get_year_display }}</td>
+                </tr>
+                <tr>
                     <td><b>Syndicate Complete?</b></td>
                     <td>{% if syndicate.complete %}Yes{% else %}No{% endif %}</td>
                 </tr>

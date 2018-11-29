@@ -8,7 +8,13 @@ Author Cameron O'Connor.
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from .models import Student, Review, Room
+import logging
 FROM_EMAIL = "Downing JCR <no-reply@downingjcr.co.uk>"
+LOG_FILE = 'roomballot.log'
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 # ============ INVITE SELECTION ==================
@@ -21,6 +27,7 @@ def invite_selection(student):
     html_message = render_to_string('roomballot/emails/selection-invite.html', {'student': student})
     message = "Time to select your room! Go to https://ballot.downingjcr.co.uk now."
     send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+    logger.info("Invited selection [" + student.user_id + "]")
 
 
 # ============ INVITE SYNDICATE ==================
@@ -36,6 +43,7 @@ def invite_syndicate(syndicate):
         html_message = render_to_string('roomballot/emails/syndicate-invite.html', {'student': student})
         message = "You've been invited to a syndicate! Go to https://ballot.downingjcr.co.uk to respond to the invite."
         send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info("Invited to syndicate [" + student.user_id + "]")
 
 
 # ============ COMPLETED SYNDICATE ================
@@ -50,6 +58,7 @@ def completed_syndicate(syndicate):
         html_message = render_to_string('roomballot/emails/syndicate-complete.html', {'student': student})
         message = "Hey! Your syndicate is complete, great job! You can view it at https://ballot.downingjcr.co.uk."
         send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info("Notified syndicate complete [" + student.user_id + "]")
 
 
 # ============ FAILED SYNDICATE ================
@@ -67,6 +76,7 @@ def failed_syndicate(syndicate):
         a new syndicate, visit https://ballot.downingjcr.co.uk.
         """
         send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info("Notified syndicate failed [" + student.user_id + "]")
 
 
 # ============= ROOM SELECTED =================
@@ -83,6 +93,7 @@ def selected_room(student, room):
     by visiting https://ballot.downingjcr.co.uk.
     """
     send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+    logger.info("Notified room allocated [" + student.user_id + "]")
 
 
 # ============= INVITE REVIEW =================
@@ -99,6 +110,7 @@ def invite_review():
         visit https://ballot.downingjcr.co.uk.
         """
         send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info("Initial review invite [" + student.user_id + "]")
 
 
 # ============= REMIND REVIEW =================
@@ -119,6 +131,7 @@ def remind_review():
                 visit https://ballot.downingjcr.co.uk.
                 """
                 send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+                logger.info("Reminded to leave review [" + student.user_id + "]")
         except Room.DoesNotExist:
             return
 
@@ -132,3 +145,4 @@ def confirm_review(student):
     html_message = render_to_string('roomballot/emails/review-confirmation.html', {'student': student})
     message = "Thanks for reviewing your room! We appreciate you :)"
     send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+    logger.info("Acknowledged review left [" + student.user_id + "]")

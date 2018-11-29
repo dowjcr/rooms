@@ -12,19 +12,28 @@ from django.db import transaction
 from ibisclient import *
 
 settings = ModelDict(Setting, key='key', value='value', instances=False)
+LOG_FILE = 'roomballot.log'
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 class ConcurrencyException(Exception):
     pass
 
+
 class BallotInProgressException(Exception):
     pass
+
 
 class NotReadyToRandomiseException(Exception):
     pass
 
+
 class StudentAlreadyExistsException(Exception):
     pass
+
 
 class InvalidIdentifierException(Exception):
     pass
@@ -43,11 +52,11 @@ def allocate_room(room, student):
             room_to_update = Room.objects.select_for_update().get(room_id=room.room_id)
             room_to_update.taken_by = student
             room_to_update.save()
-        with transaction.atomic():
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             student_to_update.has_allocated = True
             student_to_update.save()
-        selected_room(student, room)
+            selected_room(student, room)
+            logger.info("Selected room [" + student.user_id + "] [Room" + str(room.room_id) + "]")
 
 
 # ============= DEALLOCATE ROOM ==================
@@ -62,11 +71,12 @@ def deallocate_room(student):
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             student_to_update.has_allocated = False
             student_to_update.save()
-        with transaction.atomic():
+            logger.info("Deallocating room - updated student [" + student.user_id + "]")
             try:
                 room_to_update = Room.objects.select_for_update().get(taken_by=student)
                 room_to_update.taken_by = None
                 room_to_update.save()
+                logger.info("Deallocating room - updated room [" + str(room_to_update.room_id) + "]")
             except Room.DoesNotExist:
                 raise ConcurrencyException()
 
@@ -75,7 +85,6 @@ def deallocate_room(student):
 # Takes all rooms and generates their price.
 
 def generate_price():
-
     # Counts - contain number of accommodation weeks with that feature.
     count_ensuite = 0
     count_double_bed = 0
@@ -132,10 +141,10 @@ def generate_price():
 
     # x = Weighted feature weeks.
     x = (weight_ensuite * count_ensuite) + (weight_double_bed * count_double_bed) + (weight_size * count_size) + \
-            (weight_bathroom * count_bathroom) + (weight_renovated_room * count_renovated_room) + \
-            (weight_renovated_facilities * count_renovated_facilities) + (weight_flat * count_flat) + \
-            (weight_facing_lensfield * count_facing_lensfield) + (weight_facing_court * count_facing_court) + \
-            (weight_ground_floor * count_ground_floor)
+        (weight_bathroom * count_bathroom) + (weight_renovated_room * count_renovated_room) + \
+        (weight_renovated_facilities * count_renovated_facilities) + (weight_flat * count_flat) + \
+        (weight_facing_lensfield * count_facing_lensfield) + (weight_facing_court * count_facing_court) + \
+        (weight_ground_floor * count_ground_floor)
 
     # y = Feature cost per week.
     y = (total - base_price * accommodation_weeks) / x
@@ -288,6 +297,7 @@ def randomise_order():
                 syndicate.save()
                 current_rank_syndicate += 1
             settings['randomised'] = 'true'
+            logger.info("Successfully randomised order")
         generate_times()
     else:
         raise BallotInProgressException()
@@ -310,18 +320,22 @@ def advance_year():
                 student.picks_at = None
                 student.year = 3
                 student.save()
+                logger.info("Moved student to year 3 [" + student.user_id + "]")
             second_year_syndicates = Syndicate.objects.select_for_update().filter(year=2)
             for syndicate in second_year_syndicates:
                 syndicate.year = 3
                 syndicate.save()
+                logger.info("Moved syndicate to year 3 [" + str(syndicate.syndicate_id) + "]")
             # Now convert rankings and update year attributes.
-            ranked_first_year_students = Student.objects.select_for_update().filter(year=1, in_ballot=True).order_by('-rank')
+            ranked_first_year_students = Student.objects.select_for_update().filter(year=1, in_ballot=True).order_by(
+                '-rank')
             current_rank_student = 1
             for student in ranked_first_year_students:
                 student.rank = current_rank_student
                 student.year = 2
                 current_rank_student += 1
                 student.save()
+                logger.info("Moved student from first to second year [" + student.user_id + "]")
             ranked_first_year_syndicates = Syndicate.objects.select_for_update().filter(year=1).order_by('-rank')
             current_rank_syndicate = 1
             for syndicate in ranked_first_year_syndicates:
@@ -329,6 +343,7 @@ def advance_year():
                 syndicate.year = 2
                 current_rank_syndicate += 1
                 syndicate.save()
+                logger.info("Moved syndicate from first to second year [" + str(syndicate.syndicate_id) + "]")
     else:
         raise BallotInProgressException()
 
@@ -351,23 +366,28 @@ def remove_from_ballot(student):
             number_in_ballot = get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
             # Now decrease rank of all subsequent students.
             if student_rank is not None:
-                for rank in range(student_rank+1, number_in_ballot+1):
+                for rank in range(student_rank + 1, number_in_ballot + 1):
                     st = Student.objects.select_for_update().get(rank=rank)
                     st.rank -= 1
                     st.save()
+                logger.info("Removing from ballot - updated succeeding students [" + student.user_id + "]")
             if student_syndicate is not None:
                 # If syndicate is now empty, delete it and update ranks.
                 if get_syndicate_size(student_syndicate) == 0:
                     syndicate_rank = student_syndicate.rank
                     student_syndicate.delete()
+                    logger.info("Removing from ballot - deleted syndicate [" + str(student_syndicate.syndicate_id) + "]")
                     if syndicate_rank is not None:
-                        for rank in range(syndicate_rank+1, get_num_syndicates()+2):
+                        for rank in range(syndicate_rank + 1, get_num_syndicates() + 2):
                             sy = Syndicate.objects.select_for_update().get(rank=rank)
                             sy.rank -= 1
                             sy.save()
+                        logger.info("Removing from ballot - updated succeeding syndicates")
                 else:
                     if student_syndicate.owner_id == student.user_id:
                         reallocate_syndicate_owner(student_syndicate)
+                        logger.info(
+                            "Removing from ballot - reallocated syndicate owner [" + str(student_syndicate.syndicate_id) + "]")
                     # Check if syndicate complete, and update if necessary.
                     complete = True
                     for student in Student.objects.filter(syndicate=student_syndicate):
@@ -376,6 +396,7 @@ def remove_from_ballot(student):
                             break
                     student_syndicate.complete = complete
                     student_syndicate.save()
+                    logger.info("Removing from ballot - succeeded [" + student.user_id + "]")
     else:
         raise BallotInProgressException()
 
@@ -394,7 +415,7 @@ def add_to_syndicate(student, syndicate):
             # Increments the student rank of all students in subsequent syndicates.
             if syndicate_rank is not None:
                 new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-                for rank in range(syndicate_rank+1, get_num_syndicates()+1):
+                for rank in range(syndicate_rank + 1, get_num_syndicates() + 1):
                     sy = Syndicate.objects.get(rank=rank)
                     for st in Student.objects.select_for_update().filter(syndicate=sy):
                         new_rank = min(new_rank, st.rank)
@@ -405,6 +426,8 @@ def add_to_syndicate(student, syndicate):
             student_to_update.save()
             syndicate_to_update.complete = False
             syndicate_to_update.save()
+            logger.info(
+                "Added student to syndicate [" + student.user_id + "] [Syndicate " + str(syndicate.syndicate_id) + "]")
     else:
         raise BallotInProgressException()
 
@@ -422,7 +445,8 @@ def create_new_syndicate(student_ids, owner_id):
         else:
             with transaction.atomic():
                 syndicate = Syndicate()
-                syndicate.year = 1
+                year = Student.objects.get(user_id=owner_id).year
+                syndicate.year = year
                 syndicate.owner_id = owner_id
                 if len(student_ids) == 1:
                     syndicate.complete = True
@@ -430,7 +454,7 @@ def create_new_syndicate(student_ids, owner_id):
                 syndicate.save()
                 for student_id in student_ids:
                     student = Student.objects.select_for_update().get(user_id=student_id)
-                    if student.syndicate is not None or student.accepted_syndicate:
+                    if student.syndicate is not None or student.accepted_syndicate or student.year != year:
                         # If we get to a student who already has a syndicate
                         dissolve_syndicate(syndicate)
                         student.save()
@@ -442,7 +466,9 @@ def create_new_syndicate(student_ids, owner_id):
                 owner = Student.objects.select_for_update().get(user_id=owner_id)
                 owner.accepted_syndicate = True
                 owner.save()
-            invite_syndicate(syndicate)
+                logger.info("Created new syndicate [" + str(syndicate.syndicate_id) + "]")
+            # invite_syndicate(syndicate)
+            return syndicate.syndicate_id
     else:
         raise BallotInProgressException()
 
@@ -455,14 +481,16 @@ def dissolve_syndicate(syndicate):
     if settings['ballot_in_progress'] == 'true':
         raise BallotInProgressException()
     else:
-        #failed_syndicate(syndicate)
+        # failed_syndicate(syndicate)
         with transaction.atomic():
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
             for student in Student.objects.select_for_update().filter(syndicate=syndicate_to_update):
                 student.syndicate = None
                 student.accepted_syndicate = False
                 student.save()
+            id = syndicate_to_update.syndicate_id
             syndicate_to_update.delete()
+            logger.info("Deleted syndicate [" + str(id) + "]")
 
 
 # ============= ACCEPT SYNDICATE =================
@@ -478,6 +506,7 @@ def accept_syndicate(student):
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             student_to_update.accepted_syndicate = True
             student_to_update.save()
+            logger.info("Student accepted syndicate [" + student.user_id + "]")
             syndicate = Syndicate.objects.select_for_update().get(syndicate_id=student_to_update.syndicate.syndicate_id)
             accepted = True
             for s in Student.objects.filter(syndicate=syndicate):
@@ -506,6 +535,7 @@ def decline_syndicate(student):
                 student.syndicate = None
                 student.accepted_syndicate = False
                 student.save()
+                logger.info("Decline syndicate - student removed [" + student.user_id + "]")
             failed_syndicate(syndicate)
             syndicate.delete()
 
@@ -522,6 +552,7 @@ def reallocate_syndicate_owner(syndicate):
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
             syndicate_to_update.owner_id = students[0].user_id
             syndicate_to_update.save()
+            logger.info("Reallocated syndicate owner [" + str(syndicate.syndicate_id) + "]")
     else:
         raise BallotInProgressException()
 
@@ -543,20 +574,23 @@ def generate_times():
         # Generate times for second years.
         dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M")
         with transaction.atomic():
-            second_years = Student.objects.select_for_update().filter(year=2, in_ballot=True).exclude(rank=None).order_by('rank')
+            second_years = Student.objects.select_for_update().filter(year=2, in_ballot=True).exclude(
+                rank=None).order_by('rank')
             for student in second_years:
                 student.picks_at = dt
                 student.save()
-                dt += datetime.timedelta(0,300)
+                dt += datetime.timedelta(0, 300)
 
         # Generate times for first years.
         dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M") + datetime.timedelta(1)
         with transaction.atomic():
-            first_years = Student.objects.select_for_update().filter(year=1, in_ballot=True).exclude(rank=None).order_by('rank')
+            first_years = Student.objects.select_for_update().filter(year=1, in_ballot=True).exclude(
+                rank=None).order_by('rank')
             for student in first_years:
                 student.picks_at = dt
                 student.save()
                 dt += datetime.timedelta(0, 300)
+            logger.info("Successfully generated times")
     else:
         raise BallotInProgressException()
 
@@ -576,6 +610,7 @@ def update_current_student():
         try:
             student_picking = Student.objects.get(picks_at=slot_datetime)
             settings['current_student'] = student_picking.user_id
+            logger.info("Updated currently picking student [" + student_picking.user_id + "]")
         except Student.DoesNotExist:
             settings['current_student'] = None
 
@@ -605,6 +640,7 @@ def populate_student(crsid):
                 s.picks_at = None
                 s.name_set = False
                 s.save()
+                logger.info("Added student [" + s.user_id + "]")
         else:
             raise StudentAlreadyExistsException()
     else:
@@ -620,9 +656,10 @@ def send_to_bottom(student):
         raise ConcurrencyException()
     else:
         students_above = Student.objects.filter(year=student.year).exclude(user_id=student.user_id).order_by('picks_at')
-        last_student_time = students_above[students_above.count()-1].picks_at
-        new_time = last_student_time + datetime.timedelta(0,300)
+        last_student_time = students_above[students_above.count() - 1].picks_at
+        new_time = last_student_time + datetime.timedelta(0, 300)
         with transaction.atomic():
             s = Student.objects.select_for_update().get(user_id=student.user_id)
             s.picks_at = new_time
             s.save()
+            logger.info("Sent student to bottom of ballot [" + s.user_id + "]")
