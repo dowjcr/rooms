@@ -4,11 +4,11 @@ Defines some methods to send email notifications to users.
 Author Cameron O'Connor.
 """
 
-
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from .models import Student, Review, Room
 import logging
+
 FROM_EMAIL = "Downing JCR <no-reply@downingjcr.co.uk>"
 LOG_FILE = 'roomballot.log'
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
@@ -118,22 +118,20 @@ def invite_review():
 # room.
 
 def remind_review():
-    for student in Student.objects.all():
-        try:
-            room = Room.objects.get(taken_by=student)
-            reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
-            if reviews_left.count() == 0:
-                subject = student.first_name + ", review your room!"
-                recipient_list = [student.user_id + "@cam.ac.uk"]
-                html_message = render_to_string('roomballot/emails/review-room-reminder.html', {'student': student})
-                plain_message = """
+    for room in Room.objects.exclude(taken_by=None):
+        student = room.taken_by
+        reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
+        if reviews_left.count() == 0:
+            subject = student.first_name + ", review your room!"
+            recipient_list = [student.user_id + "@cam.ac.uk"]
+            html_message = render_to_string('roomballot/emails/review-room-reminder.html', {'student': student})
+            plain_message = """
                 Hey, Downing JCR here. Looks like you haven't reviewed your room yet! Please
                 visit https://ballot.downingjcr.co.uk.
                 """
-                send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
-                logger.info("Reminded to leave review [" + student.user_id + "]")
-        except Room.DoesNotExist:
-            return
+            send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+            logger.info("Reminded to leave review [" + student.user_id + "]")
+
 
 # ============= CONFIRM REVIEW ================
 # Sends an email thanking the user for leaving
