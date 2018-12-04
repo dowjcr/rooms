@@ -196,7 +196,7 @@
                         </div>
                         <div class="col-md-8">
                             <h4>{{ review.title }}</h4>
-                            <p>{{ review.text }}</p>
+                            <p>{{ review.text|linebreaks }}</p>
                             <p><i>{{ review.author_name }}</i></p>
 
                         </div>
@@ -273,7 +273,7 @@
                             </table>
                         </div>
                         <div class="col-md-12">
-                            <p>{{ review.text }}</p>
+                            <p>{{ review.text|linebreaks }}</p>
                             <p><i>{{ review.author_name }}</i></p>
 
                         </div>
