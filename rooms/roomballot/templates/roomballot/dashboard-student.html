@@ -19,10 +19,11 @@
                 <h3>Your Room</h3>
                 {% if student.has_allocated %}
                     <p>You have chosen {{ room }}.</p>
-                    <a href="room/{{ room.room_id }}" class="btn btn-primary mr-1">View Room</a>
+                    <a href="room/{{ room.room_id }}" class="btn btn-primary mr-1">View Room <i class="fas fa-angle-right ml-2"></i></a>
+                    <div class="d-md-block d-lg-none mb-2"></div>
                     {% if can_leave_review %}
-                    <a href="/roomballot/dashboard/review" class="btn btn-primary mr-1">Leave Review</a>
-                        <div class="d-block d-sm-none mb-2"></div>
+                    <a href="/roomballot/dashboard/review" class="btn btn-primary mr-1">Leave Review <i class="fas fa-angle-right ml-2"></i></a>
+                        <div class="d-block d-xl-none mb-2"></div>
                     {% endif %}
                 {% else %}
                     {% if can_pick %}
@@ -31,7 +32,7 @@
                         <p>You can't pick your room quite yet.</p>
                     {% endif %}
                 {% endif %}
-                <a href="staircases" class="btn btn-primary">Browse Rooms</a>
+                <a href="staircases" class="btn btn-primary">Browse Rooms <i class="fas fa-angle-right ml-2"></i></a>
             </div>
         </div>
 
@@ -43,18 +44,18 @@
                         {% if not student.syndicate.complete %}
                             <p>Great news! You've accepted your syndicate. We're still waiting on other people to
                                 accept.</p>
-                            <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate</a>
+                            <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate <i class="fas fa-angle-right ml-2"></i></a>
                         {% else %}
                             <p>Great news! Your syndicate is complete.</p>
-                            <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate</a>
+                            <a href="dashboard/syndicate" class="btn btn-primary">View Syndicate <i class="fas fa-angle-right ml-2"></i></a>
                         {% endif %}
                     {% else %}
                         {% if student.syndicate == None and student.year == 1 %}
                             <p>You haven't created, or been invited to, a syndicate yet.</p>
-                            <a href="dashboard/create-syndicate" class="btn btn-primary">Create Syndicate</a>
+                            <a href="dashboard/create-syndicate" class="btn btn-primary">Create Syndicate <i class="fas fa-angle-right ml-2"></i></a>
                         {% elif student.syndicate != None and student.year == 1 %}
                             <p>You've been invited to a syndicate. Accept the invite now!</p>
-                            <a href="dashboard/syndicate" class="btn btn-primary">Accept Invite</a>
+                            <a href="dashboard/syndicate" class="btn btn-primary">Accept Invite <i class="fas fa-angle-right ml-2"></i></a>
                         {% endif %}
                     {% endif %}
                 {% else %}
@@ -75,7 +76,7 @@
                             {% if student.picks_at is not None %}
                                 You'll pick your room on {{ student.picks_at }}
                             {% endif %}</p>
-                        <a href="ranking" class="btn btn-primary">View Ranking</a>
+                        <a href="ranking" class="btn btn-primary">View Ranking <i class="fas fa-angle-right ml-2"></i></a>
                     {% endif %}
                 {% else %}
                     <p>You've been removed from the ballot.</p>
@@ -87,7 +88,7 @@
             <div class="jumbotron">
                 <h3>Support</h3>
                     <p>Have some questions about the ballot process?</p>
-                    <a href="/roomballot/info" class="btn btn-primary">Knowledge Base</a>
+                    <a href="/roomballot/info" class="btn btn-primary">Knowledge Base <i class="fas fa-angle-right ml-2"></i></a>
 
             </div>
         </div>

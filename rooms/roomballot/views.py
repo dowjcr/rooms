@@ -27,11 +27,7 @@ def room_detail(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     reviews = Review.objects.filter(room=room)
     selectable = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
-    total_price = room.price * room.staircase.contract_length / 100
-    weekly_price = room.price / 100
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
-                                                                'total_price': total_price,
-                                                                'weekly_price': weekly_price,
                                                                 'images': Image.objects.filter(room=room),
                                                                 'student': student,
                                                                 'reviews': reviews,
@@ -253,7 +249,8 @@ def error(request, code):
         905: "You've already accepted this syndicate.",
         906: "You don't appear to be registered as a JCR member.",
         907: "You can't do that because the ballot is in progress.",
-        908: "We're not ready to do that - maybe syndicates aren't complete?"
+        908: "We're not ready to do that - maybe syndicates aren't complete?",
+        909: "Oops, there's something wrong with your review. Please try again."
     }
     return render(request, 'roomballot/error.html', {'message': messages[code]})
 
@@ -664,6 +661,8 @@ def leave_review(request):
                     review.save()
                 confirm_review(student)
                 return render(request, 'roomballot/create-review-success.html', {'student': student})
+            else:
+                return error(request, 909)
         else:
             room = Room.objects.get(taken_by=student)
             reviews_left = Review.objects.filter(author_id=student.user_id, room=room)

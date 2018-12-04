@@ -48,6 +48,10 @@
             MakeAjaxRequest(3);
         });
 
+        $(".clickable-row").click(function () {
+            window.location = $(this).data("href");
+        });
+
     });
 </script>
 
@@ -80,7 +84,7 @@
                         {% else %}
                             <div class="alert alert-info" role="alert" id="alert2">
                                 You are this syndicate's owner.<br>
-                                <button class="btn btn-primary mt-2" id="dissolve">Dissolve</button>
+                                <button class="btn btn-primary mt-2" id="dissolve"><i class="fas fa-times"></i> Dissolve</button>
                             </div>
                         {% endif %}
                     {% else %}
@@ -89,8 +93,8 @@
                             invited
                             by {{ syndicate.owner_id }}.
                         </div>
-                        <button class="btn btn-primary" id="accept">Accept Invite</button>
-                        <button class="btn btn-primary" id="decline">Decline Invite</button>
+                        <button class="btn btn-primary" id="accept"><i class="fas fa-check"></i> Accept Invite</button>
+                        <button class="btn btn-primary" id="decline"><i class="fas fa-times"></i> Decline Invite</button>
                     {% endif %}
 
                 {% endif %}
@@ -98,7 +102,7 @@
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped table-hover">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -108,7 +112,7 @@
                 </thead>
                 <tbody>
                 {% for st in students %}
-                    <tr>
+                    <tr class="clickable-row" data-href="/roomballot/student/{{ st.user_id }}" style="cursor: pointer;">
                         <td><b>{{ st.first_name }} {{ st.surname }}</b></td>
                         <td class="d-none d-sm-table-cell">{{ st.user_id }}</td>
                         <td>{% if st.accepted_syndicate %}Yes{% else %}No{% endif %}</td>
