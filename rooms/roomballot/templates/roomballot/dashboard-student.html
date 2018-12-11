@@ -20,7 +20,7 @@
                 {% if student.has_allocated %}
                     <p>You have chosen {{ room }}.</p>
                     <a href="room/{{ room.room_id }}" class="btn btn-primary mr-1">View Room <i class="fas fa-angle-right ml-2"></i></a>
-                    <div class="d-md-block d-lg-none mb-2"></div>
+                    <div class="d-none d-md-block d-lg-none mb-2"></div>
                     {% if can_leave_review %}
                     <a href="/roomballot/dashboard/review" class="btn btn-primary mr-1">Leave Review <i class="fas fa-angle-right ml-2"></i></a>
                         <div class="d-block d-xl-none mb-2"></div>
@@ -32,7 +32,7 @@
                         <p>You can't pick your room quite yet.</p>
                     {% endif %}
                 {% endif %}
-                <a href="staircases" class="btn btn-primary">Browse Rooms <i class="fas fa-angle-right ml-2"></i></a>
+                <a href="staircases" class="btn btn-primary">Browse <i class="fas fa-angle-right ml-2"></i></a>
             </div>
         </div>
 

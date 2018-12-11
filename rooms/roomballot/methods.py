@@ -315,22 +315,18 @@ def advance_year():
             # First clear data pertaining to current second-years.
             second_year_students = Student.objects.select_for_update().filter(year=2)
             for student in second_year_students:
-                student.syndicate = None
-                student.rank = None
-                student.picks_at = None
-                student.year = 3
-                student.save()
-                logger.info("Moved student to year 3 [" + student.user_id + "]")
+                logger.info("Deleted student [" + student.user_id + "]")
+                student.delete()
             second_year_syndicates = Syndicate.objects.select_for_update().filter(year=2)
             for syndicate in second_year_syndicates:
-                syndicate.year = 3
-                syndicate.save()
-                logger.info("Moved syndicate to year 3 [" + str(syndicate.syndicate_id) + "]")
+                logger.info("Deleted syndicate [" + str(syndicate.syndicate_id) + "]")
+                syndicate.delete()
             # Now convert rankings and update year attributes.
             ranked_first_year_students = Student.objects.select_for_update().filter(year=1, in_ballot=True).order_by(
                 '-rank')
             current_rank_student = 1
             for student in ranked_first_year_students:
+                student.has_allocated = False
                 student.rank = current_rank_student
                 student.year = 2
                 current_rank_student += 1
@@ -344,6 +340,15 @@ def advance_year():
                 current_rank_syndicate += 1
                 syndicate.save()
                 logger.info("Moved syndicate from first to second year [" + str(syndicate.syndicate_id) + "]")
+            for student in Student.objects.filter(year=1):
+                student.year = 2
+                student.has_allocated = False
+                student.save()
+                logger.info("Moved student from first to second year [" + student.user_id + "]")
+            for room in Room.objects.exclude(taken_by=None):
+                room.taken_by=None
+                room.save()
+                logger.info("Deallocated room [Room " + str(room.room_id) + "]")
     else:
         raise BallotInProgressException()
 
