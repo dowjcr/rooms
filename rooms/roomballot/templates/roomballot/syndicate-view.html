@@ -84,7 +84,7 @@
                         {% else %}
                             <div class="alert alert-info" role="alert" id="alert2">
                                 You are this syndicate's owner.<br>
-                                <button class="btn btn-primary mt-2" id="dissolve"><i class="fas fa-times"></i> Dissolve</button>
+                                <button class="btn btn-primary mt-2" id="dissolve"><i class="fas fa-times mr-1"></i> Dissolve</button>
                             </div>
                         {% endif %}
                     {% else %}
@@ -93,8 +93,8 @@
                             invited
                             by {{ syndicate.owner_id }}.
                         </div>
-                        <button class="btn btn-primary" id="accept"><i class="fas fa-check"></i> Accept Invite</button>
-                        <button class="btn btn-primary" id="decline"><i class="fas fa-times"></i> Decline Invite</button>
+                        <button class="btn btn-primary" id="accept"><i class="fas fa-check mr-1"></i> Accept Invite</button>
+                        <button class="btn btn-primary" id="decline"><i class="fas fa-times mr-1"></i> Decline Invite</button>
                     {% endif %}
 
                 {% endif %}

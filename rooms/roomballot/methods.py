@@ -472,7 +472,7 @@ def create_new_syndicate(student_ids, owner_id):
                 owner.accepted_syndicate = True
                 owner.save()
                 logger.info("Created new syndicate [" + str(syndicate.syndicate_id) + "]")
-            # invite_syndicate(syndicate)
+            invite_syndicate(syndicate)
             return syndicate.syndicate_id
     else:
         raise BallotInProgressException()
@@ -486,7 +486,7 @@ def dissolve_syndicate(syndicate):
     if settings['ballot_in_progress'] == 'true':
         raise BallotInProgressException()
     else:
-        # failed_syndicate(syndicate)
+        failed_syndicate(syndicate)
         with transaction.atomic():
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
             for student in Student.objects.select_for_update().filter(syndicate=syndicate_to_update):
