@@ -1,0 +1,263 @@
+{% extends 'roomballot/base-student.html' %}
+
+{% block content %}
+
+    <head>
+        <title>Pricing | Downing JCR RBS</title>
+    </head>
+
+    <div class="container">
+
+        <div class="row mt-4">
+
+            <div class="col-md-3 col-sm-12 mb-4 d-md-block sidebar">
+                <div class="list-group">
+                    <a href="/roomballot/info" class="list-group-item"><span>Ballot Information</span></a>
+                    <a href="#" class="list-group-item"><span>Bursaries & Rent Reduction</span></a>
+                    <a href="/roomballot/info/create-syndicate"
+                       class="list-group-item"><span>Creating a Syndicate</span></a>
+                    <a href="/roomballot/info/individual"
+                       class="list-group-item"><span>Ballot as an Individual</span></a>
+                    <a href="/roomballot/info/select-room" class="list-group-item"><span>Selecting a Room</span></a>
+                    <a href="/roomballot/info/pricing" class="list-group-item active"><span>Pricing</span></a>
+                    <a href="/roomballot/about" class="list-group-item"><span>About</span></a>
+                </div>
+            </div>
+            <main role="main" class="col md-9 ml-sm-auto col-lg-9 px-4 mb-4">
+                <div class="row">
+                    <div>
+                        <h2>Pricing</h2>
+                    </div>
+                    <div class="border-top">
+                        <p class="mt-3">
+                            In time for the next ballot, every room in College is being re-banded according to a new
+                            room pricing policy. In so doing, we aim to price rooms according to the features you
+                            actually
+                            find important, and make the reasoning behind each room's price fully transparent.<br><br>
+                            This policy was conceived and implemented by <b>Cameron O'Connor</b>, JCR Internet Officer
+                            2018-19,
+                            and <b>Barney Walker</b>, JCR Services Officer 2018-19.
+                        </p>
+
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header" id="headingOne">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne">
+                                            Why are we doing this?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseOne" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        The opaqueness of room pricing, as well as the disparity between rooms
+                                        apparently
+                                        in the same band, is a source of immense frustration. We wanted to do things
+                                        differently - to price each room individually, according to the features
+                                        students
+                                        find important.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo">
+                                            Why can't I see last year's prices?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        We've hidden last year's prices while we work out the prices for 2019/20. In the
+                                        interests of transparency, we'll be showing you how each room's price has
+                                        changed
+                                        from the old pricing policy - watch this space.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingThree">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse"
+                                                data-target="#collapseThree">
+                                            How are the features weighted?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        In Michaelmas 2018, we put out the 'Downing Accommodation Survey' which
+                                        collected
+                                        students' views on various aspects of accommodation. Having analysed the data
+                                        collected, we derived the following relative weights. A higher number indicates
+                                        greater weighting.<br>
+                                        <table class="table table-striped mt-3">
+                                            <tr>
+                                                <td>Ensuite</td>
+                                                <td>{{ weight_ensuite }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Bathroom Sharing Ratio</td>
+                                                <td>{{ weight_bathroom }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Double Bed</td>
+                                                <td>{{ weight_double_bed }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Size</td>
+                                                <td>{{ weight_size }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Renovated Room</td>
+                                                <td>{{ weight_renovated_room }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Renovated Facilities</td>
+                                                <td>{{ weight_renovated_facilities }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Not Facing Lensfield Road</td>
+                                                <td>{{ weight_facing_lensfield }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Facing Court</td>
+                                                <td>{{ weight_facing_court }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Not Ground Floor</td>
+                                                <td>{{ weight_ground_floor }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Self-Contained (Studio)</td>
+                                                <td>{{ weight_flat }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingFour">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFour">
+                                            How do we calculate prices?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFour" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        For each room, we start with a base price (£{{ base_price }}). We then use data
+                                        collected from College to determine which, if any, of the above features are
+                                        met.
+                                        We add up the weights of the applicable features to get a total <b>feature
+                                        score</b>.
+                                        We then multiply this score by the feature multiplier, which is calculated
+                                        according to
+                                        the amount College want us to raise. This year, the feature multiplier is
+                                        {{ feature_multiplier }}. Adding this total to the base price gives us the
+                                        room's
+                                        new price.<br><br>
+                                        There are some nuances in how we use the weights for each feature - see the
+                                        other
+                                        questions for a brief summary. You can also read the official pricing policy for
+                                        a
+                                        more verbose explanation (to be posted soon!).
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingFive">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFive">
+                                            How is the size weighting calculated?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFive" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        When your room is very small, every extra square metre really counts - but when
+                                        your
+                                        room is already big, a little extra space isn't as big a deal. So, we calculate
+                                        size
+                                        weighting by finding the definite integral under a line of negative gradient,
+                                        then multiplying by
+                                        the feature weight.<br><br>
+
+                                        First, we normalise the room size:<br><br>
+
+                                        <img src="https://latex.codecogs.com/gif.latex?\begin{aligned}&space;max&space;&=&space;\text{max&space;size&space;across&space;all&space;rooms}&space;\\&space;min&space;&=&space;\text{min&space;size&space;across&space;all&space;rooms}\\&space;y&space;&=&space;\frac{\text{roomSize}&space;-&space;min}{max&space;-&space;min}&space;\\&space;\end{aligned}"
+                                             title="\begin{aligned} max &= \text{max size across all rooms} \\ min &= \text{min size across all rooms}\\ y &= \frac{\text{roomSize} - min}{max - min} \\ \end{aligned}"/></a>
+
+                                        <br><br>Then we find the definite integral:<br><br>
+
+                                        <img src="https://latex.codecogs.com/gif.latex?\begin{aligned}&space;\text{multiplier}&space;&=&space;\int_{0}^{y}&space;2&space;-&space;2x&space;\;&space;dx&space;\\&space;&=&space;\Big[&space;2x&space;-&space;x^2\Big]_{0}^{y}&space;\\&space;&=&space;2y&space;-&space;y^2&space;\end{aligned}"
+                                             title="\begin{aligned} \text{multiplier} &= \int_{0}^{y} 2 - 2x \; dx \\ &= \Big[ 2x - x^2\Big]_{0}^{y} \\ &= 2y - y^2 \end{aligned}"/>
+
+                                        <br><br>Then we multiply this by the size weight, and we're done.
+
+                                        <br><br><b>OK...but I'm not a mathmo.</b><br>
+                                        In simple terms, as the size of the room increases, the cost of additional space
+                                        decreases. You might pay £2 p/w more for a 10m&#178; room than a 9m&#178; room,
+                                        but only £1 p/w more for a 20m&#178; room than a 19m&#178; room.
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingSix">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseSix">
+                                            How is the bathroom sharing weighting calculated?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseSix" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        We add feature weights according to this table:
+                                        <table class="table table-striped mt-3">
+                                            <tr>
+                                                <th>Number of people using nearest bathroom</th>
+                                                <th>Weight added (times feature weight)</th>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td><td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td><td>0.75</td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td><td>0.5</td>
+                                            </tr>
+                                            <tr>
+                                                <td>4</td><td>0.25</td>
+                                            </tr>
+                                            <tr>
+                                                <td>5+</td><td>0</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingSeven">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseSeven">
+                                            How is the renovation weighting calculated?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseSeven" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        This is yet to be finalised - we'll update you very soon.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+{% endblock %}

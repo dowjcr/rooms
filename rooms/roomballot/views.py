@@ -432,6 +432,33 @@ def select_room_info(request):
     return render(request, 'roomballot/info-select-room.html', {'student': student})
 
 
+# ================ PRICING INFO ================
+# Display page with information about pricing
+# policy.
+
+def pricing_info(request):
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/info-pricing.html', {'student': student,
+                                                            'base_price': settings['base_price'],
+                                                            'weight_ensuite': settings['weight_ensuite'],
+                                                            'weight_bathroom': settings['weight_bathroom'],
+                                                            'weight_double_bed': settings[
+                                                                'weight_double_bed'],
+                                                            'weight_size': settings['weight_size'],
+                                                            'weight_renovated_room': settings[
+                                                                'weight_renovated_room'],
+                                                            'weight_renovated_facilities': settings[
+                                                                'weight_renovated_facilities'],
+                                                            'weight_flat': settings['weight_flat'],
+                                                            'weight_facing_lensfield': settings[
+                                                                'weight_facing_lensfield'],
+                                                            'weight_facing_court': settings[
+                                                                'weight_facing_court'],
+                                                            'weight_ground_floor': settings[
+                                                                'weight_ground_floor'],
+                                                            'feature_multiplier': round(float(settings['feature_price']), 5)})
+
+
 # ================== STATUS ===================
 # Display page with ballot status - which students
 # haven't completed syndicate, which syndicates are
