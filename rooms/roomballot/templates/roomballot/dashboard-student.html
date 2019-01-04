@@ -22,8 +22,8 @@
                     <a href="room/{{ room.room_id }}" class="btn btn-primary mr-1">View Room <i class="fas fa-angle-right ml-2"></i></a>
                     <div class="d-none d-md-block d-lg-none mb-2"></div>
                     {% if can_leave_review %}
-                    <a href="/roomballot/dashboard/review" class="btn btn-primary mr-1">Leave Review <i class="fas fa-angle-right ml-2"></i></a>
-                        <div class="d-block d-xl-none mb-2"></div>
+                    <!--<a href="/roomballot/dashboard/review" class="btn btn-primary mr-1">Leave Review <i class="fas fa-angle-right ml-2"></i></a>
+                        <div class="d-block d-xl-none mb-2"></div>-->
                     {% endif %}
                 {% else %}
                     {% if can_pick %}
@@ -32,7 +32,7 @@
                         <p>You can't pick your room quite yet.</p>
                     {% endif %}
                 {% endif %}
-                <a href="staircases" class="btn btn-primary">Browse <i class="fas fa-angle-right ml-2"></i></a>
+                <a href="staircases" class="btn btn-primary">Browse Rooms <i class="fas fa-angle-right ml-2"></i></a>
             </div>
         </div>
 
@@ -70,7 +70,7 @@
                 {% if student.in_ballot %}
                     {% if student.rank == None %}
                         <p>Your ranking hasn't been generated yet. Check back soon!</p>
-                        <a href="ranking" class="btn btn-primary">View Ranking</a>
+                        <a href="ranking" class="btn btn-primary">View Ranking <i class="fas fa-angle-right ml-2"></i></a>
                     {% else %}
                         <p>You are ranked <b>{{ student.rank }} out of all students.</b><br>
                             {% if student.picks_at is not None %}
