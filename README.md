@@ -2,15 +2,13 @@
 
 # Downing College JCR Room Balloting System
 
-This system manages the allocation of college rooms during ballot weekend. It comprises a web application, which allows a student to view and select their room, and calculates room pricing automatically according to the Room Pricing Policy 2018.
+This system manages the allocation of college rooms during ballot weekend. It comprises a web application, which allows a student to view and select their room, and calculates room pricing automatically according to the Room Pricing Policy 2019.
 
 <img src="https://github.com/cjoc/cjoc.github.io/raw/master/jcr-rbs.png">
 
 ## Installation
 
-These instructions are confirmed to work on Ubuntu 18.04 LTS. The same method will work on any Linux distribution,
-but you might have to change some of the paths below as appropriate. Change into the desired installation
-directory then clone this repository:
+Change into the desired installation directory then clone this repository:
 
 ```bash
 $ git clone https://github.com/dowjcr/rooms

@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from roomballot.models import Setting, Student
-from modeldict import ModelDict
-
-settings = ModelDict(Setting, key='key', value='value', instances=False)
+from roomballot.methods import get_setting, set_setting
 
 
 class NotReadyToStartBallotException(Exception):
@@ -15,14 +13,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             # Check randomised.
-            if settings['randomised'] != 'true':
+            if get_setting('randomised') != 'true':
                 raise NotReadyToStartBallotException()
             # Check all students are complete.
             for student in Student.objects.filter(in_ballot=True):
                 if not student.accepted_syndicate or not student.syndicate.complete:
                     raise NotReadyToStartBallotException()
             # Now update setting.
-            settings['ballot_in_progress'] = 'true'
+            set_setting('ballot_in_progress', 'true')
             self.stdout.write(self.style.SUCCESS('Successfully started ballot.'))
         except NotReadyToStartBallotException:
             raise CommandError("Not ready to start ballot - perhaps a syndicate is incomplete?")

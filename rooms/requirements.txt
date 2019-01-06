@@ -1,5 +1,4 @@
 Django==2.0.8
 django-ucamwebauth
-django-modeldict-yplan
 Pillow
 numpy

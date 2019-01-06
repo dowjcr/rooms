@@ -217,8 +217,7 @@ class Floorplan(models.Model):
 
 
 # ================== SETTING =====================
-# Stores settings required for app's function, using
-# django-modeldict-yplan.
+# Stores settings required for app's function.
 
 class Setting(models.Model):
     key = models.CharField(max_length=32)
