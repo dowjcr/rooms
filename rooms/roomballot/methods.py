@@ -7,11 +7,9 @@ Author Cameron O'Connor
 from .models import *
 from .email import *
 import random, datetime
-from modeldict import ModelDict
 from django.db import transaction
 from ibisclient import *
 
-settings = ModelDict(Setting, key='key', value='value', instances=False)
 LOG_FILE = 'roomballot.log'
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -37,6 +35,16 @@ class StudentAlreadyExistsException(Exception):
 
 class InvalidIdentifierException(Exception):
     pass
+
+
+def get_setting(key):
+    return Setting.objects.get(key=key).value
+
+
+def set_setting(key, value):
+    setting = Setting.objects.get(key=key)
+    setting.value = value
+    setting.save()
 
 
 # ============== ALLOCATE ROOM ===================
@@ -126,18 +134,18 @@ def generate_price():
         count_renovated_facilities += ((r.staircase.renovated - 1) / 2) * contract_length
 
     # Getting weights from settings.
-    base_price = float(settings['base_price'])
-    weight_ensuite = float(settings['weight_ensuite'])
-    weight_bathroom = float(settings['weight_bathroom'])
-    weight_double_bed = float(settings['weight_double_bed'])
-    weight_size = float(settings['weight_size'])
-    weight_renovated_room = float(settings['weight_renovated_room'])
-    weight_renovated_facilities = float(settings['weight_renovated_facilities'])
-    weight_flat = float(settings['weight_flat'])
-    weight_facing_lensfield = float(settings['weight_facing_lensfield'])
-    weight_facing_court = float(settings['weight_facing_court'])
-    weight_ground_floor = float(settings['weight_ground_floor'])
-    total = float(settings['total'])
+    base_price = float(get_setting('base_price'))
+    weight_ensuite = float(get_setting('weight_ensuite'))
+    weight_bathroom = float(get_setting('weight_bathroom'))
+    weight_double_bed = float(get_setting('weight_double_bed'))
+    weight_size = float(get_setting('weight_size'))
+    weight_renovated_room = float(get_setting('weight_renovated_room'))
+    weight_renovated_facilities = float(get_setting('weight_renovated_facilities'))
+    weight_flat = float(get_setting('weight_flat'))
+    weight_facing_lensfield = float(get_setting('weight_facing_lensfield'))
+    weight_facing_court = float(get_setting('weight_facing_court'))
+    weight_ground_floor = float(get_setting('weight_ground_floor'))
+    total = float(get_setting('total'))
 
     # x = Weighted feature weeks.
     x = (weight_ensuite * count_ensuite) + (weight_double_bed * count_double_bed) + (weight_size * count_size) + \
@@ -148,7 +156,7 @@ def generate_price():
 
     # y = Feature cost per week.
     y = (total - base_price * accommodation_weeks) / x
-    settings['feature_price'] = y
+    set_setting('feature_price', y)
 
     # Iterating through rooms and calculating price.
     for room in Room.objects.all():
@@ -268,9 +276,9 @@ def get_num_syndicates():
 # rather than to run efficiently.
 
 def randomise_order():
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         syndicates = []
-        settings['randomised'] = 'false'
+        set_setting('randomised', 'false')
         # First check all students either in syndicate or removed from ballot.
         for s in Student.objects.all():
             if s.in_ballot and not s.accepted_syndicate:
@@ -296,7 +304,7 @@ def randomise_order():
                 syndicate.rank = current_rank_syndicate
                 syndicate.save()
                 current_rank_syndicate += 1
-            settings['randomised'] = 'true'
+                set_setting('randomised', 'true')
             logger.info("Successfully randomised order")
         generate_times()
     else:
@@ -310,7 +318,7 @@ def randomise_order():
 # delete them from Student table.
 
 def advance_year():
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         with transaction.atomic():
             # First clear data pertaining to current second-years.
             second_year_students = Student.objects.select_for_update().filter(year=2)
@@ -358,7 +366,7 @@ def advance_year():
 # by removing them from rankings and their syndicate.
 
 def remove_from_ballot(student):
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         with transaction.atomic():
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
             student_rank = student_to_update.rank
@@ -412,7 +420,7 @@ def remove_from_ballot(student):
 # be added last in the syndicate.
 
 def add_to_syndicate(student, syndicate):
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         with transaction.atomic():
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
             student_to_update = Student.objects.select_for_update().get(user_id=student.user_id)
@@ -442,7 +450,7 @@ def add_to_syndicate(student, syndicate):
 # to the concerned students.
 
 def create_new_syndicate(student_ids, owner_id):
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         owner = Student.objects.get(user_id=owner_id)
         size = len(student_ids)
         if owner.syndicate is not None or owner.accepted_syndicate or size > 6 or size < 1:
@@ -483,7 +491,7 @@ def create_new_syndicate(student_ids, owner_id):
 # students' attributes.
 
 def dissolve_syndicate(syndicate):
-    if settings['ballot_in_progress'] == 'true':
+    if get_setting('ballot_in_progress') == 'true':
         raise BallotInProgressException()
     else:
         failed_syndicate(syndicate)
@@ -551,7 +559,7 @@ def decline_syndicate(student):
 # Inductively, syndicate must be non-empty.
 
 def reallocate_syndicate_owner(syndicate):
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         with transaction.atomic():
             students = Student.objects.filter(syndicate=syndicate)
             syndicate_to_update = Syndicate.objects.select_for_update().get(syndicate_id=syndicate.syndicate_id)
@@ -569,15 +577,15 @@ def reallocate_syndicate_owner(syndicate):
 # Date in datetime format.
 
 def generate_times():
-    if settings['ballot_in_progress'] == 'false':
+    if get_setting('ballot_in_progress').value == 'false':
         with transaction.atomic():
             students = Student.objects.select_for_update().filter(in_ballot=True)
             for s in students:
                 s.picks_at = None
                 s.save()
-        start_date = settings['start_date']
+        start_date = get_setting('start_date')
         # Generate times for second years.
-        dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M")
+        dt = datetime.datetime.strptime(start_date + " 13:00", "%d/%m/%y %H:%M")
         with transaction.atomic():
             second_years = Student.objects.select_for_update().filter(year=2, in_ballot=True).exclude(
                 rank=None).order_by('rank')
@@ -605,7 +613,7 @@ def generate_times():
 # at current time, and updates setting field.
 
 def update_current_student():
-    if settings['ballot_in_progress'] != 'true':
+    if get_setting('ballot_in_progress') != 'true':
         raise ConcurrencyException()
     else:
         current_datetime = datetime.datetime.now()
@@ -614,10 +622,13 @@ def update_current_student():
                                                               microseconds=current_datetime.microsecond)
         try:
             student_picking = Student.objects.get(picks_at=slot_datetime)
-            settings['current_student'] = student_picking.user_id
+            while student_picking.has_allocated:
+                slot_datetime += datetime.timedelta(minutes=5)
+                student_picking = Student.objects.get(picks_at=slot_datetime)
+            set_setting('current_student', student_picking.user_id)
             logger.info("Updated currently picking student [" + student_picking.user_id + "]")
         except Student.DoesNotExist:
-            settings['current_student'] = None
+            set_setting('current_student', None)
 
 
 # ============ POPULATE STUDENT ================

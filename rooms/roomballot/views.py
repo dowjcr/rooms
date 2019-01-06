@@ -11,12 +11,9 @@ from django.db import transaction
 from .models import *
 from .methods import *
 from .forms import *
-from modeldict import ModelDict
 import json
 import csv
 import numpy as np
-
-settings = ModelDict(Setting, key='key', value='value', instances=False)
 
 
 # ================ ROOM DETAIL ===================
@@ -26,7 +23,7 @@ def room_detail(request, room_id):
     student = Student.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
     reviews = Review.objects.filter(room=room)
-    selectable = settings['ballot_in_progress'] == 'true' and settings['current_student'] == request.user.username
+    selectable = get_setting('ballot_in_progress') == 'true' and get_setting('current_student') == request.user.username
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'images': Image.objects.filter(room=room),
                                                                 'student': student,
@@ -40,8 +37,8 @@ def room_detail(request, room_id):
 def room_pricing(request, room_id):
     student = Student.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
-    y = round(float(settings['feature_price']), 5)
-    base_price = round(float(settings['base_price']), 2)
+    y = round(float(get_setting('feature_price')), 5)
+    base_price = round(float(get_setting('base_price')), 2)
     return render(request, 'roomballot/room-detail-pricing.html', {'room': room,
                                                                    'student': student,
                                                                    'y': y,
@@ -55,8 +52,8 @@ def room_pricing(request, room_id):
 def room_selection_confirm(request, room_id):
     student = Student.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
-    can_allocate = settings['ballot_in_progress'] == 'true' and settings[
-        'current_student'] == request.user.username and room.type == 2
+    can_allocate = get_setting('ballot_in_progress') == 'true' and get_setting(
+        'current_student') == request.user.username and room.type == 2
     if request.method == 'POST':
         try:
             if student.syndicate is None or not student.accepted_syndicate or not student.syndicate.complete:
@@ -145,7 +142,7 @@ def student_dashboard(request):
     room = Room.objects.get(taken_by=student) if student.has_allocated else None
     reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
     can_leave_review = reviews_left.count() == 0
-    can_pick = settings['current_student'] == request.user.username and settings['ballot_in_progress'] == 'true'
+    can_pick = get_setting('current_student') == request.user.username and get_setting('ballot_in_progress') == 'true'
     return render(request, 'roomballot/dashboard-student.html', {'student': student,
                                                                  'room': room,
                                                                  'can_pick': can_pick,
@@ -266,8 +263,8 @@ def admin_dashboard(request):
         for s in Student.objects.filter(year=1, in_ballot=True):
             if not s.accepted_syndicate:
                 syndicates_complete = False
-        randomised = settings['randomised'] == 'true'
-        in_progress = settings['ballot_in_progress'] == 'true'
+        randomised = get_setting('randomised') == 'true'
+        in_progress = get_setting('ballot_in_progress') == 'true'
         return render(request, 'roomballot/dashboard-admin.html', {'students': students,
                                                                    'syndicates_complete': syndicates_complete,
                                                                    'randomised': randomised,
@@ -309,7 +306,7 @@ def manage_student(request, user_id):
     try:
         AdminUser.objects.get(user_id=request.user.username)
         student = get_object_or_404(Student, user_id=user_id)
-        in_progress = settings['ballot_in_progress'] == 'true'
+        in_progress = get_setting('ballot_in_progress') == 'true'
         if request.method == 'POST':
             response_code = 900
             # Clicked 'Remove from Ballot'.
@@ -394,7 +391,7 @@ def manage_student(request, user_id):
 def ballot_info(request):
     student = Student.objects.get(user_id=request.user.username)
     return render(request, 'roomballot/info.html', {'student': student,
-                                                    'date': settings['start_date']})
+                                                    'date': get_setting('start_date')})
 
 
 # =================== ABOUT ===================
@@ -439,25 +436,22 @@ def select_room_info(request):
 def pricing_info(request):
     student = Student.objects.get(user_id=request.user.username)
     return render(request, 'roomballot/info-pricing.html', {'student': student,
-                                                            'base_price': settings['base_price'],
-                                                            'weight_ensuite': settings['weight_ensuite'],
-                                                            'weight_bathroom': settings['weight_bathroom'],
-                                                            'weight_double_bed': settings[
-                                                                'weight_double_bed'],
-                                                            'weight_size': settings['weight_size'],
-                                                            'weight_renovated_room': settings[
-                                                                'weight_renovated_room'],
-                                                            'weight_renovated_facilities': settings[
-                                                                'weight_renovated_facilities'],
-                                                            'weight_flat': settings['weight_flat'],
-                                                            'weight_facing_lensfield': settings[
-                                                                'weight_facing_lensfield'],
-                                                            'weight_facing_court': settings[
-                                                                'weight_facing_court'],
-                                                            'weight_ground_floor': settings[
-                                                                'weight_ground_floor'],
+                                                            'base_price': get_setting('base_price'),
+                                                            'weight_ensuite': get_setting('weight_ensuite'),
+                                                            'weight_bathroom': get_setting('weight_bathroom'),
+                                                            'weight_double_bed': get_setting('weight_double_bed'),
+                                                            'weight_size': get_setting('weight_size'),
+                                                            'weight_renovated_room': get_setting(
+                                                                'weight_renovated_room'),
+                                                            'weight_renovated_facilities': get_setting(
+                                                                'weight_renovated_facilities'),
+                                                            'weight_flat': get_setting('weight_flat'),
+                                                            'weight_facing_lensfield': get_setting(
+                                                                'weight_facing_lensfield'),
+                                                            'weight_facing_court': get_setting('weight_facing_court'),
+                                                            'weight_ground_floor': get_setting('weight_ground_floor'),
                                                             'feature_multiplier': round(
-                                                                float(settings['feature_price']), 5)})
+                                                                float(get_setting('feature_price')), 5)})
 
 
 # ================== STATUS ===================
@@ -468,9 +462,9 @@ def pricing_info(request):
 def status(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        randomised = settings['randomised'] == 'true'
-        in_progress = settings['ballot_in_progress'] == 'true'
-        current_student_crsid = settings['current_student']
+        randomised = get_setting('randomised') == 'true'
+        in_progress = get_setting('ballot_in_progress') == 'true'
+        current_student_crsid = get_setting('current_student')
         if current_student_crsid != None:
             current_student = Student.objects.get(user_id=current_student_crsid)
         else:
@@ -516,7 +510,7 @@ def manage_syndicate(request, syndicate_id):
             return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
         else:
             students = Student.objects.filter(syndicate=syndicate).order_by('first_name')
-            in_progress = settings['ballot_in_progress'] == 'true'
+            in_progress = get_setting('ballot_in_progress') == 'true'
             return render(request, 'roomballot/syndicate-manage.html', {'syndicate': syndicate,
                                                                         'students': students,
                                                                         'in_progress': in_progress})
@@ -598,35 +592,35 @@ def manage_room(request, room_id):
             response_code = 900
             # Clicked 'JCR Freshers'.
             if request.POST.get('response') == '1':
-                if settings['ballot_in_progress'] != 'true':
+                if get_setting('ballot_in_progress') != 'true':
                     with transaction.atomic():
                         room = Room.objects.select_for_update().get(room_id=room_id)
                         room.type = 1
                         response_code = 1
                         room.save()
             if request.POST.get('response') == '2':
-                if settings['ballot_in_progress'] != 'true':
+                if get_setting('ballot_in_progress') != 'true':
                     with transaction.atomic():
                         room = Room.objects.select_for_update().get(room_id=room_id)
                         room.type = 2
                         response_code = 1
                         room.save()
             if request.POST.get('response') == '3':
-                if settings['ballot_in_progress'] != 'true':
+                if get_setting('ballot_in_progress') != 'true':
                     with transaction.atomic():
                         room = Room.objects.select_for_update().get(room_id=room_id)
                         room.type = 3
                         response_code = 1
                         room.save()
             if request.POST.get('response') == '4':
-                if settings['ballot_in_progress'] != 'true':
+                if get_setting('ballot_in_progress') != 'true':
                     with transaction.atomic():
                         room = Room.objects.select_for_update().get(room_id=room_id)
                         room.type = 4
                         response_code = 1
                         room.save()
             return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
-        in_progress = settings['ballot_in_progress'] == 'true'
+        in_progress = get_setting('ballot_in_progress') == 'true'
         room = get_object_or_404(Room, room_id=room_id)
         return render(request, 'roomballot/room-manage.html', {'room': room,
                                                                'in_progress': in_progress})
@@ -850,78 +844,37 @@ def change_weights(request):
             form = WeightsForm(request.POST)
             if form.is_valid():
                 with transaction.atomic():
-                    base_price = Setting.objects.get(key='base_price')
-                    base_price.value = form.cleaned_data['base_price']
-                    base_price.save()
-
-                    weight_ensuite = Setting.objects.get(key='weight_ensuite')
-                    weight_ensuite.value = form.cleaned_data['weight_ensuite']
-                    weight_ensuite.save()
-
-                    weight_bathroom = Setting.objects.get(key='weight_bathroom')
-                    weight_bathroom.value = form.cleaned_data['weight_bathroom']
-                    weight_bathroom.save()
-
-                    weight_double_bed = Setting.objects.get(key='weight_double_bed')
-                    weight_double_bed.value = form.cleaned_data['weight_double_bed']
-                    weight_double_bed.save()
-
-                    weight_size = Setting.objects.get(key='weight_size')
-                    weight_size.value = form.cleaned_data['weight_size']
-                    weight_size.save()
-
-                    weight_renovated_room = Setting.objects.get(key='weight_renovated_room')
-                    weight_renovated_room.value = form.cleaned_data['weight_renovated_room']
-                    weight_renovated_room.save()
-
-                    weight_renovated_facilities = Setting.objects.get(key='weight_renovated_facilities')
-                    weight_renovated_facilities.value = form.cleaned_data['weight_renovated_facilities']
-                    weight_renovated_facilities.save()
-
-                    weight_flat = Setting.objects.get(key='weight_flat')
-                    weight_flat.value = form.cleaned_data['weight_flat']
-                    weight_flat.save()
-
-                    weight_facing_lensfield = Setting.objects.get(key='weight_facing_lensfield')
-                    weight_facing_lensfield.value = form.cleaned_data['weight_facing_lensfield']
-                    weight_facing_lensfield.save()
-
-                    weight_facing_court = Setting.objects.get(key='weight_facing_court')
-                    weight_facing_court.value = form.cleaned_data['weight_facing_court']
-                    weight_facing_court.save()
-
-                    weight_ground_floor = Setting.objects.get(key='weight_ground_floor')
-                    weight_ground_floor.value = form.cleaned_data['weight_ground_floor']
-                    weight_ground_floor.save()
-
-                    total = Setting.objects.get(key='total')
-                    total.value = form.cleaned_data['total']
-                    total.save()
+                    set_setting('base_price', form.cleaned_data['base_price'])
+                    set_setting('weight_ensuite', form.cleaned_data['weight_ensuite'])
+                    set_setting('weight_bathroom', form.cleaned_data['weight_bathroom'])
+                    set_setting('weight_double_bed', form.cleaned_data['weight_double_bed'])
+                    set_setting('weight_size', form.cleaned_data['weight_size'])
+                    set_setting('weight_renovated_room', form.cleaned_data['weight_renovated_room'])
+                    set_setting('weight_renovated_facilities', form.cleaned_data['weight_renovated_facilities'])
+                    set_setting('weight_flat', form.cleaned_data['weight_flat'])
+                    set_setting('weight_facing_lensfield', form.cleaned_data['weight_facing_lensfield'])
+                    set_setting('weight_facing_court', form.cleaned_data['weight_facing_court'])
+                    set_setting('weight_ground_floor', form.cleaned_data['weight_ground_floor'])
+                    set_setting('total', form.cleaned_data['total'])
                 return HttpResponseRedirect('/roomballot/admin/change-weights')
             elif request.POST.get('response') == '1':
                 generate_price()
                 return HttpResponse(json.dumps({'responseCode': 1}), content_type="application/json")
         else:
-            in_progress = settings['ballot_in_progress'] == 'true'
+            in_progress = get_setting('ballot_in_progress') == 'true'
             return render(request, 'roomballot/change-weights.html',
-                          {'base_price': Setting.objects.get(key='base_price'),
-                           'weight_ensuite': Setting.objects.get(key='weight_ensuite'),
-                           'weight_bathroom': Setting.objects.get(key='weight_bathroom'),
-                           'weight_double_bed': Setting.objects.get(key=
-                                                                    'weight_double_bed'),
-                           'weight_size': Setting.objects.get(key='weight_size'),
-                           'weight_renovated_room': Setting.objects.get(key=
-                                                                        'weight_renovated_room'),
-                           'weight_renovated_facilities': Setting.objects.get(key=
-                                                                              'weight_renovated_facilities'),
-                           'weight_flat': Setting.objects.get(key='weight_flat'),
-                           'weight_facing_lensfield': Setting.objects.get(key=
-                                                                          'weight_facing_lensfield'),
-                           'weight_facing_court': Setting.objects.get(key=
-                                                                      'weight_facing_court'),
-                           'weight_ground_floor': Setting.objects.get(key=
-                                                                      'weight_ground_floor'),
-                           'total': Setting.objects.get(key='total'),
+                          {'base_price': get_setting('base_price'),
+                           'weight_ensuite': get_setting('weight_ensuite'),
+                           'weight_bathroom': get_setting('weight_bathroom'),
+                           'weight_double_bed': get_setting('weight_double_bed'),
+                           'weight_size': get_setting('weight_size'),
+                           'weight_renovated_room': get_setting('weight_renovated_room'),
+                           'weight_renovated_facilities': get_setting('weight_renovated_facilities'),
+                           'weight_flat': get_setting('weight_flat'),
+                           'weight_facing_lensfield': get_setting('weight_facing_lensfield'),
+                           'weight_facing_court': get_setting('weight_facing_court'),
+                           'weight_ground_floor': get_setting('weight_ground_floor'),
+                           'total': get_setting('total'),
                            'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
