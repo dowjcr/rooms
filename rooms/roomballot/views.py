@@ -284,7 +284,7 @@ def admin_dashboard(request):
 
 def ballot_ranking(request):
     student = Student.objects.get(user_id=request.user.username)
-    ranked_students = Student.objects.filter(in_ballot=True).order_by('rank')
+    ranked_students = Student.objects.filter(in_ballot=True).exclude(rank=None).order_by('rank')
     return render(request, 'roomballot/ranking.html', {'student': student,
                                                        'students': ranked_students})
 
@@ -456,7 +456,8 @@ def pricing_info(request):
                                                                 'weight_facing_court'],
                                                             'weight_ground_floor': settings[
                                                                 'weight_ground_floor'],
-                                                            'feature_multiplier': round(float(settings['feature_price']), 5)})
+                                                            'feature_multiplier': round(
+                                                                float(settings['feature_price']), 5)})
 
 
 # ================== STATUS ===================
@@ -542,8 +543,9 @@ def create_syndicate_admin(request):
             return HttpResponse(json.dumps({'responseCode': response_code, 'newSyndicateId': syndicate_id}),
                                 content_type="application/json")
         else:
-            return render(request, 'roomballot/create-syndicate-admin.html', {'students': Student.objects.filter(syndicate=None,
-                                                                                                                 in_ballot=True)})
+            return render(request, 'roomballot/create-syndicate-admin.html',
+                          {'students': Student.objects.filter(syndicate=None,
+                                                              in_ballot=True)})
     except AdminUser.DoesNotExist:
         return error(request, 403)
     except BallotInProgressException:
@@ -901,24 +903,25 @@ def change_weights(request):
                 return HttpResponse(json.dumps({'responseCode': 1}), content_type="application/json")
         else:
             in_progress = settings['ballot_in_progress'] == 'true'
-            return render(request, 'roomballot/change-weights.html', {'base_price': settings['base_price'],
-                                                                      'weight_ensuite': settings['weight_ensuite'],
-                                                                      'weight_bathroom': settings['weight_bathroom'],
-                                                                      'weight_double_bed': settings[
-                                                                          'weight_double_bed'],
-                                                                      'weight_size': settings['weight_size'],
-                                                                      'weight_renovated_room': settings[
-                                                                          'weight_renovated_room'],
-                                                                      'weight_renovated_facilities': settings[
-                                                                          'weight_renovated_facilities'],
-                                                                      'weight_flat': settings['weight_flat'],
-                                                                      'weight_facing_lensfield': settings[
-                                                                          'weight_facing_lensfield'],
-                                                                      'weight_facing_court': settings[
-                                                                          'weight_facing_court'],
-                                                                      'weight_ground_floor': settings[
-                                                                          'weight_ground_floor'],
-                                                                      'total': settings['total'],
-                                                                      'in_progress': in_progress})
+            return render(request, 'roomballot/change-weights.html',
+                          {'base_price': Setting.objects.get(key='base_price'),
+                           'weight_ensuite': Setting.objects.get(key='weight_ensuite'),
+                           'weight_bathroom': Setting.objects.get(key='weight_bathroom'),
+                           'weight_double_bed': Setting.objects.get(key=
+                                                                    'weight_double_bed'),
+                           'weight_size': Setting.objects.get(key='weight_size'),
+                           'weight_renovated_room': Setting.objects.get(key=
+                                                                        'weight_renovated_room'),
+                           'weight_renovated_facilities': Setting.objects.get(key=
+                                                                              'weight_renovated_facilities'),
+                           'weight_flat': Setting.objects.get(key='weight_flat'),
+                           'weight_facing_lensfield': Setting.objects.get(key=
+                                                                          'weight_facing_lensfield'),
+                           'weight_facing_court': Setting.objects.get(key=
+                                                                      'weight_facing_court'),
+                           'weight_ground_floor': Setting.objects.get(key=
+                                                                      'weight_ground_floor'),
+                           'total': Setting.objects.get(key='total'),
+                           'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)

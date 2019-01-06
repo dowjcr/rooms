@@ -9005,6 +9005,14 @@ button.navbar-toggler:focus
    padding: 16px;
 }
 
+a {
+  color: #960066;
+}
+
+a:hover {
+  color: #4d0033;
+}
+
 .ui-autocomplete {
   top: 100%;
   display: none;
