@@ -13,7 +13,7 @@ from django.db import models
 class Band(models.Model):
     band_id = models.AutoField(primary_key=True)
     band_name = models.CharField(max_length=10)
-    weekly_price = models.IntegerField()
+    weekly_price = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return "Band " + self.band_name
@@ -44,16 +44,10 @@ class Syndicate(models.Model):
 # relationship to PriceCategory.
 
 class Staircase(models.Model):
-    RENOVATED_CHOICES = (
-        (1, 'Least Recently'),
-        (2, 'Quite Recently'),
-        (3, 'Most Recently')
-    )
-
     staircase_id = models.AutoField(primary_key=True)
+    identifier = models.CharField(max_length=10, default=None, null=True)
     name = models.CharField(max_length=30)
     contract_length = models.IntegerField('Number of contract weeks?')
-    renovated = models.IntegerField(choices=RENOVATED_CHOICES)
     description = models.CharField(max_length=1000, default=None, null=True, blank=True)
 
     def __str__(self):
@@ -99,12 +93,6 @@ class Room(models.Model):
         (4, 'Third')
     )
 
-    RENOVATED_CHOICES = (
-        (1, 'Least Recently'),
-        (2, 'Quite Recently'),
-        (3, 'Most Recently')
-    )
-
     BATHROOM_CHOICES = (
         (1, '1'),
         (2, '2'),
@@ -120,13 +108,19 @@ class Room(models.Model):
         (4, 'MCR')
     )
 
+    # Identifiers.
     room_id = models.AutoField(primary_key=True)
+    identifier = models.CharField(max_length=10, default=None, null=True)
     room_number = models.CharField(max_length=10)
+
+    # Room attributes.
     floor = models.IntegerField(choices=FLOOR_CHOICES)
     is_ensuite = models.BooleanField('Has ensuite?')
     is_double_bed = models.BooleanField('Has double bed?')
     has_disabled_facilities = models.BooleanField('Has disabled facilities?')
-    renovated = models.IntegerField(choices=RENOVATED_CHOICES)
+    room_last_renovated = models.IntegerField('Year Room Last Renovated (YYYY)')
+    bathroom_last_renovated = models.IntegerField('Year Bathroom Last Renovated (YYYY)')
+    kitchen_last_renovated = models.IntegerField('Year Kitchen Last Renovated (YYYY)')
     faces_lensfield = models.BooleanField('Faces Lensfield Road?')
     faces_court = models.BooleanField('Faces court/garden?')
     bathroom_sharing = models.IntegerField(choices=BATHROOM_CHOICES, null=True)
@@ -138,6 +132,8 @@ class Room(models.Model):
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, editable=False, null=True, default=None)
     price = models.IntegerField(editable=False, default=0)
     new_price = models.FloatField(default=0)
+
+    # Scores for pricing.
     score_ensuite = models.FloatField(editable=False, default=0)
     score_double_bed = models.FloatField(editable=False, default=0)
     score_renovated = models.FloatField(editable=False, default=0)
@@ -150,6 +146,7 @@ class Room(models.Model):
     score_ground_floor = models.FloatField(editable=False, default=0)
     score_total = models.FloatField(editable=False, default=0)
     feature_price = models.FloatField(editable=False, default=0)
+
     sort_number = models.IntegerField(default=0)
 
     def __str__(self):

@@ -65,12 +65,13 @@
                 </tr>
                 <tr>
                     <td><b>Renovated Room</b></td>
-                    <td>{{ room.get_renovated_display }}</td>
+                    <td>Last Renovated {{ room.room_last_renovated }}</td>
                     <td>{{ room.score_renovated|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>
                     <td><b>Renovated Facilities</b></td>
-                    <td>{{ room.staircase.get_renovated_display }}</td>
+                    <td>Bathroom Last Renovated {{ room.bathroom_last_renovated }}<br>
+                        Kitchen Last Renovated {{ room.kitchen_last_renovated }}</td>
                     <td>{{ room.score_renovated_facilities|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>

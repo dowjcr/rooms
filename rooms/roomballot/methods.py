@@ -108,6 +108,18 @@ def generate_price():
     # Useful constants.
     min_size = Room.objects.order_by('size')[0].size if Room.objects.all().count() > 0 else 0
     max_size = Room.objects.order_by('-size')[0].size if Room.objects.all().count() > 0 else 0
+    min_renovated_room = Room.objects.order_by('room_last_renovated')[
+        0].room_last_renovated if Room.objects.all().count() > 0 else 0
+    max_renovated_room = Room.objects.order_by('-room_last_renovated')[
+        0].room_last_renovated if Room.objects.all().count() > 0 else 0
+    min_renovated_bathroom = Room.objects.order_by('bathroom_last_renovated')[
+        0].bathroom_last_renovated if Room.objects.all().count() > 0 else 0
+    max_renovated_bathroom = Room.objects.order_by('-bathroom_last_renovated')[
+        0].bathroom_last_renovated if Room.objects.all().count() > 0 else 0
+    min_renovated_kitchen = Room.objects.order_by('kitchen_last_renovated')[
+        0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
+    max_renovated_kitchen = Room.objects.order_by('-kitchen_last_renovated')[
+        0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
     accommodation_weeks = 0
 
     # Iterating through rooms and populating counts.
@@ -130,8 +142,14 @@ def generate_price():
         if int(r.floor) != 1:
             count_ground_floor += contract_length
         accommodation_weeks += contract_length
-        count_renovated_room += ((r.renovated - 1) / 2) * contract_length
-        count_renovated_facilities += ((r.staircase.renovated - 1) / 2) * contract_length
+        now = datetime.datetime.now()
+        count_renovated_room = (r.room_last_renovated - min_renovated_room) / (
+                    max_renovated_room - min_renovated_room) * contract_length
+        count_renovated_bathroom = (r.bathroom_last_renovated - min_renovated_bathroom) / (
+                    max_renovated_bathroom - min_renovated_bathroom) * contract_length
+        count_renovated_kitchen = (r.kitchen_last_renovated - min_renovated_kitchen) / (
+                    max_renovated_kitchen - min_renovated_kitchen) * contract_length
+        count_renovated_facilities = (count_renovated_bathroom + count_renovated_kitchen) / 2
 
     # Getting weights from settings.
     base_price = float(get_setting('base_price'))
@@ -217,10 +235,16 @@ def generate_price():
             room_to_update.score_size = score_size
 
             # Adding weight for renovation (room & facilities).
-            score_renovated = weight_renovated_room * (room_to_update.renovated - 1) / 2
+            score_renovated = weight_renovated_room * (room_to_update.room_last_renovated - min_renovated_room) / (
+                        max_renovated_room - min_renovated_room)
             this_weight += score_renovated
             room_to_update.score_renovated = score_renovated
-            score_renovated_facilities = weight_renovated_facilities * (room_to_update.staircase.renovated - 1) / 2
+            score_renovated_bathroom = (room_to_update.bathroom_last_renovated - min_renovated_bathroom) / (
+                    max_renovated_bathroom - min_renovated_bathroom)
+            score_renovated_kitchen = (room_to_update.kitchen_last_renovated - min_renovated_kitchen) / (
+                    max_renovated_kitchen - min_renovated_kitchen)
+            score_renovated_facilities = weight_renovated_facilities * (
+                        score_renovated_bathroom + score_renovated_kitchen) / 2
             this_weight += score_renovated_facilities
             room_to_update.score_renovated_facilities = score_renovated_facilities
 
@@ -354,7 +378,7 @@ def advance_year():
                 student.save()
                 logger.info("Moved student from first to second year [" + student.user_id + "]")
             for room in Room.objects.exclude(taken_by=None):
-                room.taken_by=None
+                room.taken_by = None
                 room.save()
                 logger.info("Deallocated room [Room " + str(room.room_id) + "]")
     else:
@@ -389,7 +413,8 @@ def remove_from_ballot(student):
                 if get_syndicate_size(student_syndicate) == 0:
                     syndicate_rank = student_syndicate.rank
                     student_syndicate.delete()
-                    logger.info("Removing from ballot - deleted syndicate [" + str(student_syndicate.syndicate_id) + "]")
+                    logger.info(
+                        "Removing from ballot - deleted syndicate [" + str(student_syndicate.syndicate_id) + "]")
                     if syndicate_rank is not None:
                         for rank in range(syndicate_rank + 1, get_num_syndicates() + 2):
                             sy = Syndicate.objects.select_for_update().get(rank=rank)
@@ -400,7 +425,8 @@ def remove_from_ballot(student):
                     if student_syndicate.owner_id == student.user_id:
                         reallocate_syndicate_owner(student_syndicate)
                         logger.info(
-                            "Removing from ballot - reallocated syndicate owner [" + str(student_syndicate.syndicate_id) + "]")
+                            "Removing from ballot - reallocated syndicate owner [" + str(
+                                student_syndicate.syndicate_id) + "]")
                     # Check if syndicate complete, and update if necessary.
                     complete = True
                     for student in Student.objects.filter(syndicate=student_syndicate):
@@ -585,7 +611,7 @@ def generate_times():
                 s.save()
         start_date = get_setting('start_date')
         # Generate times for second years.
-        dt = datetime.datetime.strptime(start_date + " 13:00", "%d/%m/%y %H:%M")
+        dt = datetime.datetime.strptime(start_date + " 09:00", "%d/%m/%y %H:%M")
         with transaction.atomic():
             second_years = Student.objects.select_for_update().filter(year=2, in_ballot=True).exclude(
                 rank=None).order_by('rank')
@@ -679,3 +705,21 @@ def send_to_bottom(student):
             s.picks_at = new_time
             s.save()
             logger.info("Sent student to bottom of ballot [" + s.user_id + "]")
+
+
+# =========== GENERATE IDENTIFIERS ==============
+# For each room, generates its identifier as per
+# College's identification scheme.
+
+def generate_identifiers():
+    with transaction.atomic():
+        for room in Room.objects.select_for_update().all():
+            if room.staircase.identifier is None:
+                continue
+            prefix = str(room.staircase.identifier)
+            numbers = ''.join(c for c in room.room_number if c.isdigit())
+            if len(numbers) == 1:
+                room.identifier = prefix + "0" + str(room.room_number)
+            else:
+                room.identifier = prefix + str(room.room_number)
+            room.save()
