@@ -108,17 +108,17 @@ def generate_price():
     # Useful constants.
     min_size = Room.objects.order_by('size')[0].size if Room.objects.all().count() > 0 else 0
     max_size = Room.objects.order_by('-size')[0].size if Room.objects.all().count() > 0 else 0
-    min_renovated_room = Room.objects.order_by('room_last_renovated')[
+    min_renovated_room = Room.objects.exclude(room_last_renovated=None).order_by('room_last_renovated')[
         0].room_last_renovated if Room.objects.all().count() > 0 else 0
-    max_renovated_room = Room.objects.order_by('-room_last_renovated')[
+    max_renovated_room = Room.objects.exclude(room_last_renovated=None).order_by('-room_last_renovated')[
         0].room_last_renovated if Room.objects.all().count() > 0 else 0
-    min_renovated_bathroom = Room.objects.order_by('bathroom_last_renovated')[
+    min_renovated_bathroom = Room.objects.exclude(bathroom_last_renovated=None).order_by('bathroom_last_renovated')[
         0].bathroom_last_renovated if Room.objects.all().count() > 0 else 0
-    max_renovated_bathroom = Room.objects.order_by('-bathroom_last_renovated')[
+    max_renovated_bathroom = Room.objects.exclude(bathroom_last_renovated=None).order_by('-bathroom_last_renovated')[
         0].bathroom_last_renovated if Room.objects.all().count() > 0 else 0
-    min_renovated_kitchen = Room.objects.order_by('kitchen_last_renovated')[
+    min_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None).order_by('kitchen_last_renovated')[
         0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
-    max_renovated_kitchen = Room.objects.order_by('-kitchen_last_renovated')[
+    max_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None).order_by('-kitchen_last_renovated')[
         0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
     accommodation_weeks = 0
 
