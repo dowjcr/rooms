@@ -390,8 +390,12 @@ def manage_student(request, user_id):
 
 def ballot_info(request):
     student = Student.objects.get(user_id=request.user.username)
+    start_date = get_setting('start_date')
+    start = datetime.datetime.strptime(start_date, "%d/%m/%y")
+    syndicate_end = start - datetime.timedelta(weeks=1)
     return render(request, 'roomballot/info.html', {'student': student,
-                                                    'date': get_setting('start_date')})
+                                                    'date': start.strftime("%d/%m"),
+                                                    'syndicate_date': syndicate_end.strftime("%d/%m")})
 
 
 # =================== ABOUT ===================
