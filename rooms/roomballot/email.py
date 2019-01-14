@@ -144,3 +144,17 @@ def confirm_review(student):
     message = "Thanks for reviewing your room! We appreciate you :)"
     send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
     logger.info("Acknowledged review left [" + student.user_id + "]")
+
+
+# ============= INVITE BALLOT =================
+# Sends an email explaining the ballot to first-years,
+# and inviting them to create their syndicates.
+
+def invite_ballot():
+    for student in Student.objects.filter(year=1):
+        subject = "Important room ballot information!"
+        recipient_list = [student.user_id + "@cam.ac.uk"]
+        html_message = render_to_string('roomballot/emails/invite-ballot.html', {'student': student})
+        message = "Please view this email as HTML"
+        send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info('Sent invitation message [' + student.user_id + ']')
