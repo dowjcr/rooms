@@ -489,8 +489,10 @@ def create_new_syndicate(student_ids, owner_id):
                 syndicate.owner_id = owner_id
                 if len(student_ids) == 1:
                     syndicate.complete = True
+                    syndicate.save()
                     completed_syndicate(syndicate)
-                syndicate.save()
+                else:
+                    syndicate.save()
                 for student_id in student_ids:
                     student = Student.objects.select_for_update().get(user_id=student_id)
                     if student.syndicate is not None or student.accepted_syndicate or student.year != year:

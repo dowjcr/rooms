@@ -158,3 +158,15 @@ def invite_ballot():
         message = "Please view this email as HTML"
         send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
         logger.info('Sent invitation message [' + student.user_id + ']')
+
+
+# apology
+
+def invite_ballot_error():
+    for student in Student.objects.filter(syndicate=None):
+        subject = "Sorry!"
+        recipient_list = [student.user_id + "@cam.ac.uk"]
+        html_message = render_to_string('roomballot/emails/invite-ballot-error.html', {'student': student})
+        message = "Please view this email as HTML"
+        send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info('Sent error sorry message [' + student.user_id + ']')
