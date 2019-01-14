@@ -506,8 +506,9 @@ def create_new_syndicate(student_ids, owner_id):
                 owner.accepted_syndicate = True
                 owner.save()
                 logger.info("Created new syndicate [" + str(syndicate.syndicate_id) + "]")
-            invite_syndicate(syndicate)
-            return syndicate.syndicate_id
+                if not syndicate.complete:
+                    invite_syndicate(syndicate)
+                return syndicate.syndicate_id
     else:
         raise BallotInProgressException()
 
