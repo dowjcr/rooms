@@ -37,6 +37,7 @@ urlpatterns = [
     path('student/<str:user_id>', views.student_detail, name='student-detail'),
     path('syndicate/<int:syndicate_id>', views.syndicate_detail, name='syndicate-detail'),
     path('info', views.ballot_info, name='info'),
+    path('info/bursary', views.bursary_info, name='bursary-info'),
     path('info/create-syndicate', views.syndicate_info, name='syndicate-info'),
     path('info/individual', views.individual_info, name='individual-info'),
     path('info/select-room', views.select_room_info, name='select-room-info'),

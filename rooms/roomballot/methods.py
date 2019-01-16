@@ -489,10 +489,7 @@ def create_new_syndicate(student_ids, owner_id):
                 syndicate.owner_id = owner_id
                 if len(student_ids) == 1:
                     syndicate.complete = True
-                    syndicate.save()
-                    completed_syndicate(syndicate)
-                else:
-                    syndicate.save()
+                syndicate.save()
                 for student_id in student_ids:
                     student = Student.objects.select_for_update().get(user_id=student_id)
                     if student.syndicate is not None or student.accepted_syndicate or student.year != year:
@@ -510,6 +507,8 @@ def create_new_syndicate(student_ids, owner_id):
                 logger.info("Created new syndicate [" + str(syndicate.syndicate_id) + "]")
                 if not syndicate.complete:
                     invite_syndicate(syndicate)
+                else:
+                    completed_syndicate(syndicate)
                 return syndicate.syndicate_id
     else:
         raise BallotInProgressException()

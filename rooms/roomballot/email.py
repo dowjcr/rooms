@@ -23,11 +23,11 @@ logger = logging.getLogger(__name__)
 
 def invite_selection(student):
     subject = student.first_name + ", time to pick your room!"
-    #recipient_list = [student.user_id + "@cam.ac.uk"]
-    #html_message = render_to_string('roomballot/emails/selection-invite.html', {'student': student})
-    #message = "Time to select your room! Go to https://ballot.downingjcr.co.uk now."
-    #send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
-    #logger.info("Invited selection [" + student.user_id + "]")
+    recipient_list = [student.user_id + "@cam.ac.uk"]
+    html_message = render_to_string('roomballot/emails/selection-invite.html', {'student': student})
+    message = "Time to select your room! Go to https://ballot.downingjcr.co.uk now."
+    send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+    logger.info("Invited selection [" + student.user_id + "]")
 
 
 # ============ INVITE SYNDICATE ==================
@@ -35,15 +35,16 @@ def invite_selection(student):
 # syndicate, inviting them to accept.
 
 def invite_syndicate(syndicate):
-    owner_id = syndicate.owner_id
-    #students = Student.objects.filter(syndicate=syndicate).exclude(user_id=owner_id)
-    #for student in students:
-    #    subject = student.first_name + ", you've been invited to a syndicate!"
-    #    recipient_list = [student.user_id + "@cam.ac.uk"]
-    #    html_message = render_to_string('roomballot/emails/syndicate-invite.html', {'student': student})
-    #    message = "You've been invited to a syndicate! Go to https://ballot.downingjcr.co.uk to respond to the invite."
-    #    send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
-    #    logger.info("Invited to syndicate [" + student.user_id + "]")
+    if syndicate is not None:
+        owner_id = syndicate.owner_id
+        students = Student.objects.filter(syndicate=syndicate).exclude(user_id=owner_id)
+        for student in students:
+            subject = student.first_name + ", you've been invited to a syndicate!"
+            recipient_list = [student.user_id + "@cam.ac.uk"]
+            html_message = render_to_string('roomballot/emails/syndicate-invite.html', {'student': student})
+            message = "You've been invited to a syndicate! Go to https://ballot.downingjcr.co.uk to respond to the invite."
+            send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+            logger.info("Invited to syndicate [" + student.user_id + "]")
 
 
 # ============ COMPLETED SYNDICATE ================
@@ -51,14 +52,15 @@ def invite_syndicate(syndicate):
 # complete, since everyone has accepted.
 
 def completed_syndicate(syndicate):
-    students = Student.objects.filter(syndicate=syndicate)
-    #for student in students:
-    #    subject = student.first_name + ", your syndicate is complete!"
-    #    recipient_list = [student.user_id + "@cam.ac.uk"]
-    #    html_message = render_to_string('roomballot/emails/syndicate-complete.html', {'student': student})
-    #    message = "Hey! Your syndicate is complete, great job! You can view it at https://ballot.downingjcr.co.uk."
-    #    send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
-    #    logger.info("Notified syndicate complete [" + student.user_id + "]")
+    if syndicate is not None:
+        students = Student.objects.filter(syndicate=syndicate)
+        for student in students:
+            subject = student.first_name + ", your syndicate is complete!"
+            recipient_list = [student.user_id + "@cam.ac.uk"]
+            html_message = render_to_string('roomballot/emails/syndicate-complete.html', {'student': student})
+            message = "Hey! Your syndicate is complete, great job! You can view it at https://ballot.downingjcr.co.uk."
+            send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
+            logger.info("Notified syndicate complete [" + student.user_id + "]")
 
 
 # ============ FAILED SYNDICATE ================
@@ -66,17 +68,18 @@ def completed_syndicate(syndicate):
 # failed, since somebody rejected the invitation.
 
 def failed_syndicate(syndicate):
-    students = Student.objects.filter(syndicate=syndicate)
-    #for student in students:
-    #    subject = student.first_name + ", your syndicate has been dissolved."
-    #    recipient_list = [student.user_id + "@cam.ac.uk"]
-    #    html_message = render_to_string('roomballot/emails/syndicate-failed.html', {'student': student})
-    #    plain_message = """
-    #    Hey! Unfortunately, someone rejected their invite to your syndicate, so it has been dissolved. To create
-    #    a new syndicate, visit https://ballot.downingjcr.co.uk.
-    #    """
-    #    send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
-    #    logger.info("Notified syndicate failed [" + student.user_id + "]")
+    if syndicate is not None:
+        students = Student.objects.filter(syndicate=syndicate)
+        for student in students:
+            subject = student.first_name + ", your syndicate has been dissolved."
+            recipient_list = [student.user_id + "@cam.ac.uk"]
+            html_message = render_to_string('roomballot/emails/syndicate-failed.html', {'student': student})
+            plain_message = """
+            Hey! Unfortunately, someone rejected their invite to your syndicate, so it has been dissolved. To create
+            a new syndicate, visit https://ballot.downingjcr.co.uk.
+            """
+            send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+            logger.info("Notified syndicate failed [" + student.user_id + "]")
 
 
 # ============= ROOM SELECTED =================
@@ -85,15 +88,15 @@ def failed_syndicate(syndicate):
 
 def selected_room(student, room):
     subject = student.first_name + ", you've selected your room."
-    #recipient_list = [student.user_id + "@cam.ac.uk"]
-    #html_message = render_to_string('roomballot/emails/room-selected.html', {'student': student,
-    #                                                                         'room': room})
-    #plain_message = """
-    #Hey, thanks for selecting your room! You can view your selection on the Room Balloting System
-    #by visiting https://ballot.downingjcr.co.uk.
-    #"""
-    #send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
-    #logger.info("Notified room allocated [" + student.user_id + "]")
+    recipient_list = [student.user_id + "@cam.ac.uk"]
+    html_message = render_to_string('roomballot/emails/room-selected.html', {'student': student,
+                                                                             'room': room})
+    plain_message = """
+    Hey, thanks for selecting your room! You can view your selection on the Room Balloting System
+    by visiting https://ballot.downingjcr.co.uk.
+    """
+    send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+    logger.info("Notified room allocated [" + student.user_id + "]")
 
 
 # ============= INVITE REVIEW =================
@@ -101,17 +104,16 @@ def selected_room(student, room):
 # room.
 
 def invite_review():
-    pass
-    #for student in Student.objects.all():
-    #    subject = student.first_name + ", review your room!"
-    #    recipient_list = [student.user_id + "@cam.ac.uk"]
-    #    html_message = render_to_string('roomballot/emails/review-room.html', {'student': student})
-    #    plain_message = """
-    #    Hey, Downing JCR here. Perhaps you'd like to review the room you're living in this year? Please
-    #    visit https://ballot.downingjcr.co.uk.
-    #    """
-    #    send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
-    #    logger.info("Initial review invite [" + student.user_id + "]")
+    for student in Student.objects.exclude(has_allocated=False):
+        subject = student.first_name + ", review your room!"
+        recipient_list = [student.user_id + "@cam.ac.uk"]
+        html_message = render_to_string('roomballot/emails/review-room.html', {'student': student})
+        plain_message = """
+        Hey, Downing JCR here. Perhaps you'd like to review the room you're living in this year? Please
+        visit https://ballot.downingjcr.co.uk.
+        """
+        send_mail(subject, plain_message, FROM_EMAIL, recipient_list, html_message=html_message)
+        logger.info("Initial review invite [" + student.user_id + "]")
 
 
 # ============= REMIND REVIEW =================
@@ -159,15 +161,3 @@ def invite_ballot():
         message = "Please view this email as HTML"
         send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
         logger.info('Sent invitation message [' + student.user_id + ']')
-
-
-# apology
-
-def invite_ballot_error():
-    for student in Student.objects.filter(syndicate=None):
-        subject = "Sorry!"
-        recipient_list = [student.user_id + "@cam.ac.uk"]
-        html_message = render_to_string('roomballot/emails/invite-ballot-error.html', {'student': student})
-        message = "Please view this email as HTML"
-        send_mail(subject, message, FROM_EMAIL, recipient_list, html_message=html_message)
-        logger.info('Sent error sorry message [' + student.user_id + ']')

@@ -1,0 +1,83 @@
+{% extends 'roomballot/base-student.html' %}
+
+{% block content %}
+
+    <head>
+        <title>Bursaries & Rent Reduction | Downing JCR RBS</title>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"
+              integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+              crossorigin="anonymous">
+    </head>
+
+    <div class="container">
+
+        <div class="row mt-4">
+
+            <div class="col-md-3 col-sm-12 mb-4 d-md-block sidebar">
+                <div class="list-group">
+                    <a href="/roomballot/info" class="list-group-item"><span>Ballot Information</span></a>
+                    <a href="/roomballot/info/bursary"
+                       class="list-group-item active"><span>Bursaries & Rent Reduction</span></a>
+                    <a href="/roomballot/info/create-syndicate"
+                       class="list-group-item"><span>Creating a Syndicate</span></a>
+                    <a href="/roomballot/info/individual"
+                       class="list-group-item"><span>Ballot as an Individual</span></a>
+                    <a href="/roomballot/info/select-room" class="list-group-item"><span>Selecting a Room</span></a>
+                    <a href="/roomballot/info/pricing" class="list-group-item"><span>Pricing</span></a>
+                    <a href="/roomballot/about" class="list-group-item"></i><span>About</span></a>
+                </div>
+            </div>
+            <main role="main" class="col md-9 ml-sm-auto col-lg-9 px-4 mb-4">
+                <div class="row">
+                    <div>
+                        <h2>Bursaries & Rent Reduction</h2>
+                    </div>
+                    <div class="border-top">
+                        <p class="mt-3">
+                            There are a range of ways that College reduces your rent, and a range of bursaries that you
+                            can apply for if the cost of rent is too high. We are currently working with college to make
+                            these more transparent and open - more details of which will be released with finalised
+                            rents next week.
+                        </p>
+                        <h4>College Applied Rebate</h4>
+                        <p>
+                            As part of the agreement for the college to implement 38 week rent contracts it was agreed
+                            that some students would be given a rent rebate depending on their parental household income
+                            (as assessed by HEBSS data).  The rebate is due if household income falls between £40,000
+                            and £62,143.  The rebate is included on the Lent Term college bill.
+                            The College must have the information from HEBSS (the Higher Education Bursary and
+                            Scholarship Scheme). This means that, for College to have your information, you must allow
+                            the Student Loan Company to pass on your household financial information to the University.
+                            If you think you fall into this category, make sure to do this next year when you apply for
+                            your student finance.
+                        </p>
+                        <h4>Hardship Grant</h4>
+                        <p>
+                            This is a grant that you can apply to if the cost of accommodation is too severe. While not
+                            guaranteed, any good reason will usually result in a pay-out. Importantly, there is no
+                            strict parameter on hardship – so things like 'your only option was to take an expensive
+                            room' could be covered.<br>
+                            For more guidance on this please get in touch with Tutorials and Admissions.
+                        </p>
+                        <h4>Access to Learning Fund Awards</h4>
+                        <p>
+                            If you are falling short of your cost of rent, you can apply to this national fund. Applying
+                            necessitates a considerable amount of effort, and requires a large amount of information.
+                            However, it is another option. If you opt for this route, please make sure to read the
+                            explanatory notes to work out if the Standard or Exceptional application is what you need to
+                            make.
+                        </p>
+                        <h4>Talk to your Tutor</h4>
+                        <p>
+                            If you are having problems affording rent, make clear to your Tutor that this is the case,
+                            and ask if there are any other options. It is important College is aware of your issues, as
+                            Cambridge University guarantees that nobody will have to leave the University simply because
+                            of the cost of living here. They may be able to provide other options that are not available
+                            here, or refer you to the Senior Tutor on the matter.
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+{% endblock %}

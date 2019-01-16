@@ -424,6 +424,15 @@ def individual_info(request):
     return render(request, 'roomballot/info-individual.html', {'student': student})
 
 
+# ================= BURSARY INFO ===============
+# Display page with instructions on how to enter the
+# ballot as an individual.
+
+def bursary_info(request):
+    student = Student.objects.get(user_id=request.user.username)
+    return render(request, 'roomballot/info-bursary.html', {'student': student})
+
+
 # ============== SELECT ROOM INFO ==============
 # Display page with instructions on how to select
 # a room come ballot day.
