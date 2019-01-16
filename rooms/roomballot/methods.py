@@ -142,14 +142,12 @@ def generate_price():
         if int(r.floor) != 1:
             count_ground_floor += contract_length
         accommodation_weeks += contract_length
-        now = datetime.datetime.now()
-        count_renovated_room = (r.room_last_renovated - min_renovated_room) / (
-                    max_renovated_room - min_renovated_room) * contract_length
-        count_renovated_bathroom = (r.bathroom_last_renovated - min_renovated_bathroom) / (
-                    max_renovated_bathroom - min_renovated_bathroom) * contract_length
-        count_renovated_kitchen = (r.kitchen_last_renovated - min_renovated_kitchen) / (
-                    max_renovated_kitchen - min_renovated_kitchen) * contract_length
-        count_renovated_facilities = (count_renovated_bathroom + count_renovated_kitchen) / 2
+        count_renovated_room += (r.room_last_renovated - min_renovated_room) / (
+                max_renovated_room - min_renovated_room) * contract_length
+        count_renovated_facilities += ((r.bathroom_last_renovated - min_renovated_bathroom) / (
+                max_renovated_bathroom - min_renovated_bathroom) +
+                                      (r.kitchen_last_renovated - min_renovated_kitchen) / (
+                                              max_renovated_kitchen - min_renovated_kitchen)) / 2 * contract_length
 
     # Getting weights from settings.
     base_price = float(get_setting('base_price'))
@@ -236,7 +234,7 @@ def generate_price():
 
             # Adding weight for renovation (room & facilities).
             score_renovated = weight_renovated_room * (room_to_update.room_last_renovated - min_renovated_room) / (
-                        max_renovated_room - min_renovated_room)
+                    max_renovated_room - min_renovated_room)
             this_weight += score_renovated
             room_to_update.score_renovated = score_renovated
             score_renovated_bathroom = (room_to_update.bathroom_last_renovated - min_renovated_bathroom) / (
@@ -244,7 +242,7 @@ def generate_price():
             score_renovated_kitchen = (room_to_update.kitchen_last_renovated - min_renovated_kitchen) / (
                     max_renovated_kitchen - min_renovated_kitchen)
             score_renovated_facilities = weight_renovated_facilities * (
-                        score_renovated_bathroom + score_renovated_kitchen) / 2
+                    score_renovated_bathroom + score_renovated_kitchen) / 2
             this_weight += score_renovated_facilities
             room_to_update.score_renovated_facilities = score_renovated_facilities
 
