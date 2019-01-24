@@ -2,186 +2,207 @@
 
 {% block content %}
 
-<head>
-    <title>Ballot Information | Downing JCR RBS</title>
-</head>
+    <head>
+        <title>Ballot Information | Downing JCR RBS</title>
+    </head>
 
-<div class="container">
+    <div class="container">
 
-    <div class="row mt-4">
+        <div class="row mt-4">
 
-        <div class="col-md-3 col-sm-12 mb-4 d-md-block sidebar">
-            <div class="list-group">
-                <a href="/roomballot/info" class="list-group-item active"><span>Ballot Information</span></a>
-                <a href="/roomballot/info/bursary" class="list-group-item"><span>Bursaries & Rent Reduction</span></a>
-                <a href="/roomballot/info/create-syndicate" class="list-group-item"><span>Creating a Syndicate</span></a>
-                <a href="/roomballot/info/individual" class="list-group-item"><span>Ballot as an Individual</span></a>
-                <a href="/roomballot/info/select-room" class="list-group-item"><span>Selecting a Room</span></a>
-                <a href="/roomballot/info/pricing" class="list-group-item"><span>Pricing</span></a>
-                <a href="/roomballot/about" class="list-group-item"><span>About</span></a>
+            <div class="col-md-3 col-sm-12 mb-4 d-md-block sidebar">
+                <div class="list-group">
+                    <a href="/roomballot/info" class="list-group-item active"><span>Ballot Information</span></a>
+                    <a href="/roomballot/info/bursary"
+                       class="list-group-item"><span>Bursaries & Rent Reduction</span></a>
+                    <a href="/roomballot/info/create-syndicate"
+                       class="list-group-item"><span>Creating a Syndicate</span></a>
+                    <a href="/roomballot/info/individual"
+                       class="list-group-item"><span>Ballot as an Individual</span></a>
+                    <a href="/roomballot/info/select-room" class="list-group-item"><span>Selecting a Room</span></a>
+                    <a href="/roomballot/info/pricing" class="list-group-item"><span>Pricing</span></a>
+                    <a href="/roomballot/about" class="list-group-item"><span>About</span></a>
+                </div>
             </div>
-        </div>
-        <main role="main" class="col md-9 ml-sm-auto col-lg-9 px-4 mb-4">
-            <div class="row">
-                <div>
-                    <h2>Ballot Information</h2>
-                </div>
-                <div class="border-top">
-                    <p class="mt-3">
-                        The ballot will be held on the weekend of {{ date }}. Second years will pick on the Saturday,
-                        and first years will pick on the Sunday. Balloting will begin at 9am, and you'll be allocated
-                        a 5-minute slot in which to pick your room.
-                    </p>
-
-                    <div id="accordion">
-                        <div class="card">
-                            <div class="card-header" id="headingOne">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne">
-                                        What is the room ballot?
-                                    </button>
-                                </h5>
-                            </div>
-
-                            <div id="collapseOne" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    The room ballot is an ordered list of first and second year students - where your
-                                    position in the ballot
-                                    reflects the order in which you will choose a room on ballot weekend. The ballot
-                                    occurs over two days,
-                                    in which second years take priority and choose first, followed by the freshers.
-                                    Within your half of the
-                                    ballot, your position is randomly determined (there's no priority for scholars etc).
-                                    When you ballot
-                                    again in your second year, the order of your year will be reversed. So if you were
-                                    at the bottom of the
-                                    ballot in first year, you will be at the very top in second year.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingTwo">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" data-toggle="collapse"
-                                            data-target="#collapseTwo">
-                                        Do I need to be on the ballot?
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseTwo" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    Not necessarily. A set of rooms is reserved out of the ballot and can be applied for
-                                    via the Tutorial
-                                    & Admissions Office by students with exceptional requirements - these tend to be
-                                    upon referral from the
-                                    DRC or with medical evidence. All students who come under this remit should
-                                    have been contacted by T&A. If you have not been contacted but feel you should have,
-                                    please email the
-                                    college academic registrar, Sarah Pickard (<a href="mailto:sjp54@cam.ac.uk">sjp54@cam.ac.uk</a>).
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingThree">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" data-toggle="collapse"
-                                            data-target="#collapseThree">
-                                        What is a syndicate?
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseThree" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    You can feature on the ballot in two ways: either as an individual or as part of a
-                                    syndicate. A syndicate
-                                    is a way for a group of people (maximum 6 people) to choose rooms at the same time
-                                    as each other. If
-                                    you want to live with a certain group of people next year, being in a syndicate with
-                                    them is a way to
-                                    make that more likely because you can easily coordinate what you pick when it's your
-                                    turn on ballot
-                                    weekend. Being in a syndicate does not mean that you have to live with the people in
-                                    it - it merely
-                                    makes the option of living with them easier.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingFour">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" data-toggle="collapse"
-                                            data-target="#collapseFour">
-                                        How do I form a syndicate?
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseFour" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    Talk to your friends. It is actually quite a big decision so do give it some serious
-                                    thought, but
-                                    remember that it's also fine to not be in a syndicate. When you're ready, log on to
-                                    the Balloting
-                                    System to form your syndicates. Only freshers need to form syndicates, and you will
-                                    have until
-                                    {{ syndicate_date }} to complete this.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingFive">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" data-toggle="collapse"
-                                            data-target="#collapseFive">
-                                        Do I have to live in college?
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseFive" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    No. You are entitled to drop of the room ballot if you so wish and look for
-                                    out-of-college
-                                    accommodation. However if you change your mind there is no guarantee that college
-                                    will be able to provide accommodation to you.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingSix">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" data-toggle="collapse"
-                                            data-target="#collapseSix">
-                                        Long or short contract?
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseSix" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    There are two broad types of rooms to consider when choosing:<br><br>
-                                    <ol type="a">
-                                        <li>
-                                            Long contract rooms are on a 38-week contract, meaning that you can leave
-                                            stuff
-                                            in your room over the Michaelmas and Easter Vacations. All the rooms in the
-                                            Lensfield
-                                            houses are long contract, along with all the rooms in I and M staircases.
-                                            Some other
-                                            rooms have the option of 38-week contracts if desired (e.g. S staircase), so
-                                            please
-                                            calculate your rents with this in mind and enquire on ballot day, if you
-                                            want this.<br><br>
-                                        </li>
-                                        <li>
-                                            Short contract rooms are the rest of the rooms in college, on a 30 week
-                                            contract.
-                                        </li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
+            <main role="main" class="col md-9 ml-sm-auto col-lg-9 px-4 mb-4">
+                <div class="row">
+                    <div>
+                        <h2>Ballot Information</h2>
                     </div>
+                    <div class="border-top">
+                        <p class="mt-3">
+                            The ballot will be held on the weekend of {{ date }}. Second years will pick on the
+                            Saturday,
+                            and first years will pick on the Sunday. Balloting will begin at 9am, and you'll be
+                            allocated
+                            a 5-minute slot in which to pick your room.
+                        </p>
 
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header" id="headingOne">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne">
+                                            What is the room ballot?
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <div id="collapseOne" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        The room ballot is an ordered list of first and second year students - where
+                                        your
+                                        position in the ballot
+                                        reflects the order in which you will choose a room on ballot weekend. The ballot
+                                        occurs over two days,
+                                        in which second years take priority and choose first, followed by the freshers.
+                                        Within your half of the
+                                        ballot, your position is randomly determined (there's no priority for scholars
+                                        etc).
+                                        When you ballot
+                                        again in your second year, the order of your year will be reversed. So if you
+                                        were
+                                        at the bottom of the
+                                        ballot in first year, you will be at the very top in second year.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse"
+                                                data-target="#collapseTwo">
+                                            Do I need to be on the ballot?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        Not necessarily. A set of rooms is reserved out of the ballot and can be applied
+                                        for
+                                        via the Tutorial
+                                        & Admissions Office by students with exceptional requirements - these tend to be
+                                        upon referral from the
+                                        DRC or with medical evidence. All students who come under this remit will be
+                                        contacted by T&A in due course.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingThree">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse"
+                                                data-target="#collapseThree">
+                                            What is a syndicate?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        You can feature on the ballot in two ways: either as an individual or as part of
+                                        a
+                                        syndicate. A syndicate
+                                        is a way for a group of people (maximum 6 people) to choose rooms at the same
+                                        time
+                                        as each other. If
+                                        you want to live with a certain group of people next year, being in a syndicate
+                                        with
+                                        them is a way to
+                                        make that more likely because you can easily coordinate what you pick when it's
+                                        your
+                                        turn on ballot
+                                        weekend. Being in a syndicate does not mean that you have to live with the
+                                        people in
+                                        it - it merely
+                                        makes the option of living with them easier.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingFour">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse"
+                                                data-target="#collapseFour">
+                                            How do I form a syndicate?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFour" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        Talk to your friends. It is actually quite a big decision so do give it some
+                                        serious
+                                        thought, but
+                                        remember that it's also fine to not be in a syndicate. When you're ready, log on
+                                        to
+                                        the Balloting
+                                        System to form your syndicates. Only freshers need to form syndicates, and you
+                                        will
+                                        have until
+                                        {{ syndicate_date }} to complete this.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingFive">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse"
+                                                data-target="#collapseFive">
+                                            Do I have to live in college?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFive" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        No. You are entitled to drop of the room ballot if you so wish and look for
+                                        out-of-college
+                                        accommodation. However if you change your mind there is no guarantee that
+                                        college
+                                        will be able to provide accommodation to you.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" id="headingSix">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse"
+                                                data-target="#collapseSix">
+                                            Long or short contract?
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseSix" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        There are two broad types of rooms to consider when choosing:<br><br>
+                                        <ol type="a">
+                                            <li>
+                                                Long contract rooms are on a 38-week contract, meaning that you can
+                                                leave
+                                                stuff
+                                                in your room over the Michaelmas and Easter Vacations. All the rooms in
+                                                the
+                                                Lensfield
+                                                houses are long contract, along with all the rooms in I and M
+                                                staircases.
+                                                Some other
+                                                rooms have the option of 38-week contracts if desired (e.g. S
+                                                staircase), so
+                                                please
+                                                calculate your rents with this in mind and enquire on ballot day, if you
+                                                want this.<br><br>
+                                            </li>
+                                            <li>
+                                                Short contract rooms are the rest of the rooms in college, on a 30 week
+                                                contract.
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-            </div></main>
-    </div>
+            </main>
+        </div>
 
 {% endblock %}
