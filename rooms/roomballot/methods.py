@@ -603,7 +603,7 @@ def reallocate_syndicate_owner(syndicate):
 # Date in datetime format.
 
 def generate_times():
-    if get_setting('ballot_in_progress').value == 'false':
+    if get_setting('ballot_in_progress') == 'false':
         with transaction.atomic():
             students = Student.objects.select_for_update().filter(in_ballot=True)
             for s in students:
