@@ -92,9 +92,9 @@
                 {% if student_to_pick is None %}
                     You can't pick on anyone's behalf right now. When you can, come back to this page, and you'll
                     be able to select a room. If you have any questions in the meantime, please get in touch by
-                    livechat or by emailing <a href="mailto:internet@jcr.dow.cam.ac.uk">internet@jcr.dow.cam.ac.uk</a>.
+                    livechat or by emailing <a href="mailto:internet@jcr.dow.cam.ac.uk">internet@jcr.dow.cam.ac.uk</a>.<br><br>
                 {% elif not student_to_pick.has_allocated %}
-                    <div class="col-lg-6 col-md-6 col-sm-12 alert alert-info">
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4 alert alert-info">
                         <p>You can now pick on behalf of
                             <b>{{ student_to_pick.first_name }} {{ student_to_pick.surname }}</b>. Simply start typing
                             the room in below. Clicking on the room confirms your allocation!</p>
@@ -103,6 +103,7 @@
                         </div>
                     </div>
                 {% endif %}
+                <a href="/roomballot/staircases" class="btn btn-primary">Browse Rooms <i class="fas fa-angle-right ml-2"></i></a>
             </div>
         </div>
     </div>

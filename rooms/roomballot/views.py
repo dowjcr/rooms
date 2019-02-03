@@ -20,7 +20,10 @@ import numpy as np
 # Displays room metadata.
 
 def room_detail(request, room_id):
-    student = Student.objects.get(user_id=request.user.username)
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+    except Student.DoesNotExist:
+        student = ProxyUser.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
     reviews = Review.objects.filter(room=room)
     selectable = get_setting('ballot_in_progress') == 'true' and get_setting('current_student') == request.user.username
@@ -90,7 +93,10 @@ def landing(request):
 # Lists all staircases, shows some metadata.
 
 def staircase_list(request):
-    student = Student.objects.get(user_id=request.user.username)
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+    except Student.DoesNotExist:
+        student = ProxyUser.objects.get(user_id=request.user.username)
     staircases = Staircase.objects.order_by('name')
 
     # Getting metadata
@@ -120,7 +126,10 @@ def staircase_list(request):
 # given staircase.
 
 def staircase_detail(request, staircase_id):
-    student = Student.objects.get(user_id=request.user.username)
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+    except Student.DoesNotExist:
+        student = ProxyUser.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
     rooms = Room.objects.exclude(type=4).exclude(type=1).filter(staircase=staircase).order_by('sort_number')
     try:
@@ -473,7 +482,6 @@ def pricing_info(request):
 def proxy(request):
     try:
         student = Student.objects.get(user_id=request.user.username)
-        print(request.method)
         if request.method == 'POST':
             try:
                 if ProxyInstance.objects.filter(user_id=request.POST.get('student_id'),
@@ -533,7 +541,6 @@ def proxy(request):
                         rooms_allocated.append(Room.objects.get(taken_by=st))
                     students.append(st)
                 student_to_pick = None
-                print(rooms_allocated)
                 if get_setting('ballot_in_progress') == 'true':
                     for s in students:
                         if s.user_id == get_setting('current_student'):

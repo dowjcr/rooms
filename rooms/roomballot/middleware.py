@@ -41,8 +41,9 @@ class AuthRequiredMiddleware(object):
                     return set_first_name(request)
         except Student.DoesNotExist:
             try:
+                PROXY_URLS = [compile('roomballot/staircase'), compile('roomballot/proxy'), compile('roomballot/room')]
                 ProxyUser.objects.get(user_id=request.user.username)
-                if compile('roomballot/proxy').match(request.path_info.lstrip('/')):
+                if any(m.match(request.path_info.lstrip('/')) for m in PROXY_URLS):
                     return response
                 else:
                     return HttpResponseRedirect('/roomballot/proxy')
