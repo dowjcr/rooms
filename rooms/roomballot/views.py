@@ -467,6 +467,89 @@ def pricing_info(request):
                                                                 float(get_setting('feature_price')), 5)})
 
 
+# =================== PROXY ====================
+# Allow selection of room by registered proxy.
+
+def proxy(request):
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+        print(request.method)
+        if request.method == 'POST':
+            try:
+                if ProxyInstance.objects.filter(user_id=request.POST.get('student_id'),
+                                                proxy_user_id=request.user.username).count() > 0:
+                    room = get_object_or_404(Room, pk=request.POST.get('room_id'))
+                    allocate_room(room, Student.objects.get(user_id=request.POST.get('student_id')))
+                    response_code = 1
+                else:
+                    response_code = 905
+            except ConcurrencyException:
+                response_code = 905
+            return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+        else:
+            student_crsids = ProxyInstance.objects.filter(proxy_user_id=student.user_id)
+            students = []
+            rooms_allocated = []
+            for s in student_crsids:
+                st = Student.objects.get(user_id=s.user_id)
+                if st.has_allocated:
+                    rooms_allocated.append(Room.objects.get(taken_by=st))
+                students.append(st)
+            student_to_pick = None
+            if get_setting('ballot_in_progress') == 'true':
+                for s in students:
+                    if s.user_id == get_setting('current_student'):
+                        student_to_pick = s
+                        break
+            return render(request, 'roomballot/proxy.html', {'students': students,
+                                                             'student': student,
+                                                             'student_to_pick': student_to_pick,
+                                                             'proxy_user': student,
+                                                             'rooms': Room.objects.filter(taken_by=None).order_by(
+                                                                 'sort_number'),
+                                                             'rooms_allocated': rooms_allocated})
+    except Student.DoesNotExist:
+        try:
+            proxy_user = ProxyUser.objects.get(user_id=request.user.username)
+            if request.method == 'POST':
+                try:
+                    if ProxyInstance.objects.filter(user_id=request.POST.get('student_id'),
+                                                    proxy_user_id=request.user.username).count() > 0:
+                        room = get_object_or_404(Room, pk=request.POST.get('room_id'))
+                        allocate_room(room, Student.objects.get(user_id=request.POST.get('student_id')))
+                        response_code = 1
+                    else:
+                        response_code = 905
+                except ConcurrencyException:
+                    response_code = 905
+                return HttpResponse(json.dumps({'responseCode': response_code}), content_type="application/json")
+            else:
+                student_crsids = ProxyInstance.objects.filter(proxy_user_id=proxy_user.user_id)
+                students = []
+                rooms_allocated = []
+                for s in student_crsids:
+                    st = Student.objects.get(user_id=s.user_id)
+                    if st.has_allocated:
+                        rooms_allocated.append(Room.objects.get(taken_by=st))
+                    students.append(st)
+                student_to_pick = None
+                print(rooms_allocated)
+                if get_setting('ballot_in_progress') == 'true':
+                    for s in students:
+                        if s.user_id == get_setting('current_student'):
+                            student_to_pick = s
+                            break
+                return render(request, 'roomballot/proxy.html', {'students': students,
+                                                                 'student_to_pick': student_to_pick,
+                                                                 'student': proxy_user,
+                                                                 'proxy_user': proxy_user,
+                                                                 'rooms': Room.objects.filter(taken_by=None).order_by(
+                                                                     'sort_number'),
+                                                                 'rooms_allocated': rooms_allocated})
+        except ProxyUser.DoesNotExist:
+            return error(request, 403)
+
+
 # ================== STATUS ===================
 # Display page with ballot status - which students
 # haven't completed syndicate, which syndicates are

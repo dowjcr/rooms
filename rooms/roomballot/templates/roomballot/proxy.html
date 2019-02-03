@@ -1,0 +1,110 @@
+{% extends 'roomballot/base-student-jquery.html' %}
+
+{% block content %}
+
+    <head>
+        <title>Proxy | Downing JCR RBS</title>
+    </head>
+
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+
+        $(document).ready(function () {
+
+            // Defining CSRF token.
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            });
+
+            // Handle response received after POST request.
+            function HandleResponse(responseCode) {
+                // Successfully created syndicate.
+                if (responseCode === 1) location.reload(true);
+                else location.assign('/roomballot/error/' + responseCode.toString());
+            }
+
+            // Called when the user selects a room to allocate.
+            function CreateSelectionAjaxResponse(code, id) {
+                $.ajax({
+                        url: '/roomballot/proxy',
+                        type: 'POST',
+                        data: {'response': code, 'room_id': id, 'student_id': '{{ student_to_pick.user_id }}'},
+                        dataType: 'json',
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        success: function (response) {
+                            HandleResponse(response.responseCode);
+                        }
+                    }
+                );
+            }
+
+            $(function () {
+
+                // Generate JSON of rooms which can be allocated.
+                var availableRooms = [
+                    {% for r in rooms %}
+                        {
+                            value: "{{ r.room_id }}",
+                            label: "{{ r }} ({{ r.identifier }})"
+                        }
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+
+                // Set parameters of autocomplete field.
+                $('#room').autocomplete({
+                    source: availableRooms,
+                    select: function (event, ui) {
+                        CreateSelectionAjaxResponse(1, ui.item.value);
+                        return false;
+                    }
+                });
+
+            });
+
+            $("modal-allocate").modal({
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+
+        })
+        ;
+    </script>
+
+    <div class="container">
+        <div class="row">
+            <div class="col md-12">
+                <h2>Proxy</h2>
+                <p>Thank you for agreeing to pick a room on someone's behalf! We appreciate you. You've been nominated
+                    as a proxy for the following student(s):</p>
+                {% for s in students %}
+                    <p><b>{{ s.first_name }} {{ s.surname }} ({{ s.user_id }})</b>
+                        {% if s.picks_at is not None %}
+                            {% if not s.has_allocated %}
+                                <br>Picks at {{ s.picks_at }}
+                            {% else %}
+                                <br>Room allocated: {% for r in rooms_allocated %}{% if r.taken_by == s %}{{ r }}{% endif %}{% endfor %}
+                                <br>If you need to change this, please get in touch via livechat.
+                            {% endif %}
+                        {% endif %}</p>
+                {% endfor %}
+                {% if student_to_pick is None %}
+                    You can't pick on anyone's behalf right now. When you can, come back to this page, and you'll
+                    be able to select a room. If you have any questions in the meantime, please get in touch by
+                    livechat or by emailing <a href="mailto:internet@jcr.dow.cam.ac.uk">internet@jcr.dow.cam.ac.uk</a>.
+                {% elif not student_to_pick.has_allocated %}
+                    <div class="col-lg-6 col-md-6 col-sm-12 alert alert-info">
+                        <p>You can now pick on behalf of
+                            <b>{{ student_to_pick.first_name }} {{ student_to_pick.surname }}</b>. Simply start typing
+                            the room in below. Clicking on the room confirms your allocation!</p>
+                        <div class="ui-widget mb-3" id="allocate-room-widget">
+                            <input id="room" style="width: 100%;"><br>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -11,6 +11,7 @@ from . import views
 urlpatterns = [
     path('welcome', views.landing, name='landing'),
     path('dashboard', views.student_dashboard, name='dashboard'),
+    path('proxy', views.proxy, name='proxy'),
     path('dashboard/create-syndicate', views.create_syndicate, name='create-syndicate'),
     path('dashboard/syndicate', views.syndicate_view, name='syndicate'),
     path('admin', views.admin_dashboard, name='admin'),

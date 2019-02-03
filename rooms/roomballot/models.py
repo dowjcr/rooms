@@ -25,7 +25,7 @@ class Band(models.Model):
 class Syndicate(models.Model):
     YEAR_CHOICES = (
         (1, 'First Ballot Year'),
-        (2, 'Second Ballot Year')
+        (2, 'Second Ballot Year'),
     )
 
     syndicate_id = models.AutoField(primary_key=True)
@@ -222,3 +222,29 @@ class Setting(models.Model):
 
     def __str__(self):
         return str(self.key)
+
+
+# =============== PROXY USER =====================
+# Represents a user, not registered as a student, who
+# can pick on a student's behalf as their proxy.
+
+class ProxyUser(models.Model):
+    user_id = models.CharField('CRSid', primary_key=True, max_length=10)
+    first_name = models.CharField('First Name', max_length=50)
+    surname = models.CharField('Surname', max_length=50)
+
+    def __str__(self):
+        return self.first_name + " " + self.surname
+
+
+# ============= PROXY INSTANCE ===================
+# Represents an instance of someone being able to
+# pick as a student's proxy.
+
+class ProxyInstance(models.Model):
+    user_id = models.CharField('CRSid of Student', primary_key=True, max_length=10)
+    proxy_user_id = models.CharField('CRSid of Proxy', max_length=10)
+
+    def __str__(self):
+        return self.proxy_user_id + " picking for " + self.user_id
+
