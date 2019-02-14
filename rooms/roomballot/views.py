@@ -873,8 +873,8 @@ def analytics(request):
         for r in jcr_rooms.order_by('new_price'):
             jcr_prices.append(r.price)
             jcr_new_prices.append(r.new_price)
-            jcr_total_prices.append(r.price * r.staircase.contract_length)
-            jcr_total_new_prices.append(r.new_price * r.staircase.contract_length)
+            jcr_total_prices.append(r.price * r.contract_length)
+            jcr_total_new_prices.append(r.new_price * r.contract_length)
         jcr_prices = np.array(jcr_prices)
         jcr_total_prices = np.array(jcr_total_prices)
         jcr_new_prices = np.array(jcr_new_prices)
@@ -888,7 +888,7 @@ def analytics(request):
         for r in mcr_rooms.order_by('new_price'):
             mcr_prices.append(r.price)
             mcr_new_prices.append(r.new_price)
-            mcr_total_prices.append(r.price * r.staircase.contract_length)
+            mcr_total_prices.append(r.price * r.contract_length)
         mcr_prices = np.array(mcr_prices)
         mcr_total_prices = np.array(mcr_total_prices)
         mcr_new_prices = np.array(mcr_new_prices)

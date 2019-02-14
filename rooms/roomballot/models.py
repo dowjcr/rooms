@@ -14,6 +14,7 @@ class Band(models.Model):
     band_id = models.AutoField(primary_key=True)
     band_name = models.CharField(max_length=10)
     weekly_price = models.IntegerField(null=True, blank=True)
+    weekly_price_old = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return "Band " + self.band_name
@@ -132,6 +133,7 @@ class Room(models.Model):
     taken_by = models.ForeignKey(Student, on_delete=models.SET_DEFAULT, editable=False, null=True, default=None)
     price = models.IntegerField(editable=False, default=0)
     new_price = models.FloatField(default=0)
+    contract_length = models.IntegerField(null=True)
 
     # Scores for pricing.
     score_ensuite = models.FloatField(editable=False, default=0)

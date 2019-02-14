@@ -124,7 +124,7 @@ def generate_price():
 
     # Iterating through rooms and populating counts.
     for r in Room.objects.all():
-        contract_length = r.staircase.contract_length
+        contract_length = r.contract_length
         normalised_size = (r.size - min_size) / (max_size - min_size)
         count_size += (2 * normalised_size - (normalised_size * normalised_size)) * contract_length
         if r.is_ensuite:

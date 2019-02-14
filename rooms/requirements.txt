@@ -1,4 +1,5 @@
-Django==2.0.8
+Django==2.0.11
 django-ucamwebauth
 Pillow
 numpy
+sharepy
