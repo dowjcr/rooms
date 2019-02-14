@@ -126,7 +126,7 @@ def generate_price():
     # Iterating through rooms and populating counts.
     for r in Room.objects.all():
         contract_length = r.contract_length
-        normalised_size = (r.size - min_size) / (max_size - min_size)
+        normalised_size = (min(r.size, 25) - min_size) / (min(max_size, 25) - min_size)
         count_size += (2 * normalised_size - (normalised_size * normalised_size)) * contract_length
         if r.is_ensuite:
             count_ensuite += contract_length
@@ -228,7 +228,7 @@ def generate_price():
                 room_to_update.score_ground_floor = 0
 
             # Adding weight for size.
-            normalised_size = (room_to_update.size - min_size) / (max_size - min_size)
+            normalised_size = (min(room_to_update.size, 25) - min_size) / (min(max_size, 25) - min_size)
             score_size = weight_size * (2 * normalised_size - (normalised_size * normalised_size))
             this_weight += score_size
             room_to_update.score_size = score_size
