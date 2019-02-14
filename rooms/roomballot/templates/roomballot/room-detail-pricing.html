@@ -28,6 +28,9 @@
     <div class="row mb-4">
 
         <div class="col-md-6">
+            <p class="mt-3">
+            Please be aware that these provisional bands are not yet confirmed, and are very likely
+                to change in advance of ballot weekend.</p>
             <table class="table table-bordered mt-4">
                 <thead>
                 <tr>
@@ -51,7 +54,7 @@
                 {% else %}
                     <tr>
                         <td><b>Bathroom Ratio</b></td>
-                        <td>{{ room.bathroom_sharing }}:1</td>
+                        <td>{{ room.bathroom_sharing }}:1{% if room.bathroom_sharing == 5 %} or more{% endif %}</td>
                         <td>{{ room.score_bathroom|stringformat:'0.2f' }}</td>
                     </tr>
                 {% endif %}
@@ -98,7 +101,7 @@
                 <tr class="table-active">
                     <td><b>TOTAL</b></td>
                     <td></td>
-                    <td>{{ room.score_total|stringformat:'0.2f' }}</td>
+                    <td><b>{{ room.score_total|stringformat:'0.2f' }}</b></td>
                 </tr>
                 </tbody>
             </table>
@@ -123,10 +126,39 @@
                     <td>{{ room.score_total|stringformat:'0.2f' }} x {{ y }}</td>
                     <td>£{{ room.feature_price|stringformat:'0.2f' }}</td>
                 </tr>
-                <tr class="table-active">
+                <tr>
                     <td><b>TOTAL</b></td>
                     <td></td>
                     <td><b>£{{ room.new_price|stringformat:'0.2f' }}</b></td>
+                </tr>
+                <tr>
+                    <td><b>Nearest Band</b></td>
+                    <td></td>
+                    <td>{{ room.new_band }}</td>
+                </tr>
+                <tr class="table-active">
+                    <td><b>Proposed Weekly Price<br>(Current Rates)</b></td>
+                    <td></td>
+                    <td><b>£{{ room.new_band.weekly_price|stringformat:'0.2f' }}</b></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-bordered mt-4">
+                <thead style="display:none">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>Old Band</b></td>
+                    <td>{{ room.band }}</td>
+                </tr>
+                <tr>
+                    <td><b>Proposed New Band</b></td>
+                    <td>{{ room.new_band }}</td>
                 </tr>
                 </tbody>
             </table>

@@ -56,8 +56,12 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><b>Room ID</b></td>
-                    <td>{{ room.room_id }}</td>
+                    <td><b>Room Identifier</b></td>
+                    <td>{{ room.identifier }}</td>
+                </tr>
+                <tr>
+                    <td><b>Size</b></td>
+                    <td>{{ room.size }} m&#178;</td>
                 </tr>
                 <tr>
                     <td><b>Floor</b></td>
@@ -84,6 +88,56 @@
                         {% endif %}
                     </td>
                 </tr>
+                <!--<tr>
+                    <td><b>Previous Band</b></td>
+                    <td>{{ room.band }}</td>
+                </tr>
+                <tr>
+                    <td><b>Proposed New Band</b></td>
+                    <td>{{ room.new_band }}<br>
+                    <a href="/roomballot/room-pricing/{{ room.room_id }}" class="btn btn-primary mt-2">Why? <i class="fas fa-angle-right ml-2"></i></a></td></td>
+                </tr>
+                <tr>
+                    <td><b>Proposed New Price</b></td>
+                    <td>£{{ room.new_band.weekly_price }}<div class="mt-2"></div>
+                        <a href="/roomballot/room-pricing/{{ room.room_id }}" class="btn btn-primary">Why?</a></td>
+                </tr>-->
+                </tbody>
+            </table>
+            <table class="table table-bordered table-striped table-hover mt-4">
+                <thead style="display:none">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if not room.is_ensuite %}
+                <tr>
+                    <td><b>Number Sharing Nearest Bathroom</b></td>
+                    <td>{{ room.bathroom_sharing }}{% if room.bathroom_sharing == 5 %} or more{% endif %}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td><b>Room Last Renovated</b></td>
+                    <td>{{ room.room_last_renovated }}</td>
+                </tr>
+                <tr>
+                    <td><b>Kitchen Last Renovated</b></td>
+                    <td>{{ room.kitchen_last_renovated }}</td>
+                </tr>
+                <tr>
+                    <td><b>Bathroom Last Renovated</b></td>
+                    <td>{{ room.bathroom_last_renovated }}</td>
+                </tr>
+                <tr>
+                    <td><b>Faces Lensfield Road?</b></td>
+                    <td>{% if room.faces_lensfield %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><b>Faces Court?</b></td>
+                    <td>{% if room.faces_court %}Yes{% else %}No{% endif %}</td>
+                </tr>
                 <tr>
                     <td><b>Disabled Facilities</b></td>
                     <td>
@@ -93,27 +147,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><b>Size</b></td>
-                    <td>{{ room.size }} m&#178;</td>
-                </tr>
-                <!--<tr>
-                    <td><b>Band</b></td>
-                    <td>{{ room.band }}</td>
-                </tr>-->
-                <tr>
-                    <td><b>Weekly Price</b></td>
-                    <!--<td>£{{ room.price }}</td>-->
-                    <td>To Be Confirmed<br>
-                        <a href="/roomballot/info/pricing" class="btn btn-primary mt-2">Why?</a></td>
-                </tr>
-                <!--<tr>
-                    <td><b>Proposed New Price</b></td>
-                    <td>£{{ room.new_price|stringformat:'0.2f' }}<div class="mt-2"></div>
-                        <a href="/roomballot/room-pricing/{{ room.room_id }}" class="btn btn-primary">Why?</a></td>
-                </tr>-->
-                <tr>
                     <td><b>Contract Length</b></td>
-                    <td>{{ room.staircase.contract_length }} weeks</td>
+                    <td>{{ room.contract_length }} weeks</td>
                 </tr>
                 </tbody>
             </table>

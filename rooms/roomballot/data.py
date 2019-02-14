@@ -21,14 +21,17 @@ def get_data():
         % sharepoint_listname)
 
     values_as_html_links = []
+    errors = []
 
     count = 0
+    successes = 0
 
     for room in (r.json()['d'])['results']:
         values_as_html_links.append(room['FieldValuesAsHtml']['__deferred']['uri'])
         count += 1
 
     print("Found " + str(count) + " rooms.\n")
+    current_room = ""
 
     for link in values_as_html_links:
         try:
@@ -37,10 +40,9 @@ def get_data():
 
             # Parsing room name.
             name = soup['Room_x005f_x0020_x005f_Identifier']
-            print(name)
+            current_room = name
             identifier = name.split('(', 1)[-1].replace(')', '')
             staircase_identifier = ''
-            print(identifier)
 
             if identifier[len(identifier) - 1].isdigit():
                 staircase_identifier = identifier[0:len(identifier) - 2]
@@ -81,11 +83,14 @@ def get_data():
             # Parsing year room last renovated.
             year_last_renovated_room = int(soup['Yearlastrenovatedroom'].replace(',', ''))
 
+            # Parsing bathroom sharing.
+            bathroom_sharing = int(soup['Number_x005f_x0020_x005f_of_x005f_x0020_x005f_people_x005f_x00'])
+
             # Parsing contract length.
             contract_length = int(soup['ContractLength'])
 
             # Parsing facing court.
-            facing_court = soup['Facing_x005f_x0020_x005f_Court'] == "Yes"
+            facing_court = soup['Facing_x005f_x0020_x005f_Court'] == "Yes" and not identifier.__contains__('LR')
 
             # Parsing facing Lensfield Road / Regent St.
             facing_lensfield = soup['Facing_x005f_x0020_x005f_Lensfield_x005f_x0020_x005f_Roa'] == "Yes"
@@ -113,8 +118,11 @@ def get_data():
             room.bathroom_last_renovated = year_last_renovated_bathroom
             room.room_last_renovated = year_last_renovated_room
             room.kitchen_last_renovated = year_last_renovated_kitchen
-            room.contract_length = contract_length
-            room.sort_number = number
+            if contract_length > 0:
+                room.contract_length = contract_length
+            if room.sort_number is None:
+                room.sort_number = number
+            room.bathroom_sharing = min(bathroom_sharing, 5)
             if occupancy == 'UG':
                 room.type = 2 if in_ballot else 3
             elif occupancy == 'Fresher':
@@ -133,5 +141,15 @@ def get_data():
 
             room.staircase = staircase
             room.save()
-        except:
-            print("Failed to get data at %s" % link)
+            successes += 1
+        except Exception as e:
+            errors.append(current_room + " - " + str(e))
+    print("=== IMPORT REPORT ===")
+    print("Total Rooms:", str(count))
+    print("Succeeded:", str(successes))
+    print("Failed:", str(len(errors)))
+
+    print()
+    for error in errors:
+        print(error)
+        print()

@@ -120,6 +120,7 @@ def generate_price():
         0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
     max_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None).order_by('-kitchen_last_renovated')[
         0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
+
     accommodation_weeks = 0
 
     # Iterating through rooms and populating counts.
@@ -251,6 +252,21 @@ def generate_price():
             room_to_update.score_total = this_weight
             room_to_update.feature_price = this_weight * y
             room_to_update.save()
+    round_to_bands()
+
+
+# ============= ROUND TO BANDS ===================
+# Takes the calculated 'new price' and prescribes
+# a band, based on closest rounding.
+
+def round_to_bands():
+    bands = {}
+    for band in Band.objects.all():
+        bands[band.weekly_price] = band.band_id
+    for room in Room.objects.exclude(new_price=None):
+        band_price = min(bands, key=lambda x: abs(x - room.new_price))
+        room.new_band = Band.objects.get(band_id=bands[band_price])
+        room.save()
 
 
 # ========== FIRST YEARS IN BALLOT ===============

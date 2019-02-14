@@ -123,7 +123,7 @@
                     <td>{{ room.size }} m&#178;</td>
                 </tr>
                 <tr>
-                    <td><b>Band</b></td>
+                    <td><b>Old Band</b></td>
                     <td>{{ room.band }}</td>
                 </tr>
                 <tr>
@@ -131,12 +131,20 @@
                     <td>£{{ room.price }}</td>
                 </tr>
                 <tr>
-                    <td><b>New Price</b></td>
-                    <td>£{{ room.new_price|stringformat:'0.2f' }} per week</td>
+                    <td><b>New Band</b></td>
+                    <td>{{ room.new_band }}</td>
+                </tr>
+                <tr>
+                    <td><b>New Price (Continuous)</b></td>
+                    <td>£{{ room.new_price|stringformat:'0.2f' }}</td>
+                </tr>
+                <tr>
+                    <td><b>New Price (Discrete)</b></td>
+                    <td>£{{ room.new_band.weekly_price }}</td>
                 </tr>
                 <tr>
                     <td><b>Contract Length</b></td>
-                    <td>{{ room.staircase.contract_length }} weeks</td>
+                    <td>{{ room.contract_length }} weeks</td>
                 </tr>
                 <tr>
                     <td><b>Occupied By</b></td>

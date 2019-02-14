@@ -858,10 +858,10 @@ def analytics(request):
         for b in Band.objects.all():
             bc = BandCount()
             bc.band_name = b.band_name
-            bc.count = Room.objects.filter(band=b).count()
+            bc.count = Room.objects.filter(new_band=b).count()
             bc.percentage = round(bc.count / total_rooms_count * 100, 1)
-            bc.total_jcr = jcr_rooms.filter(band=b).count()
-            bc.total_mcr = mcr_rooms.filter(band=b).count()
+            bc.total_jcr = jcr_rooms.filter(new_band=b).count()
+            bc.total_mcr = mcr_rooms.filter(new_band=b).count()
             band_counts.append(bc)
 
         jcr_x_values = np.arange(jcr_rooms_count)
@@ -885,20 +885,23 @@ def analytics(request):
         mcr_prices = []
         mcr_new_prices = []
         mcr_total_prices = []
+        mcr_total_new_prices = []
         for r in mcr_rooms.order_by('new_price'):
             mcr_prices.append(r.price)
             mcr_new_prices.append(r.new_price)
             mcr_total_prices.append(r.price * r.contract_length)
+            mcr_total_new_prices.append(r.new_price * r.contract_length)
         mcr_prices = np.array(mcr_prices)
         mcr_total_prices = np.array(mcr_total_prices)
         mcr_new_prices = np.array(mcr_new_prices)
+        mcr_total_new_prices = np.array(mcr_total_new_prices)
 
         # Calculating metrics on average price etc.
         total_weekly_price_jcr = np.sum(jcr_prices)
         total_weekly_price_mcr = np.sum(mcr_prices)
 
         total = np.sum(jcr_total_prices) + np.sum(mcr_total_prices)
-        new_total = np.sum(jcr_total_new_prices)
+        new_total = np.sum(jcr_total_new_prices) + np.sum(mcr_total_new_prices)
 
         average_weekly_price_jcr = np.mean(jcr_prices)
         average_weekly_price_mcr = np.mean(mcr_prices)
