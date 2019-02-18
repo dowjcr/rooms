@@ -38,7 +38,10 @@ def room_detail(request, room_id):
 # Displays room pricing methodology.
 
 def room_pricing(request, room_id):
-    student = Student.objects.get(user_id=request.user.username)
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+    except Student.DoesNotExist:
+        student = ProxyUser.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
     y = round(float(get_setting('feature_price')), 5)
     base_price = round(float(get_setting('base_price')), 2)
@@ -456,7 +459,10 @@ def select_room_info(request):
 # policy.
 
 def pricing_info(request):
-    student = Student.objects.get(user_id=request.user.username)
+    try:
+        student = Student.objects.get(user_id=request.user.username)
+    except Student.DoesNotExist:
+        student = ProxyUser.objects.get(user_id=request.user.username)
     return render(request, 'roomballot/info-pricing.html', {'student': student,
                                                             'base_price': get_setting('base_price'),
                                                             'weight_ensuite': get_setting('weight_ensuite'),
@@ -858,10 +864,10 @@ def analytics(request):
         for b in Band.objects.all():
             bc = BandCount()
             bc.band_name = b.band_name
-            bc.count = Room.objects.filter(new_band=b).count()
+            bc.count = Room.objects.filter(band=b).count()
             bc.percentage = round(bc.count / total_rooms_count * 100, 1)
-            bc.total_jcr = jcr_rooms.filter(new_band=b).count()
-            bc.total_mcr = mcr_rooms.filter(new_band=b).count()
+            bc.total_jcr = jcr_rooms.filter(band=b).count()
+            bc.total_mcr = mcr_rooms.filter(band=b).count()
             band_counts.append(bc)
 
         jcr_x_values = np.arange(jcr_rooms_count)

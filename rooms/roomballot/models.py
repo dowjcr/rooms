@@ -63,7 +63,7 @@ class Staircase(models.Model):
 class Student(models.Model):
     YEAR_CHOICES = (
         (1, 'First Ballot Year'),
-        (2, 'Second Ballot Year')
+        (2, 'Second Ballot Year'),
     )
 
     user_id = models.CharField('CRSid', primary_key=True, max_length=10)
