@@ -864,10 +864,10 @@ def analytics(request):
         for b in Band.objects.all():
             bc = BandCount()
             bc.band_name = b.band_name
-            bc.count = Room.objects.filter(band=b).count()
+            bc.count = Room.objects.filter(new_band=b).count()
             bc.percentage = round(bc.count / total_rooms_count * 100, 1)
-            bc.total_jcr = jcr_rooms.filter(band=b).count()
-            bc.total_mcr = mcr_rooms.filter(band=b).count()
+            bc.total_jcr = jcr_rooms.filter(new_band=b).count()
+            bc.total_mcr = mcr_rooms.filter(new_band=b).count()
             band_counts.append(bc)
 
         jcr_x_values = np.arange(jcr_rooms_count)
