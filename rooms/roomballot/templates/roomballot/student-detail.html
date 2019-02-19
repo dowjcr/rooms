@@ -8,6 +8,8 @@
 
 <div class="container">
 
+    {% if student_to_view.in_ballot %}
+
     <div class="border-bottom">
         <div class="row">
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
@@ -29,14 +31,6 @@
                 <tr>
                     <td><b>CRSid</b></td>
                     <td>{{ student_to_view.user_id }}</td>
-                </tr>
-                <tr>
-                    <td><b>In Ballot</b></td>
-                    <td>
-                        {% if student_to_view.in_ballot %} Yes
-                        {% else %} No
-                        {% endif %}
-                    </td>
                 </tr>
                 {% if student_to_view.in_ballot %}
                 <tr>
@@ -77,6 +71,7 @@
             </table>
         </div>
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}
