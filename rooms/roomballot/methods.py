@@ -265,7 +265,12 @@ def round_to_bands():
         bands[band.weekly_price] = band.band_id
     for room in Room.objects.exclude(new_price=None):
         band_price = min(bands, key=lambda x: abs(x - room.new_price))
-        room.new_band = Band.objects.get(band_id=bands[band_price])
+        if room.size >= 14 and room.is_ensuite:
+            band_price = max(band_price, Band.objects.get(band_name="3").weekly_price)
+        new_band = Band.objects.get(band_id=bands[band_price])
+        if new_band.band_name == "1" and not room.is_ensuite:
+            new_band = Band.objects.get(band_name="2")
+        room.new_band = new_band
         room.save()
 
 
@@ -414,7 +419,7 @@ def remove_from_ballot(student):
             student_to_update.accepted_syndicate = False
             student_to_update.in_ballot = False
             student_to_update.save()
-            number_in_ballot = get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
+            number_in_ballot = Student.objects.order_by('-rank')[0].rank
             # Now decrease rank of all subsequent students.
             if student_rank is not None:
                 for rank in range(student_rank + 1, number_in_ballot + 1):
@@ -430,7 +435,7 @@ def remove_from_ballot(student):
                     logger.info(
                         "Removing from ballot - deleted syndicate [" + str(student_syndicate.syndicate_id) + "]")
                     if syndicate_rank is not None:
-                        for rank in range(syndicate_rank + 1, get_num_syndicates() + 2):
+                        for rank in range(syndicate_rank + 1, Syndicate.objects.order_by('-rank')[0].rank + 2):
                             sy = Syndicate.objects.select_for_update().get(rank=rank)
                             sy.rank -= 1
                             sy.save()
