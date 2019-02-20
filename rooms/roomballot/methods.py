@@ -473,7 +473,7 @@ def add_to_syndicate(student, syndicate):
             # Increments the student rank of all students in subsequent syndicates.
             if syndicate_rank is not None:
                 new_rank = 1 + get_num_first_years_in_ballot() + get_num_second_years_in_ballot()
-                for rank in range(syndicate_rank + 1, get_num_syndicates() + 1):
+                for rank in range(syndicate_rank + 1, Syndicate.objects.order_by('-rank')[0].rank + 1):
                     sy = Syndicate.objects.get(rank=rank)
                     for st in Student.objects.select_for_update().filter(syndicate=sy):
                         new_rank = min(new_rank, st.rank)
