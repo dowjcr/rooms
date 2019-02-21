@@ -267,6 +267,10 @@ def round_to_bands():
         band_price = min(bands, key=lambda x: abs(x - room.new_price))
         if room.size >= 14 and room.is_ensuite:
             band_price = max(band_price, Band.objects.get(band_name="3").weekly_price)
+        elif room.is_ensuite:
+            band_price = max(band_price, Band.objects.get(band_name="4").weekly_price)
+        elif room.identifier.__contains__("LR") and room.floor >= 3:
+            band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
         new_band = Band.objects.get(band_id=bands[band_price])
         room.new_band = new_band
         room.save()

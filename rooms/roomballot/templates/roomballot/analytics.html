@@ -13,7 +13,34 @@
                     type: 'column'
                 },
                 title: {
-                    text: 'Number of Rooms by Band'
+                    text: 'Number of Rooms by Band (old)'
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [{% for b in band_counts_old %}'{{ b.band_name }}',{% endfor %}]
+                },
+                yAxis: {
+                    title: {
+                        text: 'Number of Rooms'
+                    }
+                },
+                series: [{
+                    name: 'JCR',
+                    data: [{% for b in band_counts_old %}{{ b.total_jcr }}, {% endfor %}]
+                }, {
+                    name: 'MCR',
+                    data: [{% for b in band_counts_old %}{{ b.total_mcr }}, {% endfor %}]
+                }]
+            });
+
+            var bandChart2 = Highcharts.chart('bandChart2', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Number of Rooms by Band (new)'
                 },
                 credits: {
                     enabled: false
@@ -86,6 +113,29 @@
                 </tr>
                 </thead>
                 <tbody>
+                {% for b in band_counts_old %}
+                    <tr>
+                        <td><b>{{ b.band_name }}</b></td>
+                        <td>{{ b.count }}</td>
+                        <td>{{ b.percentage }}%</td>
+                        <td>{{ b.total_jcr }}</td>
+                        <td>{{ b.total_mcr }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <table class="table table-bordered table-striped table-hover mt-3">
+                <thead>
+                <tr>
+                    <th scope="col">Band</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Percentage</th>
+                    <th scope="col">Total JCR</th>
+                    <th scope="col">Total MCR</th>
+                </tr>
+                </thead>
+                <tbody>
                 {% for b in band_counts %}
                     <tr>
                         <td><b>{{ b.band_name }}</b></td>
@@ -100,6 +150,7 @@
         </div>
         <div class="col-md-6">
             <div id="bandChart1"></div>
+            <div id="bandChart2"></div>
         </div>
         <div class="col-md-12 mb-4">
         </div>

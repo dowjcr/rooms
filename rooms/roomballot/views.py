@@ -109,7 +109,7 @@ def staircase_list(request):
 
     modified_staircases = []
     for staircase in staircases:
-        rooms = Room.objects.filter(staircase=staircase).exclude(type=4).exclude(type=1)
+        rooms = Room.objects.filter(staircase=staircase)
         total_rooms = rooms.count()
         if total_rooms == 0:
             continue
@@ -134,7 +134,7 @@ def staircase_detail(request, staircase_id):
     except Student.DoesNotExist:
         student = ProxyUser.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
-    rooms = Room.objects.exclude(type=4).exclude(type=1).filter(staircase=staircase).order_by('sort_number')
+    rooms = Room.objects.filter(staircase=staircase).order_by('sort_number')
     try:
         floorplan = Floorplan.objects.get(staircase=staircase)
     except:
@@ -870,6 +870,16 @@ def analytics(request):
             bc.total_mcr = mcr_rooms.filter(new_band=b).count()
             band_counts.append(bc)
 
+        band_counts_old = []
+        for b in Band.objects.all():
+            bc = BandCount()
+            bc.band_name = b.band_name
+            bc.count = Room.objects.filter(band=b).count()
+            bc.percentage = round(bc.count / total_rooms_count * 100, 1)
+            bc.total_jcr = jcr_rooms.filter(band=b).count()
+            bc.total_mcr = mcr_rooms.filter(band=b).count()
+            band_counts_old.append(bc)
+
         jcr_x_values = np.arange(jcr_rooms_count)
         jcr_x_values += 1
         jcr_prices = []
@@ -925,6 +935,7 @@ def analytics(request):
         mcr_fitted = np.poly1d(mcr_coeffs)(mcr_x_values)
 
         return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
+                                                             'band_counts_old': band_counts_old,
                                                              'average_weekly_price_jcr': average_weekly_price_jcr,
                                                              'average_weekly_price_mcr': average_weekly_price_mcr,
                                                              'jcr_prices': jcr_new_prices,
