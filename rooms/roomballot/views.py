@@ -762,9 +762,9 @@ def export_room_data(request):
     response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Weekly Price', 'Occupant', 'CRSid'])
+    writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Old Band', 'New Band', 'Continuous Price', 'Occupant', 'CRSid'])
     for r in Room.objects.order_by('staircase', 'sort_number'):
-        writer.writerow([r.room_id, r.staircase, r.room_number, r.get_type_display(), r.price, r.taken_by,
+        writer.writerow([r.room_id, r.staircase, r.room_number, r.get_type_display(), r.band.band_name, r.new_band.band_name, r.new_price, r.taken_by,
                          r.taken_by.user_id if r.taken_by else None])
     return response
 
