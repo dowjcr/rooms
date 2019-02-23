@@ -441,7 +441,7 @@ def remove_from_ballot(student):
                     logger.info(
                         "Removing from ballot - deleted syndicate [" + str(student_syndicate.syndicate_id) + "]")
                     if syndicate_rank is not None:
-                        for rank in range(syndicate_rank + 1, Syndicate.objects.order_by('-rank')[0].rank + 2):
+                        for rank in range(syndicate_rank + 1, Syndicate.objects.order_by('-rank')[0].rank + 1):
                             sy = Syndicate.objects.select_for_update().get(rank=rank)
                             sy.rank -= 1
                             sy.save()
@@ -494,6 +494,37 @@ def add_to_syndicate(student, syndicate):
                 "Added student to syndicate [" + student.user_id + "] [Syndicate " + str(syndicate.syndicate_id) + "]")
     else:
         raise BallotInProgressException()
+
+
+# ============== ADD AFTER RANK ==================
+# Moves rank of individual student to first valid
+# position after rank given as argument.
+# TODO - this doesn't actually work. Fix it.
+
+def add_after_rank(student, rank):
+    if get_setting('ballot_in_progress') == 'false':
+        syndicate = Student.objects.get(user_id=student.user_id).syndicate
+        if Student.objects.filter(syndicate=syndicate).count() != 1 or syndicate.rank is not None:
+            raise ConcurrencyException()
+        else:
+            with transaction.atomic():
+                prior_syndicate = Student.objects.get(rank=rank).syndicate
+                for rank in range(Syndicate.objects.order_by('-rank')[0].rank, prior_syndicate.rank, -1):
+                    syndicate_to_update = Syndicate.objects.get(rank=rank)
+                    syndicate_to_update.rank = syndicate_to_update.rank + 1
+                    for student in Student.objects.filter(syndicate=syndicate_to_update):
+                        student.rank = student.rank + 1
+                        print(student.first_name, student.rank)
+                        student.save()
+                    syndicate_to_update.save()
+                syndicate_to_update = Syndicate.objects.get(syndicate_id=syndicate.syndicate_id)
+                syndicate_to_update.rank = prior_syndicate.rank + 1
+                syndicate_to_update.save()
+                new_rank = (Student.objects.filter(syndicate=prior_syndicate).order_by('-rank')[0]).rank + 1
+                print(new_rank)
+                student = Student.objects.get(user_id=student.user_id)
+                student.rank = new_rank
+                student.save()
 
 
 # ============= CREATE SYNDICATE =================

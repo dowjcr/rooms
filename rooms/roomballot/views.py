@@ -109,15 +109,20 @@ def staircase_list(request):
 
     modified_staircases = []
     for staircase in staircases:
-        rooms = Room.objects.filter(staircase=staircase)
+        rooms = Room.objects.filter(staircase=staircase).exclude(type=4).exclude(type=1)
         total_rooms = rooms.count()
         if total_rooms == 0:
             continue
-        available_rooms = rooms.filter(type=2, taken_by=None).count()
+        available_rooms_qset = rooms.filter(type=2, taken_by=None)
+        available_rooms = available_rooms_qset.count()
+        ensuite = available_rooms_qset.filter(is_ensuite=True).count()
+        double = available_rooms_qset.filter(is_double_bed=True).count()
         ms = ModifiedStaircase()
         ms.name = staircase.name
         ms.total_rooms = total_rooms
         ms.available_rooms = available_rooms
+        ms.double_rooms = double
+        ms.ensuite_rooms = ensuite
         ms.staircase_id = staircase.staircase_id
         modified_staircases.append(ms)
     return render(request, 'roomballot/staircase-list.html', {'staircases': modified_staircases,
@@ -134,7 +139,7 @@ def staircase_detail(request, staircase_id):
     except Student.DoesNotExist:
         student = ProxyUser.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
-    rooms = Room.objects.filter(staircase=staircase).order_by('sort_number')
+    rooms = Room.objects.filter(staircase=staircase).order_by('sort_number').exclude(type=4).exclude(type=1)
     try:
         floorplan = Floorplan.objects.get(staircase=staircase)
     except:

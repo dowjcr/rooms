@@ -30,16 +30,18 @@
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col" class="d-none d-sm-table-cell">Total Rooms</th>
-                    <th scope="col">Available Rooms</th>
+                    <th scope="col">Remaining</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Ensuite Remaining</th>
+                    <th scope="col" class="d-none d-sm-table-cell">Double Bed Remaining</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for staircase in staircases %}
                     <tr class="clickable-row" data-href="staircase/{{ staircase.staircase_id }}" style="cursor: pointer;">
                         <td><b>{{ staircase.name }}</b></td>
-                        <td class="d-none d-sm-table-cell">{{ staircase.total_rooms }}</td>
                         <td>{{ staircase.available_rooms }}</td>
+                        <td class="d-none d-sm-table-cell">{{ staircase.ensuite_rooms }}</td>
+                        <td class="d-none d-sm-table-cell">{{ staircase.double_rooms }}</td>
                     </tr>
 
                 {% endfor %}
