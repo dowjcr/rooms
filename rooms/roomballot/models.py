@@ -149,6 +149,7 @@ class Room(models.Model):
     score_ground_floor = models.FloatField(editable=False, default=0)
     score_total = models.FloatField(editable=False, default=0)
     feature_price = models.FloatField(editable=False, default=0)
+    pricing_notes = models.CharField(max_length=1000, default=None, null=True, blank=True)
 
     sort_number = models.IntegerField(default=0)
 

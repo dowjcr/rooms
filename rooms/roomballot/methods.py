@@ -264,18 +264,24 @@ def round_to_bands():
     for band in Band.objects.all():
         bands[band.weekly_price] = band.band_id
     for room in Room.objects.exclude(new_price=None):
+        pricing_notes = ""
         band_price = min(bands, key=lambda x: abs(x - room.new_price))
         if room.size >= 14 and room.is_ensuite:
             band_price = max(band_price, Band.objects.get(band_name="3").weekly_price)
+            pricing_notes += "An ensuite room >= 14m2 must be at least Band 3.\n"
         elif room.is_ensuite:
             band_price = max(band_price, Band.objects.get(band_name="4").weekly_price)
+            pricing_notes += "An ensuite room must be at least Band 4.\n"
         elif room.identifier.__contains__("LR") and room.floor >= 3:
             band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
+            pricing_notes += "Top floor Lensfield rooms can't be more than Band 2.\n"
         if room.is_flat:
             band_price = Band.objects.get(band_name="1*").weekly_price
+            pricing_notes += "Self-contained rooms must be Band 1*.\n"
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
         new_band = Band.objects.get(band_id=bands[band_price])
+        room.pricing_notes = pricing_notes
         room.new_band = new_band
         room.save()
 

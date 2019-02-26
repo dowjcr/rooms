@@ -139,7 +139,7 @@ def staircase_detail(request, staircase_id):
     except Student.DoesNotExist:
         student = ProxyUser.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
-    rooms = Room.objects.filter(staircase=staircase).order_by('sort_number').exclude(type=4).exclude(type=1)
+    rooms = Room.objects.filter(staircase=staircase).order_by('sort_number')
     try:
         floorplan = Floorplan.objects.get(staircase=staircase)
     except:
