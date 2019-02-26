@@ -282,7 +282,13 @@ def round_to_bands():
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
         if room.identifier.__contains__("LR") and abs(datetime.datetime.now().year - room.room_last_renovated) >= 10:
             band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
-            pricing_notes += "Lensfield rooms not renovated in the last 10 years cannot be band 1.\n"
+            pricing_notes += "Lensfield rooms not renovated in the last 10 years cannot be Band 1.\n"
+        if room.identifier.__contains__("HL"):
+            band_price = Band.objects.get(band_name="1").weekly_price
+            pricing_notes += "Howard Lodge all Band 1.\n"
+        if room.room_id == 132:
+            band_price = Band.objects.get(band_name="3").weekly_price
+            pricing_notes += "Inconsistency in House 52 - Room 7 is Band 3."
         new_band = Band.objects.get(band_id=bands[band_price])
         room.pricing_notes = pricing_notes
         room.new_band = new_band
