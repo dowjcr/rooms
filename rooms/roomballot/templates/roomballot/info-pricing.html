@@ -34,10 +34,25 @@
                             room pricing policy. In so doing, we aim to price rooms according to the features you
                             actually
                             find important, and make the reasoning behind each room's price fully transparent.<br><br>
-                            This policy was conceived and implemented by <b>Cameron O'Connor</b>, JCR Internet Officer
-                            2018-19,
-                            and <b>Barney Walker</b>, JCR Services Officer 2018-19.
+                            This policy was conceived and implemented by <b>Cam O'Connor</b>, JCR President
+                            2019-20,
+                            and <b>Barney Walker</b>, JCR Vice-President 2019-20.<br><br>
+                            <b>NOTE: We have been successful in increasing the number of rent bands from 7 to 10. Based
+                            on this year's prices (i.e. without any upcoming increase), these are the new band prices:</b>
                         </p>
+
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Band</th>
+                                <th>Price (last year's rates)</th>
+                            </tr>
+                            {% for b in bands %}
+                            <tr>
+                                <td>{{ b }}</td>
+                                <td>£{{ b.weekly_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
 
                         <div id="accordion">
                             <div class="card">
@@ -56,23 +71,6 @@
                                         differently - to price each room individually, according to the features
                                         students
                                         find important.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo">
-                                            Why can't I see last year's prices?
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseTwo" class="collapse" data-parent="#accordion">
-                                    <div class="card-body">
-                                        We've hidden last year's prices while we work out the prices for 2019/20. In the
-                                        interests of transparency, we'll be showing you how each room's price has
-                                        changed
-                                        from the old pricing policy - watch this space.
                                     </div>
                                 </div>
                             </div>

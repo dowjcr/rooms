@@ -484,7 +484,8 @@ def pricing_info(request):
                                                             'weight_facing_court': get_setting('weight_facing_court'),
                                                             'weight_ground_floor': get_setting('weight_ground_floor'),
                                                             'feature_multiplier': round(
-                                                                float(get_setting('feature_price')), 5)})
+                                                                float(get_setting('feature_price')), 5),
+                                                            'bands': Band.objects.order_by('-weekly_price')})
 
 
 # =================== PROXY ====================
