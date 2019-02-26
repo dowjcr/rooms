@@ -125,7 +125,10 @@ def generate_price():
 
     # Iterating through rooms and populating counts.
     for r in Room.objects.all():
-        contract_length = r.contract_length
+        if r.contract_length == 37:
+            contract_length = 35
+        else:
+            contract_length = r.contract_length
         normalised_size = (min(r.size, 25) - min_size) / (min(max_size, 25) - min_size)
         count_size += (2 * normalised_size - (normalised_size * normalised_size)) * contract_length
         if r.is_ensuite:
