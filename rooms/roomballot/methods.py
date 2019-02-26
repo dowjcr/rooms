@@ -280,6 +280,9 @@ def round_to_bands():
             pricing_notes += "Self-contained rooms must be Band 1*.\n"
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
+        if room.identifier.__contains__("LR") and abs(datetime.datetime.now().year - room.room_last_renovated) >= 10:
+            band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
+            pricing_notes += "Lensfield rooms not renovated in the last 10 years cannot be band 1.\n"
         new_band = Band.objects.get(band_id=bands[band_price])
         room.pricing_notes = pricing_notes
         room.new_band = new_band
