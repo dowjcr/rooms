@@ -267,28 +267,19 @@ def round_to_bands():
         pricing_notes = ""
         band_price = min(bands, key=lambda x: abs(x - room.new_price))
         if room.size >= 14 and room.is_ensuite:
-            band_price = max(band_price, Band.objects.get(band_name="3").weekly_price)
-            pricing_notes += "An ensuite room >= 14m2 must be at least Band 3.\n"
+            band_price = max(band_price, Band.objects.get(band_name="5").weekly_price)
+            pricing_notes += "An ensuite room >= 14m2 must be at least Band 5.\n"
         elif room.is_ensuite:
-            band_price = max(band_price, Band.objects.get(band_name="4").weekly_price)
-            pricing_notes += "An ensuite room must be at least Band 4.\n"
+            band_price = max(band_price, Band.objects.get(band_name="6").weekly_price)
+            pricing_notes += "An ensuite room must be at least Band 6.\n"
         elif room.identifier.__contains__("LR") and room.floor >= 3:
-            band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
-            pricing_notes += "Top floor Lensfield rooms can't be more than Band 2.\n"
+            band_price = min(band_price, Band.objects.get(band_name="3").weekly_price)
+            pricing_notes += "Top floor Lensfield rooms can't be more than Band 3.\n"
         if room.is_flat:
             band_price = Band.objects.get(band_name="1*").weekly_price
             pricing_notes += "Self-contained rooms must be Band 1*.\n"
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
-        if room.identifier.__contains__("LR") and abs(datetime.datetime.now().year - room.room_last_renovated) >= 10:
-            band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
-            pricing_notes += "Lensfield rooms not renovated in the last 10 years cannot be Band 1.\n"
-        if room.identifier.__contains__("HL"):
-            band_price = Band.objects.get(band_name="1").weekly_price
-            pricing_notes += "Howard Lodge all Band 1.\n"
-        if room.room_id == 132:
-            band_price = Band.objects.get(band_name="3").weekly_price
-            pricing_notes += "Inconsistency in House 52 - Room 7 is Band 3."
         new_band = Band.objects.get(band_id=bands[band_price])
         room.pricing_notes = pricing_notes
         room.new_band = new_band
