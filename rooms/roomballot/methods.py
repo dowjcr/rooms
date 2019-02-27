@@ -272,7 +272,7 @@ def round_to_bands():
         if room.size >= 14 and room.is_ensuite:
             band_price = max(band_price, Band.objects.get(band_name="5").weekly_price)
             pricing_notes += "An ensuite room >= 14m2 must be at least Band 5.\n"
-        elif room.is_ensuite:
+        elif room.is_ensuite and room.type != 4:
             band_price = max(band_price, Band.objects.get(band_name="6").weekly_price)
             pricing_notes += "An ensuite room must be at least Band 6.\n"
         elif room.identifier.__contains__("LR") and room.floor >= 3:
@@ -283,6 +283,8 @@ def round_to_bands():
             pricing_notes += "Self-contained rooms must be Band 1*.\n"
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
+        if room.identifer.__contains__("Flat"):
+            band_price = Band.objects.get(band_name="Flat").weekly_price
         new_band = Band.objects.get(band_id=bands[band_price])
         room.pricing_notes = pricing_notes
         room.new_band = new_band
