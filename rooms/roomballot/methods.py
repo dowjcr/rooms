@@ -106,25 +106,25 @@ def generate_price():
     count_ground_floor = 0
 
     # Useful constants.
-    min_size = Room.objects.order_by('size')[0].size if Room.objects.all().count() > 0 else 0
-    max_size = Room.objects.order_by('-size')[0].size if Room.objects.all().count() > 0 else 0
-    min_renovated_room = Room.objects.exclude(room_last_renovated=None).order_by('room_last_renovated')[
+    min_size = Room.objects.exclude(type=4).order_by('size')[0].size if Room.objects.all().count() > 0 else 0
+    max_size = Room.objects.exclude(type=4).order_by('-size')[0].size if Room.objects.all().count() > 0 else 0
+    min_renovated_room = Room.objects.exclude(room_last_renovated=None, type=4).order_by('room_last_renovated')[
         0].room_last_renovated if Room.objects.all().count() > 0 else 0
-    max_renovated_room = Room.objects.exclude(room_last_renovated=None).order_by('-room_last_renovated')[
+    max_renovated_room = Room.objects.exclude(room_last_renovated=None, type=4).order_by('-room_last_renovated')[
         0].room_last_renovated if Room.objects.all().count() > 0 else 0
-    min_renovated_bathroom = Room.objects.exclude(bathroom_last_renovated=None).order_by('bathroom_last_renovated')[
+    min_renovated_bathroom = Room.objects.exclude(bathroom_last_renovated=None, type=4).order_by('bathroom_last_renovated')[
         0].bathroom_last_renovated if Room.objects.all().count() > 0 else 0
-    max_renovated_bathroom = Room.objects.exclude(bathroom_last_renovated=None).order_by('-bathroom_last_renovated')[
+    max_renovated_bathroom = Room.objects.exclude(bathroom_last_renovated=None, type=4).order_by('-bathroom_last_renovated')[
         0].bathroom_last_renovated if Room.objects.all().count() > 0 else 0
-    min_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None).order_by('kitchen_last_renovated')[
+    min_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None, type=4).order_by('kitchen_last_renovated')[
         0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
-    max_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None).order_by('-kitchen_last_renovated')[
+    max_renovated_kitchen = Room.objects.exclude(kitchen_last_renovated=None, type=4).order_by('-kitchen_last_renovated')[
         0].kitchen_last_renovated if Room.objects.all().count() > 0 else 0
 
     accommodation_weeks = 0
 
     # Iterating through rooms and populating counts.
-    for r in Room.objects.all():
+    for r in Room.objects.exclude(type=4):
         if r.contract_length == 37:
             contract_length = 35
         else:
@@ -272,7 +272,7 @@ def round_to_bands():
         if room.size >= 14 and room.is_ensuite:
             band_price = max(band_price, Band.objects.get(band_name="5").weekly_price)
             pricing_notes += "An ensuite room >= 14m2 must be at least Band 5.\n"
-        elif room.is_ensuite and room.type != 4:
+        elif room.is_ensuite:
             band_price = max(band_price, Band.objects.get(band_name="6").weekly_price)
             pricing_notes += "An ensuite room must be at least Band 6.\n"
         elif room.identifier.__contains__("LR") and room.floor >= 3:
@@ -283,8 +283,6 @@ def round_to_bands():
             pricing_notes += "Self-contained rooms must be Band 1*.\n"
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
-        if room.identifer.__contains__("Flat"):
-            band_price = Band.objects.get(band_name="Flat").weekly_price
         new_band = Band.objects.get(band_id=bands[band_price])
         room.pricing_notes = pricing_notes
         room.new_band = new_band

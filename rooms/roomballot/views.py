@@ -858,12 +858,10 @@ def analytics(request):
         class BandCount(object):
             pass
 
-        all_rooms = Room.objects.all()
         jcr_rooms = Room.objects.exclude(type=4)
         jcr_rooms_count = jcr_rooms.count()
-        mcr_rooms = Room.objects.filter(type=4)
-        mcr_rooms_count = mcr_rooms.count()
         total_rooms_count = Room.objects.all().count()
+        contract_weeks = 0
 
         # Calculating the number of rooms in each band.
         band_counts = []
@@ -873,17 +871,15 @@ def analytics(request):
             bc.count = Room.objects.filter(new_band=b).count()
             bc.percentage = round(bc.count / total_rooms_count * 100, 1)
             bc.total_jcr = jcr_rooms.filter(new_band=b).count()
-            bc.total_mcr = mcr_rooms.filter(new_band=b).count()
             band_counts.append(bc)
 
         band_counts_old = []
-        for b in Band.objects.all():
+        for b in Band.objects.exclude(weekly_price_old=None):
             bc = BandCount()
             bc.band_name = b.band_name
             bc.count = Room.objects.filter(band=b).count()
             bc.percentage = round(bc.count / total_rooms_count * 100, 1)
             bc.total_jcr = jcr_rooms.filter(band=b).count()
-            bc.total_mcr = mcr_rooms.filter(band=b).count()
             band_counts_old.append(bc)
 
         jcr_x_values = np.arange(jcr_rooms_count)
@@ -892,72 +888,45 @@ def analytics(request):
         jcr_new_prices = []
         jcr_total_prices = []
         jcr_total_new_prices = []
-        for r in jcr_rooms.order_by('new_price'):
-            jcr_prices.append(r.price)
-            jcr_new_prices.append(r.new_price)
-            jcr_total_prices.append(r.price * r.contract_length)
-            jcr_total_new_prices.append(r.new_price * r.contract_length)
+        for r in jcr_rooms.order_by('-new_band'):
+            jcr_prices.append(r.band.weekly_price)
+            jcr_new_prices.append(r.new_band.weekly_price)
+            if r.contract_length == 37:
+                jcr_total_prices.append(r.band.weekly_price_old * 35)
+                jcr_total_new_prices.append(r.new_band.weekly_price * 35)
+                contract_weeks += 35
+            else:
+                jcr_total_prices.append(r.band.weekly_price_old * r.contract_length)
+                jcr_total_new_prices.append(r.new_band.weekly_price * r.contract_length)
+                contract_weeks += r.contract_length
         jcr_prices = np.array(jcr_prices)
         jcr_total_prices = np.array(jcr_total_prices)
         jcr_new_prices = np.array(jcr_new_prices)
         jcr_total_new_prices = np.array(jcr_total_new_prices)
 
-        mcr_x_values = np.arange(mcr_rooms_count)
-        mcr_x_values += 1
-        mcr_prices = []
-        mcr_new_prices = []
-        mcr_total_prices = []
-        mcr_total_new_prices = []
-        for r in mcr_rooms.order_by('new_price'):
-            mcr_prices.append(r.price)
-            mcr_new_prices.append(r.new_price)
-            mcr_total_prices.append(r.price * r.contract_length)
-            mcr_total_new_prices.append(r.new_price * r.contract_length)
-        mcr_prices = np.array(mcr_prices)
-        mcr_total_prices = np.array(mcr_total_prices)
-        mcr_new_prices = np.array(mcr_new_prices)
-        mcr_total_new_prices = np.array(mcr_total_new_prices)
+        total = np.sum(jcr_total_prices)
+        new_total = np.sum(jcr_total_new_prices)
 
-        # Calculating metrics on average price etc.
-        total_weekly_price_jcr = np.sum(jcr_prices)
-        total_weekly_price_mcr = np.sum(mcr_prices)
-
-        total = np.sum(jcr_total_prices) + np.sum(mcr_total_prices)
-        new_total = np.sum(jcr_total_new_prices) + np.sum(mcr_total_new_prices)
-
-        average_weekly_price_jcr = np.mean(jcr_prices)
-        average_weekly_price_mcr = np.mean(mcr_prices)
-        median_weekly_price_jcr = np.median(jcr_prices)
-        median_weekly_price_mcr = np.median(mcr_prices)
-        jcr_range = (np.max(jcr_prices) - np.min(jcr_prices)) if jcr_rooms_count > 0 else 0
-        mcr_range = (np.max(mcr_prices) - np.min(mcr_prices)) if mcr_rooms_count > 0 else 0
-        jcr_std = np.std(jcr_prices)
-        mcr_std = np.std(mcr_prices)
+        average_weekly_price_jcr = np.mean(jcr_new_prices)
+        median_weekly_price_jcr = np.median(jcr_new_prices)
+        jcr_range = (np.max(jcr_new_prices) - np.min(jcr_new_prices)) if jcr_rooms_count > 0 else 0
+        jcr_std = np.std(jcr_new_prices)
 
         jcr_coeffs = np.polyfit(jcr_x_values, jcr_new_prices, 5) if jcr_rooms_count > 0 else np.array([0])
         jcr_fitted = np.poly1d(jcr_coeffs)(jcr_x_values)
 
-        mcr_coeffs = np.polyfit(mcr_x_values, mcr_new_prices, 5) if mcr_rooms_count > 0 else np.array([0])
-        mcr_fitted = np.poly1d(mcr_coeffs)(mcr_x_values)
-
         return render(request, 'roomballot/analytics.html', {'band_counts': band_counts,
                                                              'band_counts_old': band_counts_old,
                                                              'average_weekly_price_jcr': average_weekly_price_jcr,
-                                                             'average_weekly_price_mcr': average_weekly_price_mcr,
                                                              'jcr_prices': jcr_new_prices,
-                                                             'mcr_prices': mcr_new_prices,
                                                              'jcr_rooms_count': jcr_rooms_count,
-                                                             'mcr_rooms_count': mcr_rooms_count,
                                                              'median_weekly_price_jcr': median_weekly_price_jcr,
-                                                             'median_weekly_price_mcr': median_weekly_price_mcr,
                                                              'jcr_range': jcr_range,
-                                                             'mcr_range': mcr_range,
                                                              'jcr_std': jcr_std,
-                                                             'mcr_std': mcr_std,
                                                              'jcr_fitted': jcr_fitted,
-                                                             'mcr_fitted': mcr_fitted,
                                                              'total': total,
-                                                             'new_total': new_total})
+                                                             'new_total': new_total,
+                                                             'contract_weeks': contract_weeks})
     except AdminUser.DoesNotExist:
         return error(request, 403)
 

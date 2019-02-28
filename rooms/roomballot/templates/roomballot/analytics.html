@@ -29,9 +29,6 @@
                 series: [{
                     name: 'JCR',
                     data: [{% for b in band_counts_old %}{{ b.total_jcr }}, {% endfor %}]
-                }, {
-                    name: 'MCR',
-                    data: [{% for b in band_counts_old %}{{ b.total_mcr }}, {% endfor %}]
                 }]
             });
 
@@ -56,9 +53,6 @@
                 series: [{
                     name: 'JCR',
                     data: [{% for b in band_counts %}{{ b.total_jcr }}, {% endfor %}]
-                }, {
-                    name: 'MCR',
-                    data: [{% for b in band_counts %}{{ b.total_mcr }}, {% endfor %}]
                 }]
             });
 
@@ -101,6 +95,9 @@
     </script>
 
     <div class="row mb-3">
+        <div class="col-md-12 mb-3">
+            <h3>Old Data (2018-19)</h3>
+        </div>
         <div class="col-md-6">
             <table class="table table-bordered table-striped table-hover">
                 <thead>
@@ -109,7 +106,6 @@
                     <th scope="col">Total</th>
                     <th scope="col">Percentage</th>
                     <th scope="col">Total JCR</th>
-                    <th scope="col">Total MCR</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -119,20 +115,27 @@
                         <td>{{ b.count }}</td>
                         <td>{{ b.percentage }}%</td>
                         <td>{{ b.total_jcr }}</td>
-                        <td>{{ b.total_mcr }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-
-            <table class="table table-bordered table-striped table-hover mt-3">
+        </div>
+        <div class="col-md-6">
+            <div id="bandChart1"></div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12 mb-3">
+            <h3>New Data (2019-20)</h3>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped table-hover">
                 <thead>
                 <tr>
                     <th scope="col">Band</th>
                     <th scope="col">Total</th>
                     <th scope="col">Percentage</th>
                     <th scope="col">Total JCR</th>
-                    <th scope="col">Total MCR</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -142,67 +145,68 @@
                         <td>{{ b.count }}</td>
                         <td>{{ b.percentage }}%</td>
                         <td>{{ b.total_jcr }}</td>
-                        <td>{{ b.total_mcr }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="col-md-6">
-            <div id="bandChart1"></div>
+
             <div id="bandChart2"></div>
         </div>
-        <div class="col-md-12 mb-4">
-        </div>
+    </div>
+    <div class="row mb-3">
         <div class="col-md-6">
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                 <tr>
                     <th scope="col"></th>
                     <th scope="col">JCR</th>
-                    <th scope="col">MCR</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td><b>Total Rooms</b></td>
                     <td>{{ jcr_rooms_count }}</td>
-                    <td>{{ mcr_rooms_count }}</td>
+                </tr>
+                <tr>
+                    <td><b>Total Contract Weeks Paid</b></td>
+                    <td>{{ contract_weeks }}</td>
+                </tr>
+                <tr>
+                    <td><b>Total Income (Old)</b></td>
+                    <td>{{ total }}</td>
+                </tr>
+                <tr>
+                    <td><b>Total Income (New)</b></td>
+                    <td>{{ new_total }}</td>
                 </tr>
                 <tr>
                     <td><b>Lowest</b></td>
                     <td>£{{ jcr_prices|first|stringformat:'0.2f' }}</td>
-                    <td>£{{ mcr_prices|first|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>
                     <td><b>Highest</b></td>
                     <td>£{{ jcr_prices|last|stringformat:'0.2f' }}</td>
-                    <td>£{{ mcr_prices|last|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>
                     <td><b>Mean</b></td>
                     <td>£{{ average_weekly_price_jcr|stringformat:'0.2f' }}</td>
-                    <td>£{{ average_weekly_price_mcr|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>
                     <td><b>Median</b></td>
                     <td>£{{ median_weekly_price_jcr|stringformat:'0.2f' }}</td>
-                    <td>£{{ median_weekly_price_mcr|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>
                     <td><b>Range</b></td>
                     <td>£{{ jcr_range|stringformat:'0.2f' }}</td>
-                    <td>£{{ mcr_range|stringformat:'0.2f' }}</td>
                 </tr>
                 <tr>
                     <td><b>Standard Deviation</b></td>
                     <td>£{{ jcr_std|stringformat:'0.2f' }}</td>
-                    <td>£{{ mcr_std|stringformat:'0.2f' }}</td>
                 </tr>
                 </tbody>
             </table>
-            {{ total }}<br>
-            {{ new_total }}
         </div>
         <div class="col-md-6">
             <div id="priceChart1"></div>
