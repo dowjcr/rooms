@@ -139,7 +139,7 @@ def staircase_detail(request, staircase_id):
     except Student.DoesNotExist:
         student = ProxyUser.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
-    rooms = Room.objects.filter(staircase=staircase).order_by('sort_number')
+    rooms = Room.objects.filter(staircase=staircase).exclude(type=4).order_by('sort_number')
     try:
         floorplan = Floorplan.objects.get(staircase=staircase)
     except:
@@ -768,9 +768,14 @@ def export_room_data(request):
     response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Old Band', 'New Band', 'Continuous Price', 'Occupant', 'CRSid'])
+    writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Old Band', 'New Band', 'New Price', 'Contract Length', 'Total', 'Occupant', 'CRSid'])
     for r in Room.objects.order_by('staircase', 'sort_number'):
-        writer.writerow([r.room_id, r.staircase, r.room_number, r.get_type_display(), r.band.band_name, r.new_band.band_name, r.new_price, r.taken_by,
+        if r.contract_length == 37 and not r.identifier.__contains__("BL"):
+            contract_length = 35
+        else:
+            contract_length = r.contract_length
+        writer.writerow([r.identifier, r.staircase, r.room_number, r.get_type_display(), r.band.band_name, r.new_band.band_name,
+                         r.new_band.weekly_price, contract_length, r.new_band.weekly_price * contract_length, r.taken_by,
                          r.taken_by.user_id if r.taken_by else None])
     return response
 

@@ -278,9 +278,15 @@ def round_to_bands():
         if not room.is_ensuite:
             band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
             pricing_notes += "Non-ensuite rooms can't be more than Band 2.\n"
+        if room.identifier.__contains__("HL") and room.floor == 1:
+            band_price = min(band_price, Band.objects.get(band_name="2").weekly_price)
+            pricing_notes += "Howard Pod rooms can't be more than Band 2."
         if room.is_flat:
             band_price = Band.objects.get(band_name="1*").weekly_price
             pricing_notes += "Self-contained rooms must be Band 1*.\n"
+        if room.room_id == 182: # TODO - remove this for future years.
+            band_price = Band.objects.get(band_name="4").weekly_price
+            pricing_notes += "Inconsistency in K, Room 17 is Band 4."
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
         new_band = Band.objects.get(band_id=bands[band_price])
