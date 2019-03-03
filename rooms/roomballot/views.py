@@ -691,7 +691,7 @@ def students_list(request):
 def rooms_list(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        rooms = Room.objects.order_by('new_price')  # 'staircase', 'sort_number') # TODO: change this back
+        rooms = Room.objects.order_by('staircase', 'sort_number') # TODO: change this back
         return render(request, 'roomballot/rooms-list.html', {'rooms': rooms})
     except AdminUser.DoesNotExist:
         return error(request, 403)
