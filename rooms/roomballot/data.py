@@ -103,8 +103,42 @@ def get_data():
             try:
                 room = Room.objects.get(identifier=identifier)
 
+                print(identifier)
+                if floor != room.floor:
+                    print("Old floor: %s, New floor: %s", room.floor, floor)
+
+                if size != room.size:
+                    print("Old size: %s, New size: %s", room.size, size)
+
+                if is_double_bed != room.is_double_bed:
+                    print("Old double bed: %s, New double bed: %s", room.is_double_bed, is_double_bed)
+
+                if is_ensuite != room.is_ensuite:
+                    print("Old ensuite: %s, New ensuite: %s", room.is_ensuite, is_ensuite)
+
+                if year_last_renovated_kitchen != room.kitchen_last_renovated:
+                    print("Old kitchen: %s, New kitchen: %s", room.kitchen_last_renovated, year_last_renovated_kitchen)
+
+                if year_last_renovated_bathroom != room.bathroom_last_renovated:
+                    print("Old bathroom: %s, New bathroom: %s", room.bathroom_last_renovated, year_last_renovated_bathroom)
+
+                if year_last_renovated_room != room.room_last_renovated:
+                    print("Old room: %s, New room: %s", room.room_last_renovated, year_last_renovated_room)
+
+                if bathroom_sharing != room.bathroom_sharing:
+                    print("Old bathroom sharing: %s, New bathroom sharing: %s", room.bathroom_sharing, bathroom_sharing)
+
+                if facing_lensfield != room.faces_lensfield:
+                    print("Old Lensfield: %s, New Lensfield: %s", room.faces_lensfield, facing_lensfield)
+
+                if facing_court != room.faces_court:
+                    print("Old court: %s, New court: %s", room.faces_court, facing_court)
+                print()
+
             except Room.DoesNotExist:
-                room = Room()
+                #room = Room()
+                print("Room does not exist", identifier)
+            """
             room.identifier = identifier
             room.room_number = number
             room.floor = floor
@@ -142,6 +176,7 @@ def get_data():
             room.staircase = staircase
             room.save()
             successes += 1
+            """
         except Exception as e:
             errors.append(current_room + " - " + str(e))
     print("=== IMPORT REPORT ===")
