@@ -120,7 +120,8 @@ def get_data():
                     print("Old kitchen: %s, New kitchen: %s", room.kitchen_last_renovated, year_last_renovated_kitchen)
 
                 if year_last_renovated_bathroom != room.bathroom_last_renovated:
-                    print("Old bathroom: %s, New bathroom: %s", room.bathroom_last_renovated, year_last_renovated_bathroom)
+                    print("Old bathroom: %s, New bathroom: %s", room.bathroom_last_renovated,
+                          year_last_renovated_bathroom)
 
                 if year_last_renovated_room != room.room_last_renovated:
                     print("Old room: %s, New room: %s", room.room_last_renovated, year_last_renovated_room)
@@ -136,7 +137,7 @@ def get_data():
                 print()
 
             except Room.DoesNotExist:
-                #room = Room()
+                # room = Room()
                 print("Room does not exist", identifier)
             """
             room.identifier = identifier
@@ -188,3 +189,38 @@ def get_data():
     for error in errors:
         print(error)
         print()
+
+
+def write_bands():
+    s = sharepy.connect("downingcollege.sharepoint.com", sharepoint_user, sharepoint_password)
+    r = s.get(
+        "https://downingcollege.sharepoint.com/sites/RoomsBrowserJCR/_api/web/lists/GetByTitle('RoomsData')/Items?$select=Room_x0020_Identifier,New_x0020_Room_x0020_Band")
+    context_request = s.post("https://downingcollege.sharepoint.com/sites/RoomsBrowserJCR/_api/contextinfo")
+
+    update_headers = {
+        "Accept": "application/json; odata=verbose",
+        "Content-Type": "application/json; odata=verbose",
+        "odata": "verbose",
+        "X-RequestForceAuthentication": "true",
+        "X-RequestDigest": context_request.json()['d']['GetContextWebInformation']['FormDigestValue'],
+        "IF-MATCH": "*",
+        "X-HTTP-Method": "MERGE"
+    }
+
+    print(context_request.json()['d']['GetContextWebInformation']['FormDigestValue'])
+
+    for room in (r.json()['d'])['results']:
+
+        name = room['Room_x0020_Identifier']
+        identifier = name.split('(', 1)[-1].replace(')', '')
+
+        try:
+            r = Room.objects.get(identifier=identifier)
+            if r.type == 4:
+                continue
+            else:
+                uri = (room['__metadata'])['uri']
+                s.post(uri, json={"__metadata": {"type": "SP.Data.RoomsListItem"},
+                                         'New_x0020_Room_x0020_Band': r.new_band.band_name}, headers=update_headers)
+        except Room.DoesNotExist:
+            print("Couldn't find room", identifier)
