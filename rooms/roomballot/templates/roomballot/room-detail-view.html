@@ -47,8 +47,6 @@
             {% endfor %}
         </div>
         <div class="col-md-6">
-            <p class="mt-4">Please be aware that the room catalogue may change in advance of ballot weekend. Rooms listed
-            here may be taken out of the ballot at any time, and more rooms may be added in due course.</p>
             <table class="table table-bordered table-striped table-hover mt-4">
                 <thead style="display:none">
                 <tr>
@@ -91,11 +89,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><b>Previous Band</b></td>
-                    <td>{{ room.band }} (£{{ room.band.weekly_price_old }})</td>
-                </tr>
-                <tr>
-                    <td><b>New Band</b></td>
+                    <td><b>Band</b></td>
                     <td>{{ room.new_band }} (£{{ room.new_band.weekly_price }})<br>
                     <a href="/roomballot/room-pricing/{{ room.room_id }}" class="btn btn-primary mt-2">Why? <i class="fas fa-angle-right ml-2"></i></a></td></td>
                 </tr>

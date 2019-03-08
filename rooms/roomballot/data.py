@@ -194,7 +194,7 @@ def get_data():
 def write_bands():
     s = sharepy.connect("downingcollege.sharepoint.com", sharepoint_user, sharepoint_password)
     r = s.get(
-        "https://downingcollege.sharepoint.com/sites/RoomsBrowserJCR/_api/web/lists/GetByTitle('RoomsData')/Items?$select=Room_x0020_Identifier,New_x0020_Room_x0020_Band")
+        "https://downingcollege.sharepoint.com/sites/RoomsBrowserJCR/_api/web/lists/GetByTitle('RoomsData')/Items?$top=4000&select=Room_x0020_Identifier,New_x0020_Room_x0020_Band")
     context_request = s.post("https://downingcollege.sharepoint.com/sites/RoomsBrowserJCR/_api/contextinfo")
 
     update_headers = {
@@ -216,9 +216,7 @@ def write_bands():
 
         try:
             r = Room.objects.get(identifier=identifier)
-            if r.type == 4:
-                continue
-            else:
+            if r.type != 4:
                 uri = (room['__metadata'])['uri']
                 s.post(uri, json={"__metadata": {"type": "SP.Data.RoomsListItem"},
                                          'New_x0020_Room_x0020_Band': r.new_band.band_name}, headers=update_headers)
