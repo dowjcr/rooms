@@ -29,12 +29,25 @@
                     {% if can_pick %}
                         <p>It's time to pick your room.</p>
                     {% else %}
-                        <p>You can't pick your room quite yet.</p>
+                        <p>You can't pick your room right now. If you've missed your slot, get in touch by livechat
+                        or come to the ballot room.</p>
                     {% endif %}
                 {% endif %}
                 <a href="staircases" class="btn btn-primary">Browse Rooms <i class="fas fa-angle-right ml-2"></i></a>
             </div>
         </div>
+
+        {% if is_proxy %}
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="jumbotron">
+                <h3>Proxy</h3>
+                <p>Looks like you've been nominated as someone's proxy!</p>
+
+                <a href="proxy" class="btn btn-primary">Pick for Proxy <i class="fas fa-angle-right ml-2"></i></a>
+
+            </div>
+        </div>
+        {% endif %}
 
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <div class="jumbotron">

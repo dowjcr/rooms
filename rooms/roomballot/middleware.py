@@ -47,7 +47,7 @@ class AuthRequiredMiddleware(object):
                 if any(m.match(request.path_info.lstrip('/')) for m in PROXY_URLS):
                     return response
                 else:
-                    return HttpResponseRedirect('/roomballot/staircases')
+                    return HttpResponseRedirect('/roomballot/proxy')
             except ProxyUser.DoesNotExist:
                 # Redirects to admin page if only admin user.
                 try:

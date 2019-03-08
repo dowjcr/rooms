@@ -159,11 +159,13 @@ def student_dashboard(request):
     room = Room.objects.get(taken_by=student) if student.has_allocated else None
     reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
     can_leave_review = reviews_left.count() == 0
+    is_proxy = ProxyInstance.objects.filter(proxy_user_id=request.user.username).count() > 0
     can_pick = get_setting('current_student') == request.user.username and get_setting('ballot_in_progress') == 'true'
     return render(request, 'roomballot/dashboard-student.html', {'student': student,
                                                                  'room': room,
                                                                  'can_pick': can_pick,
-                                                                 'can_leave_review': can_leave_review})
+                                                                 'can_leave_review': can_leave_review,
+                                                                 'is_proxy': is_proxy})
 
 
 # ============ CREATE SYNDICATE ================

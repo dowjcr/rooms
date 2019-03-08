@@ -28,7 +28,7 @@
                 {% if room.taken_by is None and not student.has_allocated and selectable and room.type == 2 %}
                     <div align="right">
                         <a class="btn btn-primary mt-3 mb-2" href="{{ room.room_id }}/confirm-selection">Select this
-                            room</a>
+                            room <i class="fas fa-angle-right ml-2"></i></a>
                     </div>
                 {% elif room.type != 2 %}
                     <div align="center">
