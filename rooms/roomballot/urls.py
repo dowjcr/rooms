@@ -44,5 +44,6 @@ urlpatterns = [
     path('info/select-room', views.select_room_info, name='select-room-info'),
     path('info/pricing', views.pricing_info, name='pricing-info'),
     path('dashboard/review', views.leave_review, name='leave-review'),
+    path('admin/currently-picking', views.currently_picking, name='currently-picking'),
     path('about', views.about, name='about'),
 ]

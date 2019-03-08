@@ -983,3 +983,14 @@ def change_weights(request):
                            'in_progress': in_progress})
     except AdminUser.DoesNotExist:
         return error(request, 403)
+
+
+def currently_picking(request):
+    try:
+        currently_picking = Student.objects.get(user_id=get_setting('current_student'))
+        currently_picking_time = currently_picking.picks_at + datetime.timedelta(0, 300)
+    except Student.DoesNotExist:
+        currently_picking = None
+        currently_picking_time = None
+    return render(request, 'roomballot/currently-picking.html', {'currently_picking': currently_picking,
+                                                                 'currently_picking_time': currently_picking_time})

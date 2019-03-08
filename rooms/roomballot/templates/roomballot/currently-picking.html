@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<span style="background-color: black">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>Downing JCR RBS</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"
+          integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
+</head>
+<body style="background-color: black">
+
+
+<div class="container" style="height: 100%; padding-top: 200px">
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: center">
+                <h1 style="font-size: 10em;">{{ currently_picking }}</h1>
+                <h3>until {{ currently_picking_time }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</span>
+</html>
