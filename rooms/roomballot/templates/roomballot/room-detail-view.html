@@ -12,7 +12,7 @@
 
     <div class="border-bottom">
         <div class="row">
-            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                 <h2>{{ room }}</h2>
                 {% if room.type == 2 %}
                     {% if room.taken_by is not None %}
@@ -24,10 +24,14 @@
                     <p>This room is reserved for students who are outside the JCR ballot.</p>
                 {% endif %}
             </div>
-            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 text-center">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-center">
                 {% if room.taken_by is None and not student.has_allocated and selectable and room.type == 2 %}
-                    <div align="right">
-                        <a class="btn btn-primary mt-3 mb-2" href="{{ room.room_id }}/confirm-selection">Select this
+                    <div align="right" class="d-none d-md-block">
+                        <a class="btn btn-success mt-3 mb-2" style="min-width: 90%" href="{{ room.room_id }}/confirm-selection">Select this
+                            room <i class="fas fa-angle-right ml-2"></i></a>
+                    </div>
+                    <div class="d-md-none">
+                        <a class="btn btn-success mt-3 mb-5" style="width: 80%" href="{{ room.room_id }}/confirm-selection">Select this
                             room <i class="fas fa-angle-right ml-2"></i></a>
                     </div>
                 {% elif room.type != 2 %}
