@@ -167,7 +167,7 @@ def student_dashboard(request):
     student = Student.objects.get(user_id=request.user.username)
     room = Room.objects.get(taken_by=student) if student.has_allocated else None
     reviews_left = Review.objects.filter(author_id=student.user_id, room=room)
-    can_leave_review = reviews_left.count() == 0
+    can_leave_review = reviews_left.count() == 0 and get_setting('allow_review') == 'true'
     is_proxy = ProxyInstance.objects.filter(proxy_user_id=request.user.username).count() > 0
     can_pick = get_setting('current_student') == request.user.username and get_setting('ballot_in_progress') == 'true'
     return render(request, 'roomballot/dashboard-student.html', {'student': student,
