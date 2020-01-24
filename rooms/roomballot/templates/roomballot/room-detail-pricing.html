@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-
+    {% if show_prices %}
     <div class="row mb-4">
 
         <div class="col-md-6">
@@ -151,10 +151,6 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><b>Old Band</b></td>
-                    <td>{{ room.band }}</td>
-                </tr>
-                <tr>
                     <td><b>New Band</b></td>
                     <td>{{ room.new_band }}</td>
                 </tr>
@@ -165,6 +161,7 @@
                 </tbody>
             </table>
         </div>
+        {% endif %}
     </div>
 </div>
 

@@ -92,11 +92,13 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% if show_prices %}
                 <tr>
                     <td><b>Band</b></td>
                     <td>{{ room.new_band }} (£{{ room.new_band.weekly_price }})<br>
                     <a href="/roomballot/room-pricing/{{ room.room_id }}" class="btn btn-primary mt-2">Why? <i class="fas fa-angle-right ml-2"></i></a></td></td>
                 </tr>
+                {% endif %}
                 </tbody>
             </table>
             <table class="table table-bordered table-striped table-hover mt-4">

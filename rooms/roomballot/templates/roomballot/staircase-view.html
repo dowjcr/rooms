@@ -34,7 +34,7 @@
                     <th scope="col" class="d-none d-sm-table-cell">Size</th>
                     <th scope="col" class="d-none d-sm-table-cell">Ensuite</th>
                     <th scope="col" class="d-none d-sm-table-cell">Bed Type</th>
-                    <th scope="col">Band</th>
+                    {% if show_prices %}<th scope="col">Band</th>{% endif %}
                     <th scope="col">Occupant</th>
                 </tr>
                 </thead>
@@ -49,7 +49,7 @@
                     <td class="d-none d-sm-table-cell">{{ room.size }} m&#178;</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_ensuite %}Yes{% else %}No{% endif %}</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_double_bed %}Double{% else %}Single{% endif %}</td>
-                    <td>{{ room.new_band }}</td>
+                    {% if show_prices %}<td>{{ room.new_band }}</td>{% endif %}
                     <td>{% if room.type == 2 %}{{ room.taken_by }}{% else %}Outside Ballot{% endif %}</td>
                 </tr>
                 {% endfor %}

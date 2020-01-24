@@ -26,11 +26,14 @@ def room_detail(request, room_id):
         student = ProxyUser.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
     reviews = Review.objects.filter(room=room)
+    show_prices = get_setting('show_prices') == 'true' or AdminUser.objects.filter(
+        user_id=request.user.username).count() > 0
     selectable = get_setting('ballot_in_progress') == 'true' and get_setting('current_student') == request.user.username
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'images': Image.objects.filter(room=room),
                                                                 'student': student,
                                                                 'reviews': reviews,
+                                                                'show_prices': show_prices,
                                                                 'selectable': selectable})
 
 
@@ -43,11 +46,14 @@ def room_pricing(request, room_id):
     except Student.DoesNotExist:
         student = ProxyUser.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
+    show_prices = get_setting('show_prices') == 'true' or AdminUser.objects.filter(
+        user_id=request.user.username).count() > 0
     y = round(float(get_setting('feature_price')), 5)
     base_price = round(float(get_setting('base_price')), 2)
     return render(request, 'roomballot/room-detail-pricing.html', {'room': room,
                                                                    'student': student,
                                                                    'y': y,
+                                                                   'show_prices': show_prices,
                                                                    'base_price': base_price})
 
 
@@ -140,6 +146,8 @@ def staircase_detail(request, staircase_id):
         student = ProxyUser.objects.get(user_id=request.user.username)
     staircase = get_object_or_404(Staircase, pk=staircase_id)
     rooms = Room.objects.filter(staircase=staircase).exclude(type=4).order_by('sort_number')
+    show_prices = get_setting('show_prices') == 'true' or AdminUser.objects.filter(
+        user_id=request.user.username).count() > 0
     try:
         floorplan = Floorplan.objects.get(staircase=staircase)
     except:
@@ -147,6 +155,7 @@ def staircase_detail(request, staircase_id):
     return render(request, 'roomballot/staircase-view.html', {'staircase': staircase,
                                                               'rooms': rooms,
                                                               'floorplan': floorplan,
+                                                              'show_prices': show_prices,
                                                               'student': student})
 
 
@@ -693,7 +702,7 @@ def students_list(request):
 def rooms_list(request):
     try:
         AdminUser.objects.get(user_id=request.user.username)
-        rooms = Room.objects.order_by('staircase', 'sort_number') # TODO: change this back
+        rooms = Room.objects.order_by('staircase', 'sort_number')  # TODO: change this back
         return render(request, 'roomballot/rooms-list.html', {'rooms': rooms})
     except AdminUser.DoesNotExist:
         return error(request, 403)
@@ -770,15 +779,18 @@ def export_room_data(request):
     response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Room ID', 'Staircase', 'Number', 'Type', 'Old Band', 'New Band', 'New Price', 'Contract Length', 'Total', 'Occupant', 'CRSid'])
+    writer.writerow(
+        ['Room ID', 'Staircase', 'Number', 'Type', 'Old Band', 'New Band', 'New Price', 'Contract Length', 'Total',
+         'Occupant', 'CRSid'])
     for r in Room.objects.order_by('staircase', 'sort_number'):
         if r.contract_length == 37 and not r.identifier.__contains__("BL"):
             contract_length = 35
         else:
             contract_length = r.contract_length
-        writer.writerow([r.identifier, r.staircase, r.room_number, r.get_type_display(), r.band.band_name, r.new_band.band_name,
-                         r.new_band.weekly_price, contract_length, r.new_band.weekly_price * contract_length, r.taken_by,
-                         r.taken_by.user_id if r.taken_by else None])
+        writer.writerow(
+            [r.identifier, r.staircase, r.room_number, r.get_type_display(), r.band.band_name, r.new_band.band_name,
+             r.new_band.weekly_price, contract_length, r.new_band.weekly_price * contract_length, r.taken_by,
+             r.taken_by.user_id if r.taken_by else None])
     return response
 
 
