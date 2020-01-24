@@ -481,6 +481,7 @@ def pricing_info(request):
         student = ProxyUser.objects.get(user_id=request.user.username)
     return render(request, 'roomballot/info-pricing.html', {'student': student,
                                                             'base_price': get_setting('base_price'),
+                                                            'show_prices': get_setting('show_prices') == 'true',
                                                             'weight_ensuite': get_setting('weight_ensuite'),
                                                             'weight_bathroom': get_setting('weight_bathroom'),
                                                             'weight_double_bed': get_setting('weight_double_bed'),

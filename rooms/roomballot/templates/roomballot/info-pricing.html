@@ -35,6 +35,7 @@
                             and <b>Barney Walker</b>, JCR Vice-President 2019-20.<br><br>
                         </p>
 
+                        {% if show_prices %}
                         <table class="table table-striped">
                             <tr>
                                 <th>Band</th>
@@ -47,6 +48,7 @@
                             </tr>
                             {% endfor %}
                         </table>
+                        {% endif %}
 
                         <div id="accordion">
                             <div class="card">
