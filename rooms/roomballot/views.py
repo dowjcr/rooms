@@ -25,7 +25,7 @@ def room_detail(request, room_id):
     except Student.DoesNotExist:
         student = ProxyUser.objects.get(user_id=request.user.username)
     room = get_object_or_404(Room, pk=room_id)
-    reviews = Review.objects.filter(room=room)
+    reviews = Review.objects.filter(room=room).order_by('-review_id')
     show_prices = get_setting('show_prices') == 'true' or AdminUser.objects.filter(
         user_id=request.user.username).count() > 0
     selectable = get_setting('ballot_in_progress') == 'true' and get_setting('current_student') == request.user.username
@@ -808,7 +808,7 @@ def leave_review(request):
                 with transaction.atomic():
                     review = Review()
                     review.room = room
-                    review.author_name = str(student)
+                    review.author_name = str(student) + ", " + str(datetime.datetime.now().year)
                     review.author_id = student.user_id
                     review.title = form.cleaned_data['title']
                     review.layout_rating = form.cleaned_data['layout_rating']
