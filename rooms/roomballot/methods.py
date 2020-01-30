@@ -514,7 +514,6 @@ def add_to_syndicate(student, syndicate):
 # ============== ADD AFTER RANK ==================
 # Moves rank of individual student to first valid
 # position after rank given as argument.
-# TODO - this doesn't actually work. Fix it.
 
 def add_after_rank(student, rank):
     if get_setting('ballot_in_progress') == 'false':
@@ -523,23 +522,26 @@ def add_after_rank(student, rank):
             raise ConcurrencyException()
         else:
             with transaction.atomic():
+                user_id = student.user_id
+                print(user_id)
                 prior_syndicate = Student.objects.get(rank=rank).syndicate
+                print(prior_syndicate)
                 for rank in range(Syndicate.objects.order_by('-rank')[0].rank, prior_syndicate.rank, -1):
                     syndicate_to_update = Syndicate.objects.get(rank=rank)
+                    for s in Student.objects.filter(syndicate=syndicate_to_update):
+                        print(s.first_name, s.rank)
+                        s.rank = s.rank + 1
+                        print(s.first_name, s.rank)
+                        s.save()
                     syndicate_to_update.rank = syndicate_to_update.rank + 1
-                    for student in Student.objects.filter(syndicate=syndicate_to_update):
-                        student.rank = student.rank + 1
-                        print(student.first_name, student.rank)
-                        student.save()
                     syndicate_to_update.save()
                 syndicate_to_update = Syndicate.objects.get(syndicate_id=syndicate.syndicate_id)
                 syndicate_to_update.rank = prior_syndicate.rank + 1
                 syndicate_to_update.save()
                 new_rank = (Student.objects.filter(syndicate=prior_syndicate).order_by('-rank')[0]).rank + 1
-                print(new_rank)
-                student = Student.objects.get(user_id=student.user_id)
-                student.rank = new_rank
-                student.save()
+                student_to_update = Student.objects.get(user_id=user_id)
+                student_to_update.rank = new_rank
+                student_to_update.save()
 
 
 # ============= CREATE SYNDICATE =================
