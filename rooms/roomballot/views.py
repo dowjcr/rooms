@@ -31,6 +31,7 @@ def room_detail(request, room_id):
     selectable = get_setting('ballot_in_progress') == 'true' and get_setting('current_student') == request.user.username
     return render(request, 'roomballot/room-detail-view.html', {'room': room,
                                                                 'images': Image.objects.filter(room=room),
+                                                                'plans': RoomPlan.objects.filter(room=room),
                                                                 'student': student,
                                                                 'reviews': reviews,
                                                                 'show_prices': show_prices,

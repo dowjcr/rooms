@@ -92,6 +92,12 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% for plan in plans %}
+                <tr>
+                    <td><b>Floorplan</b></td>
+                    <td><a href="/media/{{ plan.file.url }}" class="btn btn-primary mt-2">Floorplan <i class="fas fa-angle-right ml-2"></i></a></td>
+                </tr>
+                {% endfor %}
                 {% if show_prices %}
                 <tr>
                     <td><b>Band</b></td>

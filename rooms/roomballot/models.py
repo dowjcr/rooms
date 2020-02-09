@@ -252,3 +252,15 @@ class ProxyInstance(models.Model):
     def __str__(self):
         return self.proxy_user_id + " picking for " + self.user_id
 
+
+# ================= ROOM PLAN ====================
+# Implements relationship allowing storage of pdf
+# floor plan per room.
+
+class RoomPlan(models.Model):
+    roomplan_id = models.AutoField(primary_key=True)
+    room = models.ForeignKey(Room, on_delete=models.SET_DEFAULT, default=None)
+    file = models.FileField(upload_to='room_plans')
+
+    def __str__(self):
+        return self.room.__str__() + " (Plan " + str(self.roomplan_id) + ")"
