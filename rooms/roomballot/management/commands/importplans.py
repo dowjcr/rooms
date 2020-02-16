@@ -11,9 +11,10 @@ class Command(BaseCommand):
         parser.add_argument('path', nargs='+', type=str)
 
     def handle(self, *args, **options):
-        entries = os.scandir(options['path'])
+        print(options['path'][0])
+        entries = os.scandir(options['path'][0])
         for entry in entries:
-            file = File(open(options['path'] + '/' + entry.name))
+            file = File(open(options['path'][0] + '/' + entry.name))
             rooms = Room.objects.filter(identifier=entry.split(".")[0])
             for room in rooms:
                 plan = RoomPlan()

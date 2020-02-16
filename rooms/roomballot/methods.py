@@ -125,8 +125,8 @@ def generate_price():
 
     # Iterating through rooms and populating counts.
     for r in Room.objects.exclude(type=4):
-        if r.contract_length == 37 and not r.identifier.__contains__("BL"):
-            contract_length = 35
+        if r.contract_length >= 37 and not r.identifier.__contains__("BL"):
+            contract_length = r.contract_length - 2
         else:
             contract_length = r.contract_length
         normalised_size = (min(r.size, 25) - min_size) / (min(max_size, 25) - min_size)
@@ -284,9 +284,6 @@ def round_to_bands():
         if room.is_flat:
             band_price = Band.objects.get(band_name="1*").weekly_price
             pricing_notes += "Self-contained rooms must be Band 1*.\n"
-        if room.room_id == 182: # TODO - remove this for future years.
-            band_price = Band.objects.get(band_name="4").weekly_price
-            pricing_notes += "Inconsistency in K, Room 17 is Band 4."
         if not room.is_flat:
             band_price = min(band_price, Band.objects.get(band_name="1").weekly_price)
         new_band = Band.objects.get(band_id=bands[band_price])

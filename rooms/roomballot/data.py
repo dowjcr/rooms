@@ -55,47 +55,19 @@ def get_data():
                 if number[0] == '0':
                     number = number[1:len(number)]
 
-            # Parsing disabled facilities.
             disabled_facilities = soup['DisabledFacilities'] == "Yes"
-
-            # Parsing floor.
             floor_str = soup['Floor']
             floor = int(floor_str) + 1
-
-            # Parsing size.
             size = float(soup['RoomSize'])
-
-            # Parsing band.
-            band = soup['Room_x005f_x0020_x005f_Band']
-
-            # Parsing bed.
             is_double_bed = soup['DoubleBed'] == "Yes"
-
-            # Parsing ensuite.
             is_ensuite = soup['Ensuite'] == "Yes"
-
-            # Parsing year bathroom last renovated.
             year_last_renovated_bathroom = int(soup['Yearlastrenovatedbathroom'].replace(',', ''))
-
-            # Parsing year kitchen last renovated.
             year_last_renovated_kitchen = int(soup['YearlastrenovatedKitchen'].replace(',', ''))
-
-            # Parsing year room last renovated.
             year_last_renovated_room = int(soup['Yearlastrenovatedroom'].replace(',', ''))
-
-            # Parsing bathroom sharing.
             bathroom_sharing = int(soup['Number_x005f_x0020_x005f_of_x005f_x0020_x005f_people_x005f_x00'])
-
-            # Parsing contract length.
             contract_length = int(soup['ContractLength'])
-
-            # Parsing facing court.
             facing_court = soup['Facing_x005f_x0020_x005f_Court'] == "Yes" and not identifier.__contains__('LR')
-
-            # Parsing facing Lensfield Road / Regent St.
             facing_lensfield = soup['Facing_x005f_x0020_x005f_Lensfield_x005f_x0020_x005f_Roa'] == "Yes"
-
-            # Parsing in ballot.
             in_ballot = soup['IntheBallot'] == "Yes"
             occupancy = soup['Occupancy']
 
@@ -105,36 +77,38 @@ def get_data():
 
                 print(identifier)
                 if floor != room.floor:
-                    print("Old floor: %s, New floor: %s", room.floor, floor)
+                    print("Old floor: %s, New floor: %s" % (room.floor, floor))
 
                 if size != room.size:
-                    print("Old size: %s, New size: %s", room.size, size)
+                    print("Old size: %s, New size: %s" % (room.size, size))
 
                 if is_double_bed != room.is_double_bed:
-                    print("Old double bed: %s, New double bed: %s", room.is_double_bed, is_double_bed)
+                    print("Old double bed: %s, New double bed: %s" % (room.is_double_bed, is_double_bed))
 
                 if is_ensuite != room.is_ensuite:
-                    print("Old ensuite: %s, New ensuite: %s", room.is_ensuite, is_ensuite)
+                    print("Old ensuite: %s, New ensuite: %s" % (room.is_ensuite, is_ensuite))
 
                 if year_last_renovated_kitchen != room.kitchen_last_renovated:
-                    print("Old kitchen: %s, New kitchen: %s", room.kitchen_last_renovated, year_last_renovated_kitchen)
+                    print("Old kitchen: %s, New kitchen: %s" % (room.kitchen_last_renovated,
+                          year_last_renovated_kitchen))
 
-                if year_last_renovated_bathroom != room.bathroom_last_renovated:
-                    print("Old bathroom: %s, New bathroom: %s", room.bathroom_last_renovated,
-                          year_last_renovated_bathroom)
+                    if year_last_renovated_bathroom != room.bathroom_last_renovated:
+                        print("Old bathroom: %s, New bathroom: %s" % (room.bathroom_last_renovated,
+                                                                      year_last_renovated_bathroom))
 
-                if year_last_renovated_room != room.room_last_renovated:
-                    print("Old room: %s, New room: %s", room.room_last_renovated, year_last_renovated_room)
+                    if year_last_renovated_room != room.room_last_renovated:
+                        print("Old room: %s, New room: %s" % (room.room_last_renovated, year_last_renovated_room))
 
-                if bathroom_sharing != room.bathroom_sharing:
-                    print("Old bathroom sharing: %s, New bathroom sharing: %s", room.bathroom_sharing, bathroom_sharing)
+                    if bathroom_sharing != room.bathroom_sharing:
+                        print("Old bathroom sharing: %s, New bathroom sharing: %s" % (
+                            room.bathroom_sharing, bathroom_sharing))
 
-                if facing_lensfield != room.faces_lensfield:
-                    print("Old Lensfield: %s, New Lensfield: %s", room.faces_lensfield, facing_lensfield)
+                    if facing_lensfield != room.faces_lensfield:
+                        print("Old Lensfield: %s, New Lensfield: %s" % (room.faces_lensfield, facing_lensfield))
 
-                if facing_court != room.faces_court:
-                    print("Old court: %s, New court: %s", room.faces_court, facing_court)
-                print()
+                    if facing_court != room.faces_court:
+                        print("Old court: %s, New court: %s" % (room.faces_court, facing_court))
+                    print()
 
             except Room.DoesNotExist:
                 # room = Room()
@@ -145,7 +119,9 @@ def get_data():
             room.floor = floor
             room.has_disabled_facilities = disabled_facilities
             room.band = Band.objects.get(band_name=band)
+            """
             room.size = size
+            """
             room.is_double_bed = is_double_bed
             room.is_ensuite = is_ensuite
             room.faces_court = facing_court
@@ -153,18 +129,21 @@ def get_data():
             room.bathroom_last_renovated = year_last_renovated_bathroom
             room.room_last_renovated = year_last_renovated_room
             room.kitchen_last_renovated = year_last_renovated_kitchen
+            """
             if contract_length > 0:
                 room.contract_length = contract_length
+            """
             if room.sort_number is None:
                 room.sort_number = number
             room.bathroom_sharing = min(bathroom_sharing, 5)
+            """
             if occupancy == 'UG':
                 room.type = 2 if in_ballot else 3
             elif occupancy == 'Fresher':
                 room.type = 1
             else:
                 room.type = 4
-
+            """
             try:
                 staircase = Staircase.objects.get(identifier=staircase_identifier)
             except Staircase.DoesNotExist:
@@ -175,9 +154,10 @@ def get_data():
                 staircase.save()
 
             room.staircase = staircase
+            """
             room.save()
             successes += 1
-            """
+
         except Exception as e:
             errors.append(current_room + " - " + str(e))
     print("=== IMPORT REPORT ===")
@@ -219,6 +199,6 @@ def write_bands():
             if r.type != 4:
                 uri = (room['__metadata'])['uri']
                 s.post(uri, json={"__metadata": {"type": "SP.Data.RoomsListItem"},
-                                         'New_x0020_Room_x0020_Band': r.new_band.band_name}, headers=update_headers)
+                                  'New_x0020_Room_x0020_Band': r.new_band.band_name}, headers=update_headers)
         except Room.DoesNotExist:
             print("Couldn't find room", identifier)

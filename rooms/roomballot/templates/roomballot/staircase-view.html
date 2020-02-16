@@ -46,7 +46,7 @@
                     <tr class="alert-success clickable-row" data-href="../room/{{ room.room_id }}" style="cursor: pointer;">
                     {% endif %}
                     <td><b>{{ room.room_number }}</b></td>
-                    <td class="d-none d-sm-table-cell">{{ room.size }} m&#178;</td>
+                    <td class="d-none d-sm-table-cell">{{ room.size|floatformat:"0" }} m&#178;</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_ensuite %}Yes{% else %}No{% endif %}</td>
                     <td class="d-none d-sm-table-cell">{% if room.is_double_bed %}Double{% else %}Single{% endif %}</td>
                     {% if show_prices %}<td>{{ room.new_band }}</td>{% endif %}
