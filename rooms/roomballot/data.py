@@ -70,6 +70,7 @@ def get_data():
             facing_lensfield = soup['Facing_x005f_x0020_x005f_Lensfield_x005f_x0020_x005f_Roa'] == "Yes"
             in_ballot = soup['IntheBallot'] == "Yes"
             occupancy = soup['Occupancy']
+            is_battcock = identifier.__contains__("BL")
 
             # If room already exists.
             try:
@@ -113,37 +114,36 @@ def get_data():
             except Room.DoesNotExist:
                 # room = Room()
                 print("Room does not exist", identifier)
-            """
+
             room.identifier = identifier
             room.room_number = number
             room.floor = floor
             room.has_disabled_facilities = disabled_facilities
-            room.band = Band.objects.get(band_name=band)
-            """
             room.size = size
             room.is_double_bed = is_double_bed
             room.is_ensuite = is_ensuite
-            """
-            room.faces_court = facing_court
-            room.faces_lensfield = facing_lensfield
             room.bathroom_last_renovated = year_last_renovated_bathroom
             room.room_last_renovated = year_last_renovated_room
             room.kitchen_last_renovated = year_last_renovated_kitchen
-            """
+
+            if not is_battcock:
+                room.faces_court = facing_court
+                room.faces_lensfield = facing_lensfield
+
             if contract_length > 0:
                 room.contract_length = contract_length
-            """
+
             if room.sort_number is None:
                 room.sort_number = number
             room.bathroom_sharing = min(bathroom_sharing, 5)
-            """
+
             if occupancy == 'UG':
                 room.type = 2 if in_ballot else 3
             elif occupancy == 'Fresher':
                 room.type = 1
             else:
                 room.type = 4
-            """
+
             try:
                 staircase = Staircase.objects.get(identifier=staircase_identifier)
             except Staircase.DoesNotExist:
@@ -154,7 +154,6 @@ def get_data():
                 staircase.save()
 
             room.staircase = staircase
-            """
             room.save()
             successes += 1
 

@@ -912,10 +912,10 @@ def analytics(request):
         for r in jcr_rooms.order_by('-new_band'):
             jcr_prices.append(r.band.weekly_price)
             jcr_new_prices.append(r.new_band.weekly_price)
-            if r.contract_length == 37 and not r.identifier.__contains__("BL"):
-                jcr_total_prices.append(r.band.weekly_price_old * 35)
-                jcr_total_new_prices.append(r.new_band.weekly_price * 35)
-                contract_weeks += 35
+            if r.contract_length >= 36 and not r.identifier.__contains__("BL"):
+                jcr_total_prices.append(r.band.weekly_price_old * (r.contract_length - 2))
+                jcr_total_new_prices.append(r.new_band.weekly_price * (r.contract_length - 2))
+                contract_weeks += (r.contract_length - 2)
             else:
                 jcr_total_prices.append(r.band.weekly_price_old * r.contract_length)
                 jcr_total_new_prices.append(r.new_band.weekly_price * r.contract_length)
