@@ -92,23 +92,23 @@ def get_data():
                     print("Old kitchen: %s, New kitchen: %s" % (room.kitchen_last_renovated,
                           year_last_renovated_kitchen))
 
-                    if year_last_renovated_bathroom != room.bathroom_last_renovated:
-                        print("Old bathroom: %s, New bathroom: %s" % (room.bathroom_last_renovated,
-                                                                      year_last_renovated_bathroom))
+                if year_last_renovated_bathroom != room.bathroom_last_renovated:
+                    print("Old bathroom: %s, New bathroom: %s" % (room.bathroom_last_renovated,
+                                                                  year_last_renovated_bathroom))
 
-                    if year_last_renovated_room != room.room_last_renovated:
-                        print("Old room: %s, New room: %s" % (room.room_last_renovated, year_last_renovated_room))
+                if year_last_renovated_room != room.room_last_renovated:
+                    print("Old room: %s, New room: %s" % (room.room_last_renovated, year_last_renovated_room))
 
-                    if bathroom_sharing != room.bathroom_sharing:
-                        print("Old bathroom sharing: %s, New bathroom sharing: %s" % (
-                            room.bathroom_sharing, bathroom_sharing))
+                if bathroom_sharing != room.bathroom_sharing:
+                    print("Old bathroom sharing: %s, New bathroom sharing: %s" % (
+                        room.bathroom_sharing, bathroom_sharing))
 
-                    if facing_lensfield != room.faces_lensfield:
-                        print("Old Lensfield: %s, New Lensfield: %s" % (room.faces_lensfield, facing_lensfield))
+                if facing_lensfield != room.faces_lensfield:
+                    print("Old Lensfield: %s, New Lensfield: %s" % (room.faces_lensfield, facing_lensfield))
 
-                    if facing_court != room.faces_court:
-                        print("Old court: %s, New court: %s" % (room.faces_court, facing_court))
-                    print()
+                if facing_court != room.faces_court:
+                    print("Old court: %s, New court: %s" % (room.faces_court, facing_court))
+                print()
 
             except Room.DoesNotExist:
                 # room = Room()
@@ -121,9 +121,9 @@ def get_data():
             room.band = Band.objects.get(band_name=band)
             """
             room.size = size
-            """
             room.is_double_bed = is_double_bed
             room.is_ensuite = is_ensuite
+            """
             room.faces_court = facing_court
             room.faces_lensfield = facing_lensfield
             room.bathroom_last_renovated = year_last_renovated_bathroom
