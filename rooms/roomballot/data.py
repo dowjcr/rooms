@@ -109,12 +109,19 @@ def get_data():
 
                 if facing_court != room.faces_court:
                     print("Old court: %s, New court: %s" % (room.faces_court, facing_court))
+
+                if occupancy == 'UG':
+                    if in_ballot and not room.type == 2:
+                        print("Should be in the ballot")
+                    elif not in_ballot and not room.type == 3:
+                        print("Shouldn't be in the ballot")
+
                 print()
 
             except Room.DoesNotExist:
                 # room = Room()
                 print("Room does not exist", identifier)
-
+            """
             room.identifier = identifier
             room.room_number = number
             room.floor = floor
@@ -156,7 +163,7 @@ def get_data():
             room.staircase = staircase
             room.save()
             successes += 1
-
+            """
         except Exception as e:
             errors.append(current_room + " - " + str(e))
     print("=== IMPORT REPORT ===")

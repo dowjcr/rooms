@@ -35,15 +35,21 @@
                     <th scope="col">Name</th>
                     <th scope="col" class="d-none d-sm-table-cell">CRSid</th>
                     <th scope="col" class="d-none d-sm-table-cell">Picks at</th>
+                    <th scope="col">Picked</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for student in students %}
-                <tr class="clickable-row" data-href="student/{{ student.user_id }}" style="cursor: pointer;">
-                    <td>{{ student.rank }}</td>
-                    <td>{{ student.first_name }} {{ student.surname }}</td>
-                    <td class="d-none d-sm-table-cell">{{ student.user_id }}</td>
-                    <td class="d-none d-sm-table-cell">{{ student.picks_at }}</td>
+                {% for s in students %}
+                <tr class="clickable-row" data-href="student/{{ s.user_id }}" style="cursor: pointer;">
+                    <td>{{ s.rank }}</td>
+                    <td>{{ s.first_name }} {{ s.surname }}</td>
+                    <td class="d-none d-sm-table-cell">{{ s.user_id }}</td>
+                    <td class="d-none d-sm-table-cell">{{ s.picks_at }}</td>
+                    <td>{% if s.has_allocated %}
+                            <i class="fas fa-check"></i>
+                        {% else %}
+                            <i class="fas fa-times"></i>
+                        {% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
