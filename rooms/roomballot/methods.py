@@ -269,9 +269,6 @@ def round_to_bands():
     for room in Room.objects.exclude(new_price=None):
         pricing_notes = ""
         band_price = min(bands, key=lambda x: abs(x - room.new_price))
-        if room.is_ensuite:
-            band_price = max(band_price, Band.objects.get(band_name="7").weekly_price)
-            pricing_notes += "An ensuite room must be at least Band 7.\n"
         if room.identifier.__contains__("LR") and room.floor >= 3:
             band_price = min(band_price, Band.objects.get(band_name="3").weekly_price)
             pricing_notes += "Top floor Lensfield rooms can't be more than Band 3.\n"
@@ -723,6 +720,8 @@ def update_current_student():
             while student_picking.has_allocated:
                 slot_datetime += datetime.timedelta(minutes=5)
                 student_picking = Student.objects.get(picks_at=slot_datetime)
+            if get_setting('current_student') != student_picking.user_id:
+                invite_selection(student_picking)
             set_setting('current_student', student_picking.user_id)
             logger.info("Updated currently picking student [" + student_picking.user_id + "]")
         except Student.DoesNotExist:
