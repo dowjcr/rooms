@@ -40,9 +40,7 @@ class Syndicate(models.Model):
 
 
 # ================ STAIRCASE =====================
-# Represents a staircase. Stores information about
-# given staircase, and implements many-to-one
-# relationship to PriceCategory.
+# Represents a staircase.
 
 class Staircase(models.Model):
     staircase_id = models.AutoField(primary_key=True)

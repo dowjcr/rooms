@@ -785,8 +785,8 @@ def export_room_data(request):
         ['Room ID', 'Staircase', 'Number', 'Type', 'Old Band', 'New Band', 'New Price', 'Contract Length', 'Total',
          'Occupant', 'CRSid'])
     for r in Room.objects.order_by('staircase', 'sort_number'):
-        if r.contract_length == 37 and not r.identifier.__contains__("BL"):
-            contract_length = 35
+        if r.contract_length >= 36 and not r.identifier.__contains__("BL"):
+            contract_length = r.contract_length - 2
         else:
             contract_length = r.contract_length
         writer.writerow(
