@@ -1,4 +1,4 @@
-Django==2.0.11
+Django==2.2.10
 django-ucamwebauth
 Pillow
 numpy
