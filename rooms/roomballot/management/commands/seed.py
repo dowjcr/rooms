@@ -10,7 +10,7 @@ class Command(BaseCommand):
         setting_names_set_zero = ['weight_ground_floor', 'weight_facing_court', 'weight_facing_lensfield',
                          'feature_price', 'weight_flat', 'weight_renovated_facilities', 'weight_renovated_room',
                          'weight_bathroom', 'total', 'weight_size', 'weight_double_bed', 'weight_ensuite', 'base_price']
-        setting_names_set_false = ['randomised', 'ballot_in_progress']
+        setting_names_set_false = ['allow_review', 'show_prices', 'randomised', 'ballot_in_progress']
         setting_names_set_none = ['current_student', 'start_date']
         with transaction.atomic():
             for name in setting_names_set_zero:

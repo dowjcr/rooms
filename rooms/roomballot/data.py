@@ -119,9 +119,9 @@ def get_data():
                 print()
 
             except Room.DoesNotExist:
-                # room = Room()
+                room = Room()
                 print("Room does not exist", identifier)
-            """
+
             room.identifier = identifier
             room.room_number = number
             room.floor = floor
@@ -163,7 +163,7 @@ def get_data():
             room.staircase = staircase
             room.save()
             successes += 1
-            """
+
         except Exception as e:
             errors.append(current_room + " - " + str(e))
     print("=== IMPORT REPORT ===")
