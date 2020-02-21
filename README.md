@@ -59,9 +59,10 @@ Instructions on how to serve Django in production are widely available; `mod_wsg
 - [**Bootstrap 4.1.1**](https://getbootstrap.com)
 - [**Lookup API**](https://www.lookup.cam.ac.uk/doc/ws-doc/)
 
-## Authors
+## Contributors
 
 - [**Cameron O'Connor**](https://github.com/cjoc), JCR Internet Officer 2018-19
+- [**Lawrence Brown**](https://github.com/albino), JCR Internet Officer 2020-21
 
 ## Licence
 
