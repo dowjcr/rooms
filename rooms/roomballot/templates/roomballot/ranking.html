@@ -46,9 +46,9 @@
                     <td class="d-none d-sm-table-cell">{{ s.user_id }}</td>
                     <td class="d-none d-sm-table-cell">{{ s.picks_at }}</td>
                     <td>{% if s.has_allocated %}
-                            <i class="fas fa-check"></i>
+                            <i class="fas fa-check" style="color: #228B22"></i>
                         {% else %}
-                            <i class="fas fa-times"></i>
+                            <i class="fas fa-times" style="color: #8B0000"></i>
                         {% endif %}</td>
                 </tr>
                 {% endfor %}
@@ -59,11 +59,10 @@
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
             <div class="d-md-block">
             <div class="list-group">
-                <p class="list-group-item"><b>Questions?</b></p>
                 <p class="list-group-item">
-                    If you're unsure about the ballot process, please consult the Knowledge Base.
+                    If you have any questions about the ballot process, please consult the knowledge base.
                 </p>
-                <a class="list-group-item" href="/roomballot/info">Knowledge Base</a>
+                <a class="list-group-item" href="/roomballot/info">Knowledge Base<i class="fas fa-angle-right ml-2"></i></a>
             </div>
         </div>
     </div>

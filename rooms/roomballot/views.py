@@ -74,6 +74,7 @@ def room_selection_confirm(request, room_id):
             else:
                 if can_allocate:
                     allocate_room(room, student)
+                    update_current_student()
                     response_code = 1
                 else:
                     response_code = 404
