@@ -433,6 +433,7 @@ def remove_from_ballot(student):
             student_to_update.syndicate = None
             student_to_update.accepted_syndicate = False
             student_to_update.in_ballot = False
+            student_to_update.picks_at = None
             student_to_update.save()
             number_in_ballot = Student.objects.order_by('-rank')[0].rank
             # Now decrease rank of all subsequent students.
